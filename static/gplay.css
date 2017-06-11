@@ -3,6 +3,10 @@ body {
   padding-bottom: 20px;
 }
 
+.container {
+  width: 900px;
+}
+
 .header {
   margin-bottom: 30px;
 }

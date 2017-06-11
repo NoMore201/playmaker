@@ -19,16 +19,23 @@ function fillTable(apps) {
 }
 
 function search() {
+  let app = document.getElementById('searchInput').value;
+  if (app.length === 0) {
+    // error
+    return;
+  }
   let headers = new Headers();
-  headers.append("Content-Type", "text/plain");
+  headers.append('Content-Type', 'application/json');
+  let form = new FormData();
+  form.append('search', app);
 
   fetch('/gplay/search', {
     method: 'POST',
-    headers: headers
+    headers: headers,
+    body: JSON.stringify({ 'search': app })
   }).then(response => {
     return response.text();
   }).then(text => {
-    console.log(text);
     let apps = JSON.parse(text);
     if (apps.length === 0)
       return;
@@ -38,21 +45,13 @@ function search() {
   });
 }
 
-function onClickSearch() {
-  let input = document.getElementById('searchInput');
-  console.log(input.value);
-  search();
-}
-
 switch (window.location.pathname) {
   case '/':
-    console.log('home');
     break;
   case '/search':
     document.getElementById('searchBtn')
-      .onclick = onClickSearch;
+      .onclick = search;
     break;
   case '/config':
-    console.log('config');
     break;
 }
