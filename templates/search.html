@@ -15,10 +15,10 @@
       <div class="header clearfix">
       <nav>
         <ul class="nav nav-pills pull-right">
-          <li role="presentation" class="active">
+          <li role="presentation">
             <a href="/">Apps</a>
           </li>
-          <li role="presentation">
+          <li role="presentation" class="active">
             <a href="/search">Search</a>
           </li>
           <li role="presentation">
@@ -28,8 +28,17 @@
       </nav>
       <h2 class="apptitle">Playmaker</h2>
       </div>
-      
-      <div id "devlog"></div>
+      <div class="row">
+        <div id="searchBox">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for..." id="searchInput">
+            <span class="input-group-btn">
+              <button class="btn btn-primary" type="button" id="searchBtn">Search</button>
+            </span>
+          </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+      </div>
+      <div id="searchTable"></div>
     </div>
     <script src="{{ url_for('static', filename='gplay.js') }}"></script>
   </body>

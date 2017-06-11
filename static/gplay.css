@@ -1,0 +1,19 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.apptitle {
+  margin: 0;
+  padding: 0;
+}
+
+#searchBox {
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 40px;
+}
