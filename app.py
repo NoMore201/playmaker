@@ -5,16 +5,15 @@ import configparser
 import urllib.request
 from urllib.error import URLError
 import os
+import sys
 import json
 
 
-def get_token(config, configFile):
+def get_token(config):
     print('Retrieving token from %s' % config['Main']['tokenurl'])
     r = urllib.request.urlopen(config['Main']['tokenurl'])
     token = r.read().decode('utf-8')
     config['Main']['token'] = token
-    with open(configFile, 'w') as cfgfile:
-        config.write(cfgfile)
     return token
 
 
@@ -22,32 +21,43 @@ class Play(object):
     def __init__(self):
         self.config = configparser.ConfigParser()
         config_paths = [
-            'playmaker.conf',
             os.path.expanduser('~') + '/.config/playmaker.conf',
-            '/etc/playmaker.conf']
+            '/etc/playmaker.conf',
+            'playmaker.conf'
+        ]
         while not os.path.isfile(config_paths[0]):
             config_paths.pop(0)
             if len(config_paths) == 0:
                 raise OSError('No configuration file found')
-        self.configFilePath = config_paths[0]
+                sys.exit(1)
         self.config.read(config_paths[0])
+        self.set_download_folder('.')
         self.service = GooglePlayAPI(self.config['Main']['id'], 'en_US', True)
         if self.config['Main']['token'] == '':
             try:
-                token = get_token(self.config, self.configFilePath)
+                for i in range(1, 4):
+                    print('#%d try' % i)
+                    token = get_token(self.config)
+                    if token == "":
+                        continue
+                    else:
+                        break
+                if token == "":
+                    raise LoginError()
+                    sys.exit(1)
                 self.service.login(None, None, token)
             except URLError:
                 print('Failed to fetch url, try again in a few minutes')
-                quit()
+                sys.exit(1)
             except LoginError:
                 print('Login failed')
-                quit()
+                sys.exit(1)
         else:
             try:
                 self.service.login(None, None, self.config['Main']['token'])
             except LoginError:
                 print('Login failed')
-                quit()
+                sys.exit(1)
 
     def search(self, appName, numItems=5):
         results = self.service.search(appName, numItems, None).doc
@@ -74,7 +84,7 @@ class Play(object):
         return json.dumps(all_apps)
 
     def set_download_folder(self, folder):
-        self.config['download_folder_path'] = folder
+        self.config['Main']['download_path'] = folder
 
     def file_size(self, num):
         for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
