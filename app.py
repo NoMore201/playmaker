@@ -103,13 +103,6 @@ class Play(object):
             current = results.entry[pos]
             doc = current.doc
             appDetails = doc.details.appDetails
-            #if any([
-            #    appDetails.uploadDate == '',
-            #    doc.docid == '',
-            #    doc.title == ''
-            #]):
-                # no result found, so we avoid creating the entry
-            #    continue
             details[apk] = {
                'title': doc.title,
                'developer': doc.creator,
