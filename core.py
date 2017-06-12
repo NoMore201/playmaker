@@ -30,10 +30,12 @@ def search_app():
 
 @app.route('/gplay/dl', methods=['POST'])
 def download_app():
-    print(service.download_selection([
-        'org.mozilla.firefox',
-        'com.whatsapp.whatsapp'
-    ]))
+    return service.download_selection(request.json['download'])
+
+    
+@app.route('/gplay/check', methods=['POST'])
+def check_local():
+    return service.check_local_apks()
 
 
 if __name__ == '__main__':

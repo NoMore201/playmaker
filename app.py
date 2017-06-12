@@ -1,5 +1,6 @@
 from googleplay_api.googleplay import GooglePlayAPI, LoginError
 from google.protobuf.message import DecodeError
+from pyaxmlparser import APK
 
 import configparser
 import urllib.request
@@ -10,16 +11,16 @@ import json
 
 
 def get_token(config):
-    print('Retrieving token from %s' % config['Main']['tokenurl'])
-    r = urllib.request.urlopen(config['Main']['tokenurl'])
+    print('Retrieving token from %s' % config['tokenurl'])
+    r = urllib.request.urlopen(config['tokenurl'])
     token = r.read().decode('utf-8')
-    config['Main']['token'] = token
+    config['token'] = token
     return token
 
 
 class Play(object):
     def __init__(self):
-        self.config = configparser.ConfigParser()
+        self.configparser = configparser.ConfigParser()
         config_paths = [
             os.path.expanduser('~') + '/.config/playmaker.conf',
             '/etc/playmaker.conf',
@@ -30,12 +31,16 @@ class Play(object):
             if len(config_paths) == 0:
                 raise OSError('No configuration file found')
                 sys.exit(1)
-        self.config.read(config_paths[0])
+        self.configparser.read(config_paths[0])
+        self.config = dict()
+        for key, value in self.configparser.items('Main'):
+            self.config[key] = value
         self.set_download_folder('.')
-        self.service = GooglePlayAPI(self.config['Main']['id'], 'en_US', True)
-        if self.config['Main']['token'] == '':
+        self.service = GooglePlayAPI(self.config['id'], 'en_US', True)
+        if self.config['token'] == '':
             try:
                 for i in range(1, 4):
+                    # TODO: add verbose log
                     print('#%d try' % i)
                     token = get_token(self.config)
                     if token == "":
@@ -54,7 +59,7 @@ class Play(object):
                 sys.exit(1)
         else:
             try:
-                self.service.login(None, None, self.config['Main']['token'])
+                self.service.login(None, None, self.config['token'])
             except LoginError:
                 print('Login failed')
                 sys.exit(1)
@@ -84,7 +89,7 @@ class Play(object):
         return json.dumps(all_apps)
 
     def set_download_folder(self, folder):
-        self.config['Main']['download_path'] = folder
+        self.config['download_path'] = folder
 
     def file_size(self, num):
         for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
@@ -120,7 +125,7 @@ class Play(object):
         failed = list()
         unavail = list()
 
-        downloadPath = self.config['Main']['download_path']
+        downloadPath = self.config['download_path']
         if not os.path.isdir(downloadPath):
             os.mkdir(downloadPath)
         details = self.get_bulk_details(apksList)
@@ -149,3 +154,38 @@ class Play(object):
             'failed': failed,
             'unavail': unavail
         })
+
+    def check_local_apks(self):
+        downloadPath = self.config['download_path']
+        print(os.listdir(downloadPath))
+        apksList = [apk for apk in os.listdir(downloadPath)
+                    if os.path.splitext(apk)[1] == '.apk']
+        if len(apksList) > 0:
+            # TODO: add verbose log
+            print('Checking local apks..')
+            toSearch = list()
+            for apk in apksList:
+                filepath = os.path.join(downloadPath, apk)
+                a = APK(filepath)
+                packageName = a.package
+                toSearch.append(packageName)
+            if len(toSearch) == 0:
+                raise Exception('Error retrieving package names from apk')
+                sys.exit(1)
+            details = self.get_bulk_details(toSearch)
+            toUpdate = list()
+            for apk in apksList:
+                filepath = os.path.join(downloadPath, apk)
+                a = APK(filepath)
+                localVersion = int(a.version_code)
+                packageName = a.package
+                onlineVersion = details.get(packageName)['version']
+                print('%d == %d ?' % (localVersion, onlineVersion))
+                if localVersion != onlineVersion:
+                    print('Package %s needs to be updated' % packageName)
+                    toUpdate.append(packageName)
+                else:
+                    print('Package %s is up to date' % packageName)
+            return json.dumps(toUpdate)
+        else:
+            return '[]'
