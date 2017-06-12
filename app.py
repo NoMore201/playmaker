@@ -103,13 +103,13 @@ class Play(object):
             current = results.entry[pos]
             doc = current.doc
             appDetails = doc.details.appDetails
-            if any([
-                appDetails.uploadDate == '',
-                doc.docid == '',
-                doc.title == ''
-            ]):
+            #if any([
+            #    appDetails.uploadDate == '',
+            #    doc.docid == '',
+            #    doc.title == ''
+            #]):
                 # no result found, so we avoid creating the entry
-                continue
+            #    continue
             details[apk] = {
                'title': doc.title,
                'developer': doc.creator,
@@ -117,7 +117,7 @@ class Play(object):
                'numDownloads': appDetails.numDownloads,
                'uploadDate': appDetails.uploadDate,
                'docId': doc.docid,
-               'version': str(appDetails.versionCode),
+               'version': appDetails.versionCode,
                'stars': '%.2f' % doc.aggregateRating.starRating
             }
         return details
@@ -132,4 +132,27 @@ class Play(object):
             os.mkdir(downloadPath)
         details = self.get_bulk_details(apksList)
         for appname, appdetails in details.items():
-            print(appdetails)
+            print('Downloading %s' % appname)
+            try:
+                data = self.service.download(appname, appdetails['version'])
+                success.append(appname)
+                print('Done!')
+            except IndexError as exc:
+                print('Package %s does not exists' % appname)
+                unavail.append(appname)
+            except Exception as exc:
+                print('Failed to download %s' % appname)
+                failed.append(appname)
+            else:
+                filename = appname + '.apk'
+                filepath = os.path.join(downloadPath, filename)
+                try:
+                    open(filepath, 'wb').write(data)
+                except IOError as exc:
+                    print('Error while writing %s: %s' % (filename, exc))
+                    failed.append(appname)
+        return json.dumps({
+            'success': success,
+            'failed': failed,
+            'unavail': unavail
+        })

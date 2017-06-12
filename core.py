@@ -28,5 +28,13 @@ def search_app():
     return service.search(request.json['search'])
 
 
+@app.route('/gplay/dl', methods=['POST'])
+def download_app():
+    print(service.download_selection([
+        'org.mozilla.firefox',
+        'com.whatsapp.whatsapp'
+    ]))
+
+
 if __name__ == '__main__':
     app.run()

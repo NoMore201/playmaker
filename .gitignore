@@ -1,5 +1,6 @@
 *.pyc
 **/__pycache__/
 *.swp
+*.apk
 .tern-project
 .jshintrc
