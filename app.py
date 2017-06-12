@@ -103,6 +103,13 @@ class Play(object):
             current = results.entry[pos]
             doc = current.doc
             appDetails = doc.details.appDetails
+            if any([
+                appDetails.uploadDate == '',
+                doc.docid == '',
+                doc.title == ''
+            ]):
+                # no result found, so we avoid creating the entry
+                continue
             details[apk] = {
                'title': doc.title,
                'developer': doc.creator,
@@ -114,3 +121,15 @@ class Play(object):
                'stars': '%.2f' % doc.aggregateRating.starRating
             }
         return details
+
+    def download_selection(self, apksList):
+        success = list()
+        failed = list()
+        unavail = list()
+
+        downloadPath = self.config['Main']['download_path']
+        if not os.path.isdir(downloadPath):
+            os.mkdir(downloadPath)
+        details = self.get_bulk_details(apksList)
+        for appname, appdetails in details.items():
+            print(appdetails)
