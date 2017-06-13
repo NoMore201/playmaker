@@ -13,12 +13,34 @@
     <link href="{{ url_for('static', filename='css/gplay.css') }}" rel="stylesheet">
   </head>
   <body>
-    <!-- navbar -->
-    
-    <!-- container -->
-    <div class="container">
-
+    <div class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="javascript:void(0)">Playmaker</a>
+        </div>
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Apps</a></li>
+            <li><a href="#">Search</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
+    <div class="container" id="container">
+    </div>
+
+    <script type="text/template" id="apk-template">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <%- title %>
+        </div>
+      </div>
+    </script>
 
     <!-- graphic js resources -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

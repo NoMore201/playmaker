@@ -1,57 +1,60 @@
-function fillTable(apps) {
-  let tableBox = document.getElementById('searchTable');
-  let tableHtml = "";
-  tableHtml += '<table class="table" id="appsTable">' +
-    '<thead><tr><th>Name</th><th>Developer</th><th>Version</th>' +
-    '<th>Downloads</th><th>Upload Date</th><th>Stars</th></tr>' +
-    '</thead><tbody id="appsTableBody">';
-  for (var i = 0; i < apps.length; i++) {
-    tableHtml +=
-      '<tr><td>' + apps[i].title + '</td>' +
-      '<td>' + apps[i].developer + '</td>' +
-      '<td>' + apps[i].version + '</td>' +
-      '<td>' + apps[i].numDownloads + '</td>' +
-      '<td>' + apps[i].uploadDate + '</td>' +
-      '<td>' + apps[i].stars + '</td></tr>';
+const app = {};
+
+const appHeaders = new Headers();
+appHeaders.append("Content-Type", "application.json");
+
+/*
+ * MODELS
+ */
+
+app.Apk = Backbone.Model.extend({
+  defaults: {
+    title: '',
+    developer: '',
+    size: '',
+    numDownloads: '',
+    uploadDate: '',
+    docId: '',
+    version: -1,
+    stars: ''
   }
-  tableHtml += '</tbody></table>';
-  tableBox.innerHTML = tableHtml;
-}
+});
 
-function search() {
-  let app = document.getElementById('searchInput').value;
-  if (app.length === 0) {
-    // error
-    return;
+/*
+ * COLLECTIONS
+ */
+
+app.ApkView = Backbone.View.extend({
+  template: _.template($('#apk-template').html()),
+  render: function(){
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
   }
-  let headers = new Headers();
-  headers.append('Content-Type', 'application/json');
-  let form = new FormData();
-  form.append('search', app);
+});
 
-  fetch('/gplay/search', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({ 'search': app })
-  }).then(response => {
-    return response.text();
-  }).then(text => {
-    let apps = JSON.parse(text);
-    if (apps.length === 0)
-      return;
-    fillTable(apps);
-  }).catch(error => {
-    console.log(error);
-  });
-}
+app.AppView = Backbone.View.extend({
+  el: '#container',
+  initialize: function () {
+    this.getLocalApkList();
+  },
+  getLocalApkList: function () {
+    fetch('/gplay/getapks', {
+      method: 'GET',
+      headers: appHeaders
+    }).then(response => {
+      return response.text();
+    }).then(text => {
+      /*
+       * Returned data is an object containing
+       * objects, so we need to iterate through keys
+       */
+      console.log(text);
+      let data = JSON.parse(text);
+      
+    });
+  },
+  events: {
+  }
+});
 
-switch (window.location.pathname) {
-  case '/':
-    break;
-  case '/search':
-    document.getElementById('searchBtn')
-      .onclick = search;
-    break;
-  case '/config':
-    break;
-}
+app.appView = new app.AppView();

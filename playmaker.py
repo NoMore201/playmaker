@@ -42,7 +42,7 @@ def check_local():
 
 @app.route('/gplay/getapks', methods=['GET'])
 def get_apks():
-    return json.dumps(service.get_local_apks())
+    return json.dumps(service.get_local_apps())
 
 if __name__ == '__main__':
     app.run()

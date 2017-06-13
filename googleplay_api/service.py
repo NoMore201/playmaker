@@ -102,12 +102,12 @@ class Play(object):
         except DecodeError:
             print('Cannot decode data')
             return {}
-        details = dict()
+        details = list()
         for pos, apk in enumerate(apksList):
             current = results.entry[pos]
             doc = current.doc
             appDetails = doc.details.appDetails
-            details[apk] = {
+            details.append({
                'title': doc.title,
                'developer': doc.creator,
                'size': self.file_size(appDetails.installationSize),
@@ -116,7 +116,7 @@ class Play(object):
                'docId': doc.docid,
                'version': appDetails.versionCode,
                'stars': '%.2f' % doc.aggregateRating.starRating
-            }
+            })
         return details
 
     def download_selection(self, apksList):
@@ -128,7 +128,8 @@ class Play(object):
         if not os.path.isdir(downloadPath):
             os.mkdir(downloadPath)
         details = self.get_bulk_details(apksList)
-        for appname, appdetails in details.items():
+        for appdetails in details:
+            appname = appdetails['docId']
             print('Downloading %s' % appname)
             try:
                 data = self.service.download(appname, appdetails['version'])
@@ -158,6 +159,29 @@ class Play(object):
         downloadPath = self.config['download_path']
         return [apk for apk in os.listdir(downloadPath)
                     if os.path.splitext(apk)[1] == '.apk']
+
+    def select_app_from_details(self, details, appName):
+        for x in details:
+            if x['docId'] == appName:
+                return x
+        return None
+
+    def get_local_apps(self):
+        downloadPath = self.config['download_path']
+        appList = [os.path.splitext(apk)[0]
+                   for apk in self.get_local_apks()]
+        print(appList)
+        details = self.get_bulk_details(appList)
+        print(details)
+        toReturn = list()
+        for app in appList:
+            d = self.select_app_from_details(details, app)
+            print(d)
+            filepath = os.path.join(downloadPath, app + '.apk')
+            a = APK(filepath)
+            d['version'] = a.version_code
+            toReturn.append(d)
+        return toReturn
 
 
     def check_local_apks(self):
