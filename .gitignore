@@ -2,5 +2,6 @@
 **/__pycache__/
 *.swp
 *.apk
-.tern-project
-.jshintrc
+
+dist/
+build/
