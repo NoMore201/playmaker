@@ -25,7 +25,7 @@ setup(name='playmaker',
             'Flask',
       ],
       data_files=[
-          ['/etc/playmaker.conf', ['playmaker.conf']],
+          ['/etc', ['playmaker.conf']],
           [os.path.join(RES_DIR, 'templates'), templates],
           [os.path.join(RES_DIR, 'static'), static]
       ]
