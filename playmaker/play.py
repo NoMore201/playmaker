@@ -7,7 +7,6 @@ import urllib.request
 from urllib.error import URLError
 import os
 import sys
-import json
 
 
 def get_token(config):
@@ -86,7 +85,7 @@ class Play(object):
                 'stars': '%.2f' % result.aggregateRating.starRating
             }
             all_apps.append(app)
-        return json.dumps(all_apps)
+        return all_apps
 
     def set_download_folder(self, folder):
         self.config['download_path'] = folder
@@ -149,17 +148,21 @@ class Play(object):
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
                     failed.append(appname)
-        return json.dumps({
+        return {
             'success': success,
             'failed': failed,
             'unavail': unavail
-        })
+        }
+
+    def get_local_apks(self):
+        downloadPath = self.config['download_path']
+        return [apk for apk in os.listdir(downloadPath)
+                    if os.path.splitext(apk)[1] == '.apk']
+
 
     def check_local_apks(self):
         downloadPath = self.config['download_path']
-        print(os.listdir(downloadPath))
-        apksList = [apk for apk in os.listdir(downloadPath)
-                    if os.path.splitext(apk)[1] == '.apk']
+        apksList = self.get_local_apks()
         if len(apksList) > 0:
             # TODO: add verbose log
             print('Checking local apks..')
@@ -186,6 +189,6 @@ class Play(object):
                     toUpdate.append(packageName)
                 else:
                     print('Package %s is up to date' % packageName)
-            return json.dumps(toUpdate)
+            return toUpdate
         else:
             return '[]'
