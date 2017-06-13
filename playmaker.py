@@ -30,6 +30,7 @@ def render_config():
     return render_template('config.html')
 
 
+# TODO: this should be GET
 @app.route('/gplay/search', methods=['POST'])
 def search_app():
     return json.dumps(service.search(request.json['search']))
@@ -46,6 +47,7 @@ def check_local():
     return json.dumps(service.check_local_apks())
 
 
+# TODO: this should be GET
 @app.route('/gplay/getapks', methods=['POST'])
 def get_apks():
     return json.dumps(service.get_local_apks())
