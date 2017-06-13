@@ -7,30 +7,29 @@
     <meta name="description" content="Xonotic scoreboard 0.1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='gplay.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap-material-design.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/ripples.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/gplay.css') }}" rel="stylesheet">
   </head>
   <body>
+    <!-- navbar -->
+    
+    <!-- container -->
     <div class="container">
-      <div class="header clearfix">
-      <nav>
-        <ul class="nav nav-pills pull-right">
-          <li role="presentation" class="active">
-            <a href="/">Apps</a>
-          </li>
-          <li role="presentation">
-            <a href="/search">Search</a>
-          </li>
-          <li role="presentation">
-            <a href="/config">Config</a>
-          </li>
-        </ul>
-      </nav>
-      <h2 class="apptitle">Playmaker</h2>
-      </div>
-      
-      <div id "devlog"></div>
+
     </div>
-    <script src="{{ url_for('static', filename='gplay.js') }}"></script>
+
+    <!-- graphic js resources -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/material.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ripples.min.js') }}"></script>
+    <!-- backbone libraries -->
+    <script src="{{ url_for('static', filename='js/underscore-min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/backbone-min.js') }}"></script>
+
+    <!-- playmaker app -->
+    <script src="{{ url_for('static', filename='js/gplay.js') }}"></script>
   </body>
 </html>

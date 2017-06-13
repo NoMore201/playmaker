@@ -7,4 +7,5 @@ RUN apt-get update && \
 WORKDIR /opt/playmaker
 
 RUN pip3 install -r requirements.txt
+EXPOSE 5000
 ENTRYPOINT /opt/playmaker/playmaker

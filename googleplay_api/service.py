@@ -63,7 +63,7 @@ class Play(object):
                 print('Login failed')
                 sys.exit(1)
 
-    def search(self, appName, numItems=5):
+    def search(self, appName, numItems=20):
         results = self.service.search(appName, numItems, None).doc
         all_apps = []
         if len(results) > 0:
