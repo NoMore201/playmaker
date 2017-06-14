@@ -128,8 +128,11 @@ class Play(object):
         if not os.path.isdir(downloadPath):
             os.mkdir(downloadPath)
         details = self.get_bulk_details(apksList)
-        for appdetails in details:
-            appname = appdetails['docId']
+        for appname, appdetails in zip(apksList, details):
+            if appdetails['docId'] == '':
+                print('Package does not exits')
+                unavail.append(appname)
+                continue
             print('Downloading %s' % appname)
             try:
                 data = self.service.download(appname, appdetails['version'])
@@ -170,17 +173,14 @@ class Play(object):
         downloadPath = self.config['download_path']
         appList = [os.path.splitext(apk)[0]
                    for apk in self.get_local_apks()]
-        print(appList)
         details = self.get_bulk_details(appList)
-        print(details)
         toReturn = list()
-        for app in appList:
-            d = self.select_app_from_details(details, app)
-            print(d)
-            filepath = os.path.join(downloadPath, app + '.apk')
+        for app in details:
+            appName = app['docId']
+            filepath = os.path.join(downloadPath, appName + '.apk')
             a = APK(filepath)
-            d['version'] = a.version_code
-            toReturn.append(d)
+            app['version'] = int(a.version_code)
+            toReturn.append(app)
         return toReturn
 
 
@@ -188,31 +188,31 @@ class Play(object):
         downloadPath = self.config['download_path']
         apksList = self.get_local_apks()
         if len(apksList) > 0:
-            # TODO: add verbose log
             print('Checking local apks..')
             toSearch = list()
             for apk in apksList:
                 filepath = os.path.join(downloadPath, apk)
                 a = APK(filepath)
-                packageName = a.package
-                toSearch.append(packageName)
+                appName = a.package
+                toSearch.append(appName)
             if len(toSearch) == 0:
                 raise Exception('Error retrieving package names from apk')
                 sys.exit(1)
             details = self.get_bulk_details(toSearch)
             toUpdate = list()
-            for apk in apksList:
-                filepath = os.path.join(downloadPath, apk)
+            for app in details:
+                appName = app['docId']
+                apkName = appName + '.apk'
+                filepath = os.path.join(downloadPath, apkName)
                 a = APK(filepath)
                 localVersion = int(a.version_code)
-                packageName = a.package
-                onlineVersion = details.get(packageName)['version']
+                onlineVersion = app['version']
                 print('%d == %d ?' % (localVersion, onlineVersion))
                 if localVersion != onlineVersion:
-                    print('Package %s needs to be updated' % packageName)
-                    toUpdate.append(packageName)
+                    print('Package %s needs to be updated' % appName)
+                    toUpdate.append(appName)
                 else:
-                    print('Package %s is up to date' % packageName)
+                    print('Package %s is up to date' % appName)
             return toUpdate
         else:
             return '[]'
