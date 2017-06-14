@@ -19,6 +19,7 @@ def get_token(config):
 
 class Play(object):
     def __init__(self):
+        self.currentSet = list()
         self.configparser = configparser.ConfigParser()
         config_paths = [
             '/etc/playmaker.conf',
@@ -50,6 +51,7 @@ class Play(object):
                     raise LoginError()
                     sys.exit(1)
                 self.service.login(None, None, token)
+                self.update_state()
             except URLError:
                 print('Failed to fetch url, try again in a few minutes')
                 sys.exit(1)
@@ -59,9 +61,48 @@ class Play(object):
         else:
             try:
                 self.service.login(None, None, self.config['token'])
+                self.update_state()
             except LoginError:
                 print('Login failed')
                 sys.exit(1)
+
+    #
+    # HELPERS
+    #
+
+    def get_local_apks(self):
+        """
+        Return apk files found in download_path
+        """
+        downloadPath = self.config['download_path']
+        return [apk for apk in os.listdir(downloadPath)
+                    if os.path.splitext(apk)[1] == '.apk']
+
+    # TODO: fix this
+    def fetch_details_for_local_apps(self):
+        """
+
+        """
+        downloadPath = self.config['download_path']
+        appList = self.get_local_apps()
+        details = self.get_bulk_details(appList)
+        toReturn = list()
+        for app in details:
+            appName = app['docId']
+            filepath = os.path.join(downloadPath, appName + '.apk')
+            a = APK(filepath)
+            app['version'] = int(a.version_code)
+            toReturn.append(app)
+        return toReturn
+
+    def get_local_apps(self):
+        """
+        Returns a list of package names currently
+        downloaded (that is file name without '.apk'
+        """
+        downloadPath = self.config['download_path']
+        return [os.path.splitext(apk)[0] for apk in os.listdir(downloadPath)
+                if os.path.splitext(apk)[1] == '.apk']
 
     def search(self, appName, numItems=20):
         results = self.service.search(appName, numItems, None).doc
@@ -96,12 +137,16 @@ class Play(object):
                 return "%3.1f%s" % (num, x)
             num /= 1024.0
 
+    def update_state(self):
+        print('Updating local app state')
+        self.currentSet = self.fetch_details_for_local_apps()
+
     def get_bulk_details(self, apksList):
         try:
             results = self.service.bulkDetails(apksList)
         except DecodeError:
             print('Cannot decode data')
-            return {}
+            return []
         details = list()
         for pos, apk in enumerate(apksList):
             current = results.entry[pos]
@@ -119,7 +164,7 @@ class Play(object):
             })
         return details
 
-    def download_selection(self, apksList):
+    def download_selection(self, appNames):
         success = list()
         failed = list()
         unavail = list()
@@ -127,8 +172,8 @@ class Play(object):
         downloadPath = self.config['download_path']
         if not os.path.isdir(downloadPath):
             os.mkdir(downloadPath)
-        details = self.get_bulk_details(apksList)
-        for appname, appdetails in zip(apksList, details):
+        details = self.get_bulk_details(appNames)
+        for appname, appdetails in zip(appNames, details):
             if appdetails['docId'] == '':
                 print('Package does not exits')
                 unavail.append(appname)
@@ -158,61 +203,20 @@ class Play(object):
             'unavail': unavail
         }
 
-    def get_local_apks(self):
-        downloadPath = self.config['download_path']
-        return [apk for apk in os.listdir(downloadPath)
-                    if os.path.splitext(apk)[1] == '.apk']
-
-    def select_app_from_details(self, details, appName):
-        for x in details:
-            if x['docId'] == appName:
-                return x
-        return None
-
-    def get_local_apps(self):
-        downloadPath = self.config['download_path']
-        appList = [os.path.splitext(apk)[0]
-                   for apk in self.get_local_apks()]
-        details = self.get_bulk_details(appList)
-        toReturn = list()
-        for app in details:
-            appName = app['docId']
-            filepath = os.path.join(downloadPath, appName + '.apk')
-            a = APK(filepath)
-            app['version'] = int(a.version_code)
-            toReturn.append(app)
-        return toReturn
 
 
+    # TODO: use update_state() and currentSet
     def check_local_apks(self):
         downloadPath = self.config['download_path']
-        apksList = self.get_local_apks()
-        if len(apksList) > 0:
-            print('Checking local apks..')
-            toSearch = list()
-            for apk in apksList:
-                filepath = os.path.join(downloadPath, apk)
-                a = APK(filepath)
-                appName = a.package
-                toSearch.append(appName)
-            if len(toSearch) == 0:
-                raise Exception('Error retrieving package names from apk')
-                sys.exit(1)
-            details = self.get_bulk_details(toSearch)
-            toUpdate = list()
-            for app in details:
-                appName = app['docId']
-                apkName = appName + '.apk'
-                filepath = os.path.join(downloadPath, apkName)
-                a = APK(filepath)
-                localVersion = int(a.version_code)
-                onlineVersion = app['version']
-                print('%d == %d ?' % (localVersion, onlineVersion))
-                if localVersion != onlineVersion:
-                    print('Package %s needs to be updated' % appName)
-                    toUpdate.append(appName)
-                else:
-                    print('Package %s is up to date' % appName)
-            return toUpdate
+        localDetails = self.currentSet
+        onlineDetails = self.get_bulk_details(self.get_local_apps())
+        if len(localDetails) == 0 or len(onlineDetails) == 0:
+            print('There is no package locally')
+            return []
         else:
-            return '[]'
+            toUpdate = list()
+            for local, online in zip(localDetails, onlineDetails):
+                print('Checking %s' % online['docId'])
+                if local['version'] != online['version']:
+                    toUpdate.append(online['docId'])
+            return toUpdate
