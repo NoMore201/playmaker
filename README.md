@@ -10,10 +10,9 @@ On the other hand, the frontend is completely rewritten using modern web technol
 ### Backend
 - [ ] General python3 code check
 - [ ] Add API for deleting apk
-- [ ] Add API to get only local apk (for fast startup)
+- [x] Add API to get only local apk (for fast startup)
 
 ### Frontend
-- [ ] General css/js code check
 - [ ] Implement search view
 - [ ] Implement /gplay/check
 - [ ] Implement /gplay/download

@@ -4,9 +4,6 @@ $(function(){
 
   $.material.init();
 
-  const appHeaders = new Headers();
-  appHeaders.append("Content-Type", "application.json");
-
   /*
    * MODELS
    */
@@ -43,27 +40,9 @@ $(function(){
     }
   });
 
-  app.LoadAlertView = Backbone.View.extend({
-    tagName: 'div',
-    id: 'loading-alert',
-    className: 'alert alert-dismissible alert-info',
-    template: '<button type="button" class="close" data-dismiss="alert">×</button>' +
-              '<strong><%- message %></strong>',
-    initialize: function() {
-      this.template = _.template(this.template);
-    },
-    render: function() {
-      let output = this.template({message: 'Loading apks..'});
-      this.$el.html(output);
-      return this;
-    }
-  });
-  app.loadAlertView = new app.LoadAlertView();
-
   app.AppView = Backbone.View.extend({
     el: '#container',
     initialize: function () {
-      $('body').append(app.loadAlertView.render().el);
       this.getLocalApkList();
     },
     getLocalApkList: function () {
@@ -72,14 +51,12 @@ $(function(){
       });
     },
     onLoad: function(apks, response) {
-      let load = this.loadAlertView;
       apks.models.forEach(apk => {
         let view = new app.ApkView({
           model: apk
         });
         $('#container').append(view.render().el);
       });
-      app.loadAlertView.remove();
     },
     events: {}
   });
