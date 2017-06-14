@@ -34,13 +34,26 @@
     <div class="container" id="container">
     </div>
 
+    <!-- templates -->
     <script type="text/template" id="apk-template">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <%- title %>
+      <div class="col-xs-12 col-md-6">
+        <div id="apk-item" class="panel panel-default">
+          <div class="panel-body">
+            <strong><h3 class="apk-item-title"><%- title %></h3></strong>
+            <span><strong>Developer: </strong><%- developer %></span><br>
+            <span><strong>Version: </strong><%- version %></span><br>
+            <span><strong>Size: </strong><%- size %></span><br>
+            <span><strong>Version: </strong><%- version %></span><br>
+            <span><strong>PackageId: </strong><%- docId %></span><br>
+            <span><strong>Stars: </strong><%- stars %></span><br>
+            <a class="btn btn-raised">update</a>
+            <a href="" class="btn btn-raised btn-danger apk-item-delete pull-right">delete</a>
+          </div>
         </div>
       </div>
     </script>
+
+
 
     <!-- graphic js resources -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

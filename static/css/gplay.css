@@ -1,1 +1,18 @@
+.container {
+}
 
+#loading-alert {
+  position: absolute;
+  right: 40px;
+  top: 80px;
+}
+
+#apk-item {
+  min-width: 400px;
+}
+
+.apk-item-title {
+  margin:0;
+  margin-bottom: 10px;
+  padding:0;
+}
