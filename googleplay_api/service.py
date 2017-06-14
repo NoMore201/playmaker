@@ -37,10 +37,12 @@ class Play(object):
             self.config[key] = value
         self.set_download_folder('.')
         self.service = GooglePlayAPI(self.config['id'], 'en_US', True)
+        self.login()
+
+    def login(self):
         if self.config['token'] == '':
             try:
                 for i in range(1, 4):
-                    # TODO: add verbose log
                     print('#%d try' % i)
                     token = get_token(self.config)
                     if token == "":
@@ -70,6 +72,17 @@ class Play(object):
     # HELPERS
     #
 
+    def set_download_folder(self, folder):
+        self.config['download_path'] = folder
+
+
+    def file_size(self, num):
+        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+            if num < 1024.0:
+                return "%3.1f%s" % (num, x)
+            num /= 1024.0
+
+
     def get_local_apks(self):
         """
         Return apk files found in download_path
@@ -78,31 +91,52 @@ class Play(object):
         return [apk for apk in os.listdir(downloadPath)
                     if os.path.splitext(apk)[1] == '.apk']
 
-    # TODO: fix this
+
+    def get_local_apps(self):
+        """
+        Returns a list of package names currently
+        downloaded (that is file name without '.apk')
+        """
+        downloadPath = self.config['download_path']
+        return [os.path.splitext(apk)[0] for apk in os.listdir(downloadPath)
+                if os.path.splitext(apk)[1] == '.apk']
+
+
     def fetch_details_for_local_apps(self):
         """
-
+        Return list of details of the currently downloaded apps.
+        Details are fetched from the google server. Don't use this
+        function to get names of downloaded apps (use get_local_apps instead)
         """
         downloadPath = self.config['download_path']
         appList = self.get_local_apps()
         details = self.get_bulk_details(appList)
         toReturn = list()
-        for app in details:
-            appName = app['docId']
+        for appName, appDetails in zip(appList, details):
             filepath = os.path.join(downloadPath, appName + '.apk')
             a = APK(filepath)
-            app['version'] = int(a.version_code)
-            toReturn.append(app)
+            appDetails['version'] = int(a.version_code)
+            toReturn.append(appDetails)
         return toReturn
 
-    def get_local_apps(self):
-        """
-        Returns a list of package names currently
-        downloaded (that is file name without '.apk'
-        """
-        downloadPath = self.config['download_path']
-        return [os.path.splitext(apk)[0] for apk in os.listdir(downloadPath)
-                if os.path.splitext(apk)[1] == '.apk']
+    def update_state(self):
+        print('Updating local app state')
+        self.currentSet = self.fetch_details_for_local_apps()
+
+    def insert_app_into_state(self, newApp):
+        found = False
+        for pos, app in enumerate(self.currentSet):
+            if app['docId'] == newApp['docId']:
+                found = True
+                self.currentSet[pos] = newApp
+                break
+        if found is False:
+            self.currentSet.append(newApp)
+
+
+    #
+    # MAIN SERVER FUNCTIONS
+    #
 
     def search(self, appName, numItems=20):
         results = self.service.search(appName, numItems, None).doc
@@ -128,18 +162,7 @@ class Play(object):
             all_apps.append(app)
         return all_apps
 
-    def set_download_folder(self, folder):
-        self.config['download_path'] = folder
 
-    def file_size(self, num):
-        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-            if num < 1024.0:
-                return "%3.1f%s" % (num, x)
-            num /= 1024.0
-
-    def update_state(self):
-        print('Updating local app state')
-        self.currentSet = self.fetch_details_for_local_apps()
 
     def get_bulk_details(self, apksList):
         try:
@@ -164,6 +187,7 @@ class Play(object):
             })
         return details
 
+
     def download_selection(self, appNames):
         success = list()
         failed = list()
@@ -181,7 +205,7 @@ class Play(object):
             print('Downloading %s' % appname)
             try:
                 data = self.service.download(appname, appdetails['version'])
-                success.append(appname)
+                success.append(appdetails)
                 print('Done!')
             except IndexError as exc:
                 print('Package %s does not exists' % appname)
@@ -197,6 +221,11 @@ class Play(object):
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
                     failed.append(appname)
+        # Now we should save the new app into the currentSet, we can
+        # 1) just fire update_state, (more computation) or
+        # 2) add objects in the success list to currentSet (taking care of duplicates)
+        for x in success:
+            self.insert_app_into_state(x)
         return {
             'success': success,
             'failed': failed,
@@ -204,8 +233,6 @@ class Play(object):
         }
 
 
-
-    # TODO: use update_state() and currentSet
     def check_local_apks(self):
         downloadPath = self.config['download_path']
         localDetails = self.currentSet

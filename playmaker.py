@@ -42,7 +42,8 @@ def check_local():
 
 @app.route('/gplay/getapps', methods=['GET'])
 def get_apks():
-    return json.dumps(service.currentSet)
+    apps = sorted(service.currentSet, key=lambda k: k['title'])
+    return json.dumps(apps)
 
 if __name__ == '__main__':
     app.run()

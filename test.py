@@ -12,6 +12,8 @@ if len(downloaded['unavail']) == 0:
 if downloaded['unavail'][0] != apps[2]:
     print('Wrong result in download_selection()')
     sys.exit(1)
-local_apks = service.get_local_apks()
-service.check_local_apks()
-local = service.get_local_apps()
+local_apks = service.currentSet
+print(str(local_apks))
+service.download_selection(['com.backdrops.wallpapers'])
+local_apks = service.currentSet
+print(str(local_apks))
