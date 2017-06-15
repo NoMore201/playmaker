@@ -54,6 +54,10 @@ $(function(){
     //delete app view
   });
 
+  /*
+   * VIEWS
+   */
+
   app.ApkView = Backbone.View.extend({
     template: _.template($('#apk-template').html()),
     render: function(){
@@ -68,6 +72,22 @@ $(function(){
       return this;
     }
   });
+
+  app.appViewManager = {
+    currentView: null,
+    showView: view => {
+      if (this.currentView != null) {
+        console.log('currentView is initializated');
+      }
+      if (this.currentView != null &&
+          this.currentView.cid !== view.cid)
+      {
+        this.currentView.remove();
+      }
+      this.currentView = view;
+      return this.currentView.render();
+    }
+  };
 
   app.AppView = Backbone.View.extend({
     el: '#container',
@@ -90,6 +110,29 @@ $(function(){
     events: {}
   });
 
-  app.appView = new app.AppView();
+  app.SearchView = null; // TODO
+
+  /*
+   * ROUTER
+   */
+
+  app.Router = Backbone.Router.extend({
+    routes: {
+        '' : 'index',
+        'search' : 'search'
+    },
+    index: () => {
+      let indexView = new app.AppView();
+      app.appViewManager.showView(indexView);
+    },
+    search: () => {
+      let searchView = new app.SearchView();
+      app.appViewManager.showView(searchView);
+    }
+  });
+
+  app.appRouter = new app.Router();
+
+  Backbone.history.start();
 
 }); // end jquery onload function

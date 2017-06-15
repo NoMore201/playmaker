@@ -17,6 +17,7 @@ On the other hand, the frontend is completely rewritten using modern web technol
 - [ ] Implement search page
 - [ ] Implement /gplay/check
 - [ ] Implement /gplay/download
+- [ ] Add placeholder when there aren't local apps
 
 ## Usage
 
