@@ -7,6 +7,7 @@
     <meta name="description" content="Xonotic scoreboard 0.1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/bootstrap-material-design.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/ripples.min.css') }}" rel="stylesheet">
@@ -26,8 +27,12 @@
         <div class="navbar-collapse collapse navbar-responsive-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Apps</a></li>
-            <li><a href="#">Search</a></li>
           </ul>
+          <form class="navbar-form navbar-left">
+            <div class="form-group">
+              <input class="form-control col-sm-8" placeholder="Search" type="text">
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -46,8 +51,8 @@
             <span><strong>Version: </strong><%- version %></span><br>
             <span><strong>PackageId: </strong><%- docId %></span><br>
             <span><strong>Stars: </strong><%- stars %></span><br><br>
-            <button class="btn btn-default" type="button">update</button>
-            <a href="" class="btn btn-raised btn-danger apk-item-delete pull-right">delete</a>
+            <button id="apk-item-update" class="btn btn-default" type="button"><i class="fa fa-refresh" aria-hidden="true"></i> update</button>
+            <a id="apk-item-delete" class="btn btn-raised btn-danger pull-right"><i class="fa fa-trash-o" aria-hidden="true"></i> delete</a>
           </div>
         </div>
       </div>

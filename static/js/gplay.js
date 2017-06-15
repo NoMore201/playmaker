@@ -1,6 +1,9 @@
 $(function(){
 
   const app = {};
+  
+  const headers = new Headers();
+  headers.append('Content-Type', 'application/json');
 
   $.material.init();
 
@@ -31,11 +34,37 @@ $(function(){
     initialize: function() {}
   });
   app.apkList = new app.ApkList();
+  app.apkList.on('remove', app => {
+    // delete app on server
+    fetch('/gplay/delete', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          'delete': app.get('docId')
+        })
+      }).then(response => {
+        return response.text();
+      }).then(text => {
+        if (text === 'OK')
+          console.log('deleted ' + app.get('docId'));
+      }).catch(error => {
+        console.log(error);
+      });
+    
+    //delete app view
+  });
 
   app.ApkView = Backbone.View.extend({
     template: _.template($('#apk-template').html()),
     render: function(){
       this.$el.html(this.template(this.model.toJSON()));
+      
+      // set the button to send delete request
+      this.$('#apk-item-delete').click(() => {
+        app.apkList.remove(this.model);
+        this.remove();
+      });
+      this.$('#apk-item-update').prop('disabled', true);
       return this;
     }
   });
