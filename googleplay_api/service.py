@@ -112,11 +112,12 @@ class Play(object):
         appList = self.get_local_apps()
         details = self.get_bulk_details(appList)
         toReturn = list()
-        for appName, appDetails in zip(appList, details):
-            filepath = os.path.join(downloadPath, appName + '.apk')
-            a = APK(filepath)
-            appDetails['version'] = int(a.version_code)
-            toReturn.append(appDetails)
+        if len(appList) > 0:
+            for appName, appDetails in zip(appList, details):
+                filepath = os.path.join(downloadPath, appName + '.apk')
+                a = APK(filepath)
+                appDetails['version'] = int(a.version_code)
+                toReturn.append(appDetails)
         return toReturn
 
     def update_state(self):

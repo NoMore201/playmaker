@@ -26,8 +26,8 @@
         </div>
         <div class="navbar-collapse collapse navbar-responsive-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="">Apps</a></li>
-            <li><a href="">Search</a></li>
+            <li class="active"><a href="#" id="app-page-link">Apps</a></li>
+            <li ><a href="#" id="search-page-link">Search</a></li>
           </ul>
         </div>
       </div>
@@ -54,7 +54,12 @@
       </div>
     </script>
 
-
+    <script type="text/template" id="search-template">
+      <div class="form-group label-floating">
+        <label for="i5" class="control-label">Search app</label>
+        <input type="email" class="form-control" id="i5">
+      </div>
+    </script>
 
     <!-- graphic js resources -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

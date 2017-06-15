@@ -93,6 +93,9 @@ $(function(){
     el: '#container',
     initialize: function () {
       this.getLocalApkList();
+      $('#search-page-link').click(() => {
+        Backbone.history.navigate('search', {trigger: true});
+      });
     },
     getLocalApkList: function () {
       app.apkList.fetch({
@@ -110,7 +113,19 @@ $(function(){
     events: {}
   });
 
-  app.SearchView = null; // TODO
+  app.SearchView = Backbone.View.extend({
+    el: '#container',
+    template: _.template($('#search-template').html()),
+    initialize: function () {
+      $('#app-page-link').click(() => {
+        Backbone.history.navigate('', {trigger: true});
+      });
+    },
+    render: () => {
+      this.$el.html(this.template());
+      return this;
+    }
+  });
 
   /*
    * ROUTER
