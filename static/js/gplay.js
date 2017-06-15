@@ -1,7 +1,7 @@
 $(function(){
 
   const app = {};
-  
+
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
 
@@ -50,7 +50,7 @@ $(function(){
       }).catch(error => {
         console.log(error);
       });
-    
+
     //delete app view
   });
 
@@ -58,7 +58,7 @@ $(function(){
     template: _.template($('#apk-template').html()),
     render: function(){
       this.$el.html(this.template(this.model.toJSON()));
-      
+
       // set the button to send delete request
       this.$('#apk-item-delete').click(() => {
         app.apkList.remove(this.model);
