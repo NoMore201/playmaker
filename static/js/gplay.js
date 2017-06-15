@@ -30,9 +30,9 @@ $(function(){
 
   app.ApkList = Backbone.Collection.extend({
     model: app.Apk,
-    url: '/gplay/getapps',
-    initialize: function() {}
+    url: '/gplay/getapps'
   });
+
   app.apkList = new app.ApkList();
   app.apkList.on('remove', app => {
     // delete app on server
@@ -63,39 +63,23 @@ $(function(){
     render: function(){
       this.$el.html(this.template(this.model.toJSON()));
 
-      // set the button to send delete request
-      this.$('#apk-item-delete').click(() => {
-        app.apkList.remove(this.model);
-        this.remove();
-      });
+      // set update button as disables
       this.$('#apk-item-update').prop('disabled', true);
       return this;
+    },
+    events: {
+      'click #apk-item-delete': 'onClickDelete'
+    },
+    onClickDelete: function() {
+      app.apkList.remove(this.model);
+      this.remove();
     }
   });
-
-  app.appViewManager = {
-    currentView: null,
-    showView: view => {
-      if (this.currentView != null) {
-        console.log('currentView is initializated');
-      }
-      if (this.currentView != null &&
-          this.currentView.cid !== view.cid)
-      {
-        this.currentView.remove();
-      }
-      this.currentView = view;
-      return this.currentView.render();
-    }
-  };
 
   app.AppView = Backbone.View.extend({
     el: '#container',
     initialize: function () {
       this.getLocalApkList();
-      $('#search-page-link').click(() => {
-        Backbone.history.navigate('search', {trigger: true});
-      });
     },
     getLocalApkList: function () {
       app.apkList.fetch({
@@ -107,47 +91,12 @@ $(function(){
         let view = new app.ApkView({
           model: apk
         });
-        $('#container').append(view.render().el);
+        this.$el.append(view.render().el);
       });
-    },
-    events: {}
-  });
-
-  app.SearchView = Backbone.View.extend({
-    el: '#container',
-    template: _.template($('#search-template').html()),
-    initialize: function () {
-      $('#app-page-link').click(() => {
-        Backbone.history.navigate('', {trigger: true});
-      });
-    },
-    render: () => {
-      this.$el.html(this.template());
-      return this;
     }
   });
 
-  /*
-   * ROUTER
-   */
-
-  app.Router = Backbone.Router.extend({
-    routes: {
-        '' : 'index',
-        'search' : 'search'
-    },
-    index: () => {
-      let indexView = new app.AppView();
-      app.appViewManager.showView(indexView);
-    },
-    search: () => {
-      let searchView = new app.SearchView();
-      app.appViewManager.showView(searchView);
-    }
-  });
-
-  app.appRouter = new app.Router();
-
-  Backbone.history.start();
+  // initialize main Apps view
+  app.appView = new app.AppView();
 
 }); // end jquery onload function

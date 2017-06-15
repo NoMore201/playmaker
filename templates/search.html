@@ -26,33 +26,29 @@
         </div>
         <div class="navbar-collapse collapse navbar-responsive-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a id="app-page-link"><i class="fa fa-android fa-2" aria-hidden="true"></i> Apps</a></li>
-            <li ><a href="/search" id="search-page-link"><i class="fa fa-search" aria-hidden="true"></i> Search</a></li>
+            <li><a href="/" id="app-page-link"><i class="fa fa-android fa-2" aria-hidden="true"></i> Apps</a></li>
+            <li class="active"><a id="search-page-link"><i class="fa fa-search fa-2" aria-hidden="true"></i> Search</a></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="container" id="container">
-      <div id="modal"></div>
     </div>
 
     <!-- templates -->
-    <script type="text/template" id="apk-template">
-      <div class="col-xs-12 col-md-6">
-        <div id="apk-item" class="panel panel-default">
-          <div class="panel-body">
-            <strong><h3 class="apk-item-title"><%- title %></h3></strong>
-            <span><strong>Developer: </strong><%- developer %></span><br>
-            <span><strong>Version: </strong><%- version %></span><br>
-            <span><strong>Size: </strong><%- size %></span><br>
-            <span><strong>Version: </strong><%- version %></span><br>
-            <span><strong>PackageId: </strong><%- docId %></span><br>
-            <span><strong>Stars: </strong><%- stars %></span><br><br>
-            <button id="apk-item-update" class="btn btn-default" type="button"><i class="fa fa-refresh" aria-hidden="true"></i> update</button>
-            <a id="apk-item-delete" class="btn btn-raised btn-danger pull-right"><i class="fa fa-trash-o" aria-hidden="true"></i> delete</a>
+    <script type="text/template" id="search-template">
+      <div class="row">
+        <div class="col-md-10 col-xs-10">
+          <div class="form-group label-floating">
+            <label for="i5" class="control-label">Search</label>
+            <input type="email" class="form-control" id="i5">
           </div>
         </div>
+        <div class="col-md-2 col-xs-2">
+          <a class="btn btn-raised btn-primary">Search</a>
+        </div>
       </div>
+      <div id="table-box"></div>
     </script>
 
     <!-- graphic js resources -->
@@ -65,6 +61,6 @@
     <script src="{{ url_for('static', filename='js/backbone-min.js') }}"></script>
 
     <!-- playmaker app -->
-    <script src="{{ url_for('static', filename='js/gplay.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
   </body>
 </html>

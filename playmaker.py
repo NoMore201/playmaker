@@ -19,6 +19,10 @@ service = Play()
 def render_home():
     return render_template('index.html')
 
+@app.route('/search')
+def render_search():
+    return render_template('search.html')
+
 
 @app.route('/gplay/search', methods=['GET'])
 def search_app():
