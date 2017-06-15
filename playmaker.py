@@ -45,5 +45,13 @@ def get_apks():
     apps = sorted(service.currentSet, key=lambda k: k['title'])
     return json.dumps(apps)
 
+@app.route('/gplay/delete', methods=['POST'])
+def delete_app():
+    res = service.remove_local_app(request.json['delete'])
+    if res:
+        return 'OK'
+    else:
+        abort(500)
+
 if __name__ == '__main__':
     app.run()

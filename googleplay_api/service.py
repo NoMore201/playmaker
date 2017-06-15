@@ -247,3 +247,15 @@ class Play(object):
                 if local['version'] != online['version']:
                     toUpdate.append(online['docId'])
             return toUpdate
+
+    def remove_local_app(self, appName):
+        apkName = appName + '.apk'
+        downloadPath = self.config['download_path']
+        apkPath = os.path.join(downloadPath, apkName)
+        if os.path.isfile(apkPath):
+            os.remove(apkPath)
+            for pos, app in enumerate(self.currentSet):
+                if app['docId'] == appName:
+                    del self.currentSet[pos]
+            return True
+        return False

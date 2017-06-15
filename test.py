@@ -17,3 +17,6 @@ print(str(local_apks))
 service.download_selection(['com.backdrops.wallpapers'])
 local_apks = service.currentSet
 print(str(local_apks))
+service.remove_local_app('com.whatsapp')
+local_apks = service.currentSet
+print(str(local_apks))
