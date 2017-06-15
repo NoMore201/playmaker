@@ -1,5 +1,4 @@
-.container {
-}
+.container {}
 
 #loading-alert {
   position: absolute;
@@ -7,9 +6,7 @@
   top: 80px;
 }
 
-#apk-item {
-  min-width: 400px;
-}
+#apk-item {}
 
 .apk-item-title {
   margin:0;
