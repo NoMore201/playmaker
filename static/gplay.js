@@ -45,8 +45,12 @@ $(function(){
       }).then(response => {
         return response.text();
       }).then(text => {
-        if (text === 'OK')
-          console.log('deleted ' + app.get('docId'));
+        if (text === 'OK') {
+          let alertHtml = '<div class="alert alert-dismissible alert-info">' +
+            '<button type="button" class="close" data-dismiss="alert">×' +
+            '</button>Removed ' + app.get('docId') + ' from server</div>';
+          $('body').append(alertHtml);
+        }
       }).catch(error => {
         console.log(error);
       });

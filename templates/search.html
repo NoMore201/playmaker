@@ -26,8 +26,8 @@
         </div>
         <div class="navbar-collapse collapse navbar-responsive-collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/" id="app-page-link"><i class="fa fa-android fa-2" aria-hidden="true"></i> Apps</a></li>
-            <li class="active"><a id="search-page-link"><i class="fa fa-search fa-2" aria-hidden="true"></i> Search</a></li>
+            <li><a href="/" id="app-page-link"><i class="fa fa-android fa-1x" aria-hidden="true"></i> Apps</a></li>
+            <li class="active"><a id="search-page-link"><i class="fa fa-search fa-1x" aria-hidden="true"></i> Search</a></li>
           </ul>
         </div>
       </div>
@@ -36,8 +36,8 @@
       <div class="row">
         <div class="col-md-12 col-xs-12">
           <div class="form-group label-floating">
-            <label for="search-input" class="control-label">Search</label>
-            <input type="email" class="form-control" id="search-input">
+            <label class="control-label">Search</label>
+            <input type="text" class="form-control" id="search-input">
           </div>
         </div>
       </div>
@@ -47,11 +47,15 @@
       <i class="fa fa-refresh fa-spin fa-4x fa-fw"></i>
       <span class="sr-only">Loading...</span>
     </div>
-    <div id="loading-modal">
+    <div id="loading-modal" class="mymodal">
       <div id="modal-body">
         <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
         <span class="sr-only">Loading...</span>
         <span>Downloading...</span>
+      </div>
+    </div>
+    <div id="info-modal" class="mymodal">
+      <div id="info-modal-body">
       </div>
     </div>
 

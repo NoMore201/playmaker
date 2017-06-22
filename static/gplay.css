@@ -20,8 +20,8 @@ td {
   height: 40px;
 }
 
-#loading-modal {
-  position: fixed;
+.mymodal {
+  position: absolute;
   top:0;
   left:0;
   width: 100%;
@@ -40,6 +40,18 @@ td {
   box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2)
 }
 
+#info-modal-body {
+  position:fixed;
+  top:50%;
+  left:50%;
+  margin-top: -50px;
+  margin-left: -120px;
+  width:240px;
+  padding: 20px;
+  background: #FFFFFF;
+  box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2)
+}
+
 #modal-body > span {
   vertical-align: middle;
   line-height: 40px;
@@ -49,4 +61,9 @@ td {
   vertical-align: middle;
 }
 
-
+.alert {
+  position:fixed;
+  top:7%;
+  right:5%;
+  width:300px;
+}

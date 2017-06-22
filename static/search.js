@@ -40,7 +40,8 @@ $(function () {
     },
 
     events: {
-      'click .dl-button': 'download'
+      'click .dl-button': 'download',
+      'click .info-button': 'showInfo'
     },
 
     download: function () {
@@ -54,9 +55,26 @@ $(function () {
       }).then(response => {
         return response.text();
       }).then(text => {
-        console.log(text);
-        this.$('.dl-button').hide();
+        let data = JSON.parse(text);
+        if (data.failed.length === 0) {
+          this.$('.dl-button').hide();
+          //TODO: display error msg
+        }
         $('#loading-modal').hide();
+      });
+    },
+
+    showInfo: function () {
+      let modal = $('#info-modal');
+      $('#info-modal-body').html(
+          '<span><strong>Id:</strong> ' + this.model.get('docId') + '</span><br>' +
+          '<span><strong>Dev:</strong> ' + this.model.get('developer') + '</span><br>' +
+          '<span><strong>Version:</strong> ' + this.model.get('version') + '</span><br>' +
+          '<span><strong>Uploaded:</strong> ' + this.model.get('uploadDate') + '</span><br>'
+      );
+      modal.show();
+      modal.click( function () {
+        modal.hide();
       });
     }
 
@@ -101,6 +119,8 @@ $(function () {
       this.spinner.hide();
       this.modal = $('#loading-modal');
       this.modal.hide();
+      this.infoModal = $('#info-modal');
+      this.infoModal.hide();
     },
 
     events: {
@@ -124,7 +144,7 @@ $(function () {
       //TODO filter text
       let url = '/gplay/search';
       url = url + '?search=' + text;
-      url = url + '&numEntries=10';
+      url = url + '&numEntries=15';
 
       fetch(url, {
         method: 'GET',
