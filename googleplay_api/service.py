@@ -1,4 +1,4 @@
-from googleplay_api.googleplay import GooglePlayAPI, LoginError
+from googleplay_api.googleplay import GooglePlayAPI, LoginError, RequestError
 from google.protobuf.message import DecodeError
 from pyaxmlparser import APK
 
@@ -39,34 +39,34 @@ class Play(object):
         self.service = GooglePlayAPI(self.config['id'], 'en_US', True)
         self.login()
 
+
+    def fetch_new_token(self):
+        token = ""
+        for i in range(1, 4):
+            print('#%d try' % i)
+            token = get_token(self.config)
+            if token == "":
+                continue
+            else:
+                break
+        if token == "":
+            raise LoginError()
+            sys.exit(1)
+        return token
+
+
     def login(self):
-        if self.config['token'] == '':
-            try:
-                for i in range(1, 4):
-                    print('#%d try' % i)
-                    token = get_token(self.config)
-                    if token == "":
-                        continue
-                    else:
-                        break
-                if token == "":
-                    raise LoginError()
-                    sys.exit(1)
-                self.service.login(None, None, token)
-                self.update_state()
-            except URLError:
-                print('Failed to fetch url, try again in a few minutes')
-                sys.exit(1)
-            except LoginError:
-                print('Login failed')
-                sys.exit(1)
-        else:
-            try:
-                self.service.login(None, None, self.config['token'])
-                self.update_state()
-            except LoginError:
-                print('Login failed')
-                sys.exit(1)
+        try:
+            token = self.fetch_new_token()
+            self.service.login(None, None, token)
+            self.update_state()
+        except URLError:
+            print('Failed to fetch url, try again in a few minutes')
+            sys.exit(1)
+        except LoginError:
+            print('Login failed')
+            sys.exit(1)
+
 
     #
     # HELPERS
