@@ -27,7 +27,7 @@ def render_search():
 @app.route('/gplay/search', methods=['GET'])
 def search_app():
     number = request.args.get('numEntries')
-    if number is not '':
+    if number is not None:
         return json.dumps(service.search(request.args.get('search'),
                                          int(number)))
     return json.dumps(service.search(request.args.get('search')))
