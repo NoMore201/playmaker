@@ -87,11 +87,12 @@ $(function(){
       });
     },
     onLoad: function(apks, response) {
+      console.log(apks);
       apks.models.forEach(apk => {
         let view = new app.ApkView({
           model: apk
         });
-        this.$el.append(view.render().el);
+        this.$('#container').append(view.render().el);
       });
     }
   });
