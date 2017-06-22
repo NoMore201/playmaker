@@ -30,7 +30,7 @@ $(function () {
   app.ItemView = Backbone.View.extend({
 
     tagName: 'tr',
-    
+
     template: _.template($('#table-item-template').html()),
 
     render: function () {
@@ -44,7 +44,20 @@ $(function () {
     },
 
     download: function () {
-      console.log('Downloading ' + this.model.get('title'));
+      $('#loading-modal').show();
+      fetch('/gplay/download', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          download: [this.model.get('docId')]
+        })
+      }).then(response => {
+        return response.text();
+      }).then(text => {
+        console.log(text);
+        this.$('.dl-button').hide();
+        $('#loading-modal').hide();
+      });
     }
 
   });
@@ -62,6 +75,9 @@ $(function () {
 
       this.tBody = this.$('#table-body');
 
+      if (app.apkList.models.length !== 0) {
+        app.apkList.reset()
+      }
       app.apkList.add(data);
       app.apkList.models.forEach(m => {
         let view = new app.ItemView({
@@ -81,6 +97,10 @@ $(function () {
     initialize: function () {
       this.tableBox = this.$('#table-box');
       this.searchInput = this.$('#search-input');
+      this.spinner = $('#loading-spinner');
+      this.spinner.hide();
+      this.modal = $('#loading-modal');
+      this.modal.hide();
     },
 
     events: {
@@ -91,6 +111,10 @@ $(function () {
       if (e.keyCode !== 13) {
         return;
       }
+
+      // reset the table view
+      this.tableBox.html('');
+      this.spinner.show();
 
       let text = this.searchInput.val();
       if (text.length === 0) {
@@ -110,7 +134,8 @@ $(function () {
       }).then( text => {
         let data = JSON.parse(text);
         let table = new app.TableView();
-        this.tableBox.append(table.render(data).el);
+        this.spinner.hide();
+        this.tableBox.html(table.render(data).el);
       })
     }
 

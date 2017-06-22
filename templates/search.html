@@ -43,6 +43,17 @@
       </div>
       <div class="row" id="table-box"></div>
     </div>
+    <div id="loading-spinner">
+      <i class="fa fa-refresh fa-spin fa-4x fa-fw"></i>
+      <span class="sr-only">Loading...</span>
+    </div>
+    <div id="loading-modal">
+      <div id="modal-body">
+        <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
+        <span class="sr-only">Loading...</span>
+        <span>Downloading...</span>
+      </div>
+    </div>
 
     <script type="text/template" id="table-template">
         <thead>
@@ -51,24 +62,29 @@
             <th>Title</th>
             <% if ($(window).width() > 600) { %>
             <th>Developer</th>
-            <% } %>
             <th>Id</th>
+            <th>Version</th>
+            <% } else { %>
+            <th>Info</th>
+            <% } %>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
     </script>
 
     <script type="text/template" id="table-item-template">
-      <td><a class="dl-button"><i class="fa fa-download fa-2x" aria-hidden="true"></i></a></td>
+      <td><a class="dl-button"><i class="fa fa-download fa-1x" aria-hidden="true"></i></a></td>
       <td><%- title %></td>
       <% if ($(window).width() > 600) { %>
       <td><%- developer %></td>
       <td><%- docId %></td>
       <td><%- version %></td>
       <% } else { %>
-      <td><a class="info-button"><i class="fa fa-info-circle fa-2x" aria-hidden="true"></i></a></td>
+      <td><a class="info-button"><i class="fa fa-info-circle fa-1x" aria-hidden="true"></i></a></td>
       <% } %>
     </script>
+
+
 
     <!-- graphic js resources -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
