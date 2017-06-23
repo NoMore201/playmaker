@@ -37,7 +37,7 @@ class Play(object):
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
         self.set_download_folder('.')
-        self.service = GooglePlayAPI(self.config['id'], 'fr', True)
+        self.service = GooglePlayAPI(self.config['id'], 'en_US', True)
         self.login()
 
 
@@ -64,7 +64,11 @@ class Play(object):
 
     def login(self):
         try:
-            token = self.fetch_new_token()
+            token = ''
+            if self.config['token'] != '':
+                token = self.config['token']
+            else:
+                token = self.fetch_new_token()
             self.service.login(None, None, token)
             self.update_state()
         except URLError:
@@ -81,6 +85,8 @@ class Play(object):
             sys.exit(1)
         try:
             self.service.login(mail, passwd, None)
+            self.config['token'] = self.service.authSubToken
+            self.save_config()
             self.update_state()
         except LoginError:
             print('Login failed')
@@ -186,6 +192,9 @@ class Play(object):
     def get_bulk_details(self, apksList):
         try:
             results = self.service.bulkDetails(apksList)
+            if len(results.entry) == 0:
+                print('Authentication error, try to reset the token')
+                sys.exit(1)
         except DecodeError:
             print('Cannot decode data')
             return []
