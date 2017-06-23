@@ -37,7 +37,7 @@ class Play(object):
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
         self.set_download_folder('.')
-        self.service = GooglePlayAPI(self.config['id'], 'en_US', True)
+        self.service = GooglePlayAPI(self.config['id'], 'fr', True)
         self.login()
 
 
@@ -87,7 +87,8 @@ class Play(object):
             self.service.login(mail, passwd, None)
             self.config['token'] = self.service.authSubToken
             self.save_config()
-            self.update_state()
+            # self.update_state()
+            quit()
         except LoginError:
             print('Login failed')
             sys.exit(1)

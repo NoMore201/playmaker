@@ -37,6 +37,20 @@ class RequestError(Exception):
         return repr(self.value)
 
 
+def encrypt_password(email, passwd):
+    googlePubKey = "AAAAgMom/1a/v0lblO2Ubrt60J2gcuXSljGFQXgcyZWveWLEwo6prwgi3iJIZdodyhKZQrNWp5nKJ3srRXcUW+F1BD3baEVGcmEgqaLZUNBjm057pKRI16kB0YppeGx5qIQ5QjKzsR8ETQbKLNWgRY0QRNVz34kMJR3P/LgHax/6rmf5AAAAAwEAAQ=="
+    binaryKey = base64.b64encode(str.encode(googlePubKey))
+    #TODO: implement
+    # 1 - calculate SHA-1 of pub-key
+    # 2 - concatenate login and password with \u0000 as separator
+    # 3 - convert the generated string into bytes
+    # 4 - encrypt bytes with public key
+    # 5 -  Add the result to a byte array output[] of 133 bytes length:
+    #   output[0] = 0 (always 0!)
+    #   output[1...4] = first 4 bytes of SHA-1 of the public key
+    #   output[5...132] = encrypted login+password ("\u0000" is used as a separator)
+
+
 class GooglePlayAPI(object):
     """Google Play Unofficial API Class
 
@@ -133,7 +147,7 @@ class GooglePlayAPI(object):
                       # "client_sig": self.client_sig,
                       "device_country": "fr",
                       "operatorCountry": "fr",
-                      "lang": "fr",
+                      "lang": self.lang,
                       "sdk_version": "19"}
             headers = {
                 "Accept-Encoding": "",
