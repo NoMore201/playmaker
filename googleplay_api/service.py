@@ -31,6 +31,7 @@ class Play(object):
             if len(config_paths) == 0:
                 raise OSError('No configuration file found')
                 sys.exit(1)
+        self.configfile = config_paths[0]
         self.configparser.read(config_paths[0])
         self.config = dict()
         for key, value in self.configparser.items('Main'):
@@ -53,6 +54,12 @@ class Play(object):
             raise LoginError()
             sys.exit(1)
         return token
+
+
+    def save_config(self):
+        with open(self.configfile, 'w') as configfile:
+            self.configparser['Main'] = self.config
+            self.configparser.write(configfile)
 
 
     def login(self):
