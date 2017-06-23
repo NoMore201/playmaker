@@ -4,6 +4,7 @@ import sys
 apps = ['org.mozilla.firefox', 'com.whatsapp', 'com.appthatdoesntexits', 'it.atm.appmobile']
 
 service = Play()
+quit()
 
 downloaded = service.download_selection(apps)
 if len(downloaded['unavail']) == 0:

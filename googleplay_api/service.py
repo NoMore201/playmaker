@@ -36,7 +36,7 @@ class Play(object):
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
         self.set_download_folder('.')
-        self.service = GooglePlayAPI(self.config['id'], 'en_US', True)
+        self.service = GooglePlayAPI(self.config['id'], 'fr', True)
         self.login()
 
 
@@ -61,12 +61,23 @@ class Play(object):
             self.service.login(None, None, token)
             self.update_state()
         except URLError:
-            print('Failed to fetch url, try again in a few minutes')
+            print('Failed to fetch url, trying with credentials in playmaker.conf')
+            self.login_with_mail(self.config['mail'], self.config['passwd'])
+        except LoginError:
+            print('Login failed, trying with credentials in playmaker.conf')
+            self.login_with_mail(self.config['mail'], self.config['passwd'])
+
+
+    def login_with_mail(self, mail, passwd):
+        if mail == '' or passwd == '':
+            print('You should specify a google account in the config file')
             sys.exit(1)
+        try:
+            self.service.login(mail, passwd, None)
+            self.update_state()
         except LoginError:
             print('Login failed')
             sys.exit(1)
-
 
     #
     # HELPERS
