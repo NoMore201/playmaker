@@ -16,8 +16,21 @@
   cursor: pointer;
 }
 
-td {
-  height: 40px;
+#search-table {
+  margin-top:40px;
+}
+
+#table-body > tr {
+  line-height: 70px;
+  vertical-align: middle;
+}
+
+#table-body > tr > td {
+  vertical-align: middle;
+}
+
+#table-body > tr > td > a {
+  color: #333333;
 }
 
 .mymodal {

@@ -57,7 +57,9 @@ $(function () {
       }).then(text => {
         let data = JSON.parse(text);
         if (data.failed.length === 0) {
-          this.$('.dl-button').hide();
+          this.$('.dl-button').css('cursor', 'default');
+          this.$('.dl-button').css('pointer-events', 'none');
+          this.$('.dl-button').css('color', '#BABABA');
           //TODO: display error msg
         }
         $('#loading-modal').hide();
@@ -81,6 +83,8 @@ $(function () {
   });
 
   app.TableView = Backbone.View.extend({
+
+    id: 'search-table',
 
     tagName: 'table',
 
