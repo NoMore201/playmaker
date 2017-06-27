@@ -96,6 +96,7 @@ $(function(){
 
     initialize: function () {
       this.updateAllBtn = $('#update-all');
+      app.apkViews = [];
       this.getLocalApkList();
     },
 
@@ -110,6 +111,7 @@ $(function(){
         let view = new app.ApkView({
           model: apk
         });
+        app.apkViews.push(view);
         this.$('#container').append(view.render().el);
       });
     },
@@ -126,8 +128,9 @@ $(function(){
       }).then(response => {
         return response.text();
       }).then(text => {
-        console.log(text);
         this.updateAllBtn.html(refreshIcon + ' update');
+        let result = JSON.parse(text);
+        console.log(result);
       }).catch(error => {
         console.log(error);
         this.updateAllBtn.html(refreshIcon + ' update');
