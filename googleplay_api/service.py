@@ -140,10 +140,13 @@ class Play(object):
         for pos, app in enumerate(self.currentSet):
             if app['docId'] == newApp['docId']:
                 found = True
+                print('%s is already in currentState, updating..' % newApp['docId'])
                 self.currentSet[pos] = newApp
                 break
         if found is False:
+            print('Adding %s into currentState..' % newApp['docId'])
             self.currentSet.append(newApp)
+        print(str(self.currentSet))
 
 
     #
@@ -259,6 +262,7 @@ class Play(object):
             toUpdate = list()
             for local, online in zip(localDetails, onlineDetails):
                 print('Checking %s' % online['docId'])
+                print('%d == %d ?' % (local['version'], online['version']))
                 if local['version'] != online['version']:
                     toUpdate.append(online['docId'])
             return toUpdate
@@ -272,5 +276,6 @@ class Play(object):
             for pos, app in enumerate(self.currentSet):
                 if app['docId'] == appName:
                     del self.currentSet[pos]
+                    print(str(self.currentSet))
             return True
         return False

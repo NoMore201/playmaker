@@ -12,7 +12,15 @@
   padding:0;
 }
 
+#function-bar {
+  margin-bottom:30px;
+}
+
 .dl-button {
+  cursor: pointer;
+}
+
+#update-all {
   cursor: pointer;
 }
 
