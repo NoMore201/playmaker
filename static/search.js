@@ -6,6 +6,10 @@ $(function () {
 
   $.material.init();
 
+  // Resources
+  const loadingSpinner = '<i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>';
+  const downloadIcon = '<i class="fa fa-download fa-2x" aria-hidden="true"></i>';
+
   app.Apk = Backbone.Model.extend({
 
     defaults: {
@@ -45,7 +49,7 @@ $(function () {
     },
 
     download: function () {
-      $('#loading-modal').show();
+      this.$('.dl-button').html(loadingSpinner);
       fetch('/gplay/download', {
         method: 'POST',
         headers: headers,
@@ -57,12 +61,12 @@ $(function () {
       }).then(text => {
         let data = JSON.parse(text);
         if (data.failed.length === 0) {
+          this.$('.dl-button').html(downloadIcon);
           this.$('.dl-button').css('cursor', 'default');
           this.$('.dl-button').css('pointer-events', 'none');
           this.$('.dl-button').css('color', '#BABABA');
           //TODO: display error msg
         }
-        $('#loading-modal').hide();
       });
     },
 
@@ -121,8 +125,6 @@ $(function () {
       this.searchInput = this.$('#search-input');
       this.spinner = $('#loading-spinner');
       this.spinner.hide();
-      this.modal = $('#loading-modal');
-      this.modal.hide();
       this.infoModal = $('#info-modal');
       this.infoModal.hide();
     },
