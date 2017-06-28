@@ -26,7 +26,6 @@ Install dependencies, then start the application
 
 ```
 pip install -r requirements.txt  # consider using a virtualenv
-make install                     # install css and js stuff using nodejs' npm
 python3 playmaker.py
 ```
 
