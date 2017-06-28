@@ -10,14 +10,15 @@ On the other hand, the frontend is completely rewritten using modern web technol
 ### Backend
 - [ ] General python3 code check
 - [x] Add API for deleting apk
-- [x] Add API to get only local apk (for fast startup)
-- [ ] Implement configuration methods
+- [x] Save local apps in application state (for fast retrieving)
+- [ ] Implement configuration API (mainly for resetting/updating tokens)
 
 ### Frontend
-- [ ] Implement search page
+- [x] Implement search page
 - [ ] Implement /gplay/check
-- [ ] Implement /gplay/download
+- [x] Implement /gplay/download
 - [ ] Add placeholder when there aren't local apps
+- [ ] Merge both AppViews in the same file (need to investigate)
 
 ## Usage
 
@@ -27,4 +28,8 @@ Just clone this repo and start the application
 python3 playmaker.py
 ```
 
-it will listen on Flask default port 5000. There is also an experimental Dockerfile, still working on it.
+it will listen on Flask default port 5000. By default the application uses [Matlink token-dispenser service](https://github.com/matlink/gplaycli#changelog). However, in order to avoid [problems](https://github.com/matlink/gplaycli/issues/80) I suggest you to host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser).
+
+For additional informations on how to do this, consider checking the Docker images for token-dispenser: https://github.com/NoMore201/docker-token-dispenser
+
+After correctly setting up the server, change the `tokenurl` variable inside `playmaker.conf`.
