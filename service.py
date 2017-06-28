@@ -1,4 +1,4 @@
-from googleplay_api.googleplay import GooglePlayAPI, LoginError, RequestError
+from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
 from google.protobuf.message import DecodeError
 from pyaxmlparser import APK
 

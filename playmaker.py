@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, request
-from googleplay_api.service import Play
+from service import Play
 
 import json, os
 
