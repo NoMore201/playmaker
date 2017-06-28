@@ -1,7 +1,7 @@
 #loading-spinner {
-  position: fixed;
+  position: absolute;
   left: 50%;
-  top: 50%;
+  top: 250px;
   margin-left: -30px;
   margin-top: -30px;
 }
@@ -42,7 +42,7 @@
 }
 
 .mymodal {
-  position: absolute;
+  position: fixed;
   top:0;
   left:0;
   width: 100%;
@@ -68,7 +68,7 @@
   margin-top: -50px;
   margin-left: -120px;
   width:240px;
-  padding: 20px;
+  padding: 10px;
   background: #FFFFFF;
   box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2)
 }

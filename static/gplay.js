@@ -86,6 +86,16 @@ $(function(){
     onClickDelete: function() {
       app.apkList.remove(this.model);
       this.remove();
+    },
+
+    onClickUpdate: function() {
+      // download app and then disable
+      // the button
+    },
+
+    enableUpdateBtn: function() {
+      this.$('#apk-item-update').prop('disabled', false);
+      // TODO: enable on click method
     }
 
   });
@@ -131,6 +141,17 @@ $(function(){
         this.updateAllBtn.html(refreshIcon + ' update');
         let result = JSON.parse(text);
         console.log(result);
+
+        if (result.length > 0) {
+          result.forEach( function (app) {
+            let relatedView = app.apkViews.search( function(view) {
+              return view.model.get('docId') === app;
+            });
+            if (relatedView !== undefined) {
+              relatedView.enableUpdateBtn();
+            }
+          });
+        }
       }).catch(error => {
         console.log(error);
         this.updateAllBtn.html(refreshIcon + ' update');
