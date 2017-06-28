@@ -22,10 +22,11 @@ On the other hand, the frontend is completely rewritten using modern web technol
 
 ## Usage
 
-Install static client dependencies (requires `make` and `npm`), then just clone this repo and start the application
+Install dependencies, then start the application
 
 ```
-make install
+pip install -r requirements.txt  # consider using a virtualenv
+make install                     # install css and js stuff using nodejs' npm
 python3 playmaker.py
 ```
 
