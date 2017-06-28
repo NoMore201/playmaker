@@ -9,12 +9,18 @@ import os
 import sys
 
 
-def get_token(config):
+def get_token():
     print('Retrieving token from %s' % config['tokenurl'])
     r = urllib.request.urlopen(config['tokenurl'])
     token = r.read().decode('utf-8')
-    config['token'] = token
     return token
+
+
+def file_size(num):
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f%s" % (num, x)
+        num /= 1024.0
 
 
 class Play(object):
@@ -47,7 +53,7 @@ class Play(object):
         token = ""
         for i in range(1, 4):
             print('#%d try' % i)
-            token = get_token(self.config)
+            token = get_token()
             if token == "":
                 continue
             else:
@@ -81,19 +87,8 @@ class Play(object):
             sys.exit(1)
 
 
-    #
-    # HELPERS
-    #
-
     def set_download_folder(self, folder):
         self.config['download_path'] = folder
-
-
-    def file_size(self, num):
-        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-            if num < 1024.0:
-                return "%3.1f%s" % (num, x)
-            num /= 1024.0
 
 
     def fetch_details_for_local_apps(self):
@@ -116,12 +111,15 @@ class Play(object):
                 toReturn.append(appdetails)
         return toReturn
 
+
     def update_state(self):
         print('Updating local app state')
         self.currentSet = self.fetch_details_for_local_apps()
 
+
     def get_state(self):
         return [app['docId'] for app in self.currentSet]
+
 
     def insert_app_into_state(self, newApp):
         found = False
@@ -135,10 +133,6 @@ class Play(object):
             print('Adding %s into currentState..' % newApp['docId'])
             self.currentSet.append(newApp)
 
-
-    #
-    # MAIN SERVER FUNCTIONS
-    #
 
     def search(self, appName, numItems=20):
         results = self.service.search(appName, numItems, None).doc
@@ -155,7 +149,7 @@ class Play(object):
                 'title': result.title,
                 'developer': result.creator,
                 'version': appDetails.versionCode,
-                'size': self.file_size(appDetails.installationSize),
+                'size': file_size(appDetails.installationSize),
                 'docId': result.docid,
                 'numDownloads': appDetails.numDownloads,
                 'uploadDate': appDetails.uploadDate,
@@ -163,7 +157,6 @@ class Play(object):
             }
             all_apps.append(app)
         return all_apps
-
 
 
     def get_bulk_details(self, apksList):
@@ -186,7 +179,7 @@ class Play(object):
             details.append({
                'title': doc.title,
                'developer': doc.creator,
-               'size': self.file_size(appDetails.installationSize),
+               'size': file_size(appDetails.installationSize),
                'numDownloads': appDetails.numDownloads,
                'uploadDate': appDetails.uploadDate,
                'docId': doc.docid,
