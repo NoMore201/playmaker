@@ -9,7 +9,7 @@ import os
 import sys
 
 
-def get_token():
+def get_token(config):
     print('Retrieving token from %s' % config['tokenurl'])
     r = urllib.request.urlopen(config['tokenurl'])
     token = r.read().decode('utf-8')
@@ -53,7 +53,7 @@ class Play(object):
         token = ""
         for i in range(1, 4):
             print('#%d try' % i)
-            token = get_token()
+            token = get_token(self.config)
             if token == "":
                 continue
             else:
