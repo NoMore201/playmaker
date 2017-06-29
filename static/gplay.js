@@ -7,9 +7,6 @@ $(function(){
 
   $.material.init();
 
-  const loadingSpinner = '<i class="fa fa-refresh fa-spin fa-fw"></i>';
-  const refreshIcon = '<i class="fa fa-refresh" aria-hidden="true"></i>';
-
   /*
    * MODELS
    */
@@ -41,8 +38,15 @@ $(function(){
 
   });
 
+  // initialize view list, used to enable
+  // update on apks
+  app.apkViews = [];
+
+  // instance of the collection
   app.apkList = new app.ApkList();
 
+  // after removing an element from collection
+  // fire a delete request to the server
   app.apkList.on('remove', app => {
 
     // delete app on server
@@ -63,6 +67,8 @@ $(function(){
 
   });
 
+
+
   /*
    * VIEWS
    */
@@ -75,12 +81,18 @@ $(function(){
       this.$el.html(this.template(this.model.toJSON()));
 
       // set update button as disables
+      this.$('#apk-item-update').attr('class', 'btn btn-default');
+      //this.$('#apk-item-update').removeAttr('href');
       this.$('#apk-item-update').prop('disabled', true);
+      this.$('#apk-item-update').css('cursor', 'default');
+
+      this.updateAvailable = false;
       return this;
     },
 
     events: {
-      'click #apk-item-delete': 'onClickDelete'
+      'click #apk-item-delete': 'onClickDelete',
+      'click #apk-item-update': 'onClickUpdate'
     },
 
     onClickDelete: function() {
@@ -89,13 +101,17 @@ $(function(){
     },
 
     onClickUpdate: function() {
-      // download app and then disable
-      // the button
+      if (this.updateAvailable) {
+        console.log('Updating ' + this.model.get('docId'));
+        // TODO: update app and then reset boolean
+      }
     },
 
     enableUpdateBtn: function() {
       this.$('#apk-item-update').prop('disabled', false);
-      // TODO: enable on click method
+      this.$('#apk-item-update').css('cursor', 'pointer');
+      this.$('#apk-item-update').attr('class', 'btn btn-raised btn-primary');
+      this.updateAvailable = true;
     }
 
   });
@@ -106,23 +122,18 @@ $(function(){
 
     initialize: function () {
       this.updateAllBtn = $('#update-all');
-      app.apkViews = [];
-      this.getLocalApkList();
-    },
 
-    getLocalApkList: function () {
+      // fetch apks from server
       app.apkList.fetch({
-        success: this.onLoad
-      });
-    },
-
-    onLoad: function(apks, response) {
-      apks.models.forEach(apk => {
-        let view = new app.ApkView({
-          model: apk
-        });
-        app.apkViews.push(view);
-        this.$('#container').append(view.render().el);
+        success: function(apks, response) {
+          apks.models.forEach(apk => {
+            let view = new app.ApkView({
+              model: apk
+            });
+            this.$('#container').append(view.render().el);
+            app.apkViews.push(view);
+          });
+        }
       });
     },
 
@@ -131,20 +142,19 @@ $(function(){
     },
 
     updateAll: function(e) {
-      this.updateAllBtn.html(loadingSpinner + ' update');
       fetch('/gplay/check', {
         method: 'POST',
         headers: headers
-      }).then(response => {
+      }).then(function (response) {
         return response.text();
-      }).then(text => {
-        this.updateAllBtn.html(refreshIcon + ' update');
+      }).then(function (text) {
         let result = JSON.parse(text);
         console.log(result);
+        let viewSet = app.apkViews;
 
         if (result.length > 0) {
           result.forEach( function (app) {
-            let relatedView = app.apkViews.search( function(view) {
+            let relatedView = viewSet.find( function(view) {
               return view.model.get('docId') === app;
             });
             if (relatedView !== undefined) {
@@ -154,7 +164,6 @@ $(function(){
         }
       }).catch(error => {
         console.log(error);
-        this.updateAllBtn.html(refreshIcon + ' update');
       });
     }
 
