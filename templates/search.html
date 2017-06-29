@@ -9,8 +9,6 @@
 
     <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/bootstrap-material-design.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/ripples.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='gplay.css') }}" rel="stylesheet">
   </head>
   <body>
@@ -33,23 +31,11 @@
       </div>
     </div>
     <div class="container" id="container">
-      <div class="row">
-        <div class="col-md-12 col-xs-12">
-          <div class="form-group label-floating">
-            <label class="control-label">Search</label>
-            <input type="text" class="form-control" id="search-input">
-          </div>
-        </div>
+      <div id="search-area" class="input-group input-group-lg">
+        <span class="input-group-addon" id="search-input-label"><i class="fa fa-search" aria-hidden="true"></i></span>
+        <input type="text" class="form-control" id="search-input" placeholder="Search" aria-describedby="search-input-label">
       </div>
       <div class="row" id="table-box"></div>
-    </div>
-    <div id="loading-spinner">
-      <i class="fa fa-refresh fa-spin fa-4x fa-fw"></i>
-      <span class="sr-only">Loading...</span>
-    </div>
-    <div id="info-modal" class="mymodal">
-      <div id="info-modal-body">
-      </div>
     </div>
 
     <script type="text/template" id="table-template">
@@ -77,7 +63,7 @@
       <td><%- docId %></td>
       <td><%- version %></td>
       <% } else { %>
-      <td><a class="info-button"><i class="fa fa-info-circle fa-2x" aria-hidden="true"></i></a></td>
+      <td><a class="info-button"><i class="fa fa-info-circle fa-2x" data-toggle="popover" data-html="true" title="" data-placement="left" data-content="" aria-hidden="true"></i></a></td>
       <% } %>
     </script>
 
@@ -86,8 +72,6 @@
     <!-- graphic js resources -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/material.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/ripples.min.js') }}"></script>
     <!-- backbone libraries -->
     <script src="{{ url_for('static', filename='js/underscore-min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/backbone-min.js') }}"></script>

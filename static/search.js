@@ -4,8 +4,7 @@ $(function () {
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
 
-  $.material.init();
-
+  
   // Resources
   const loadingSpinner = '<i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>';
   const downloadIcon = '<i class="fa fa-download fa-2x" aria-hidden="true"></i>';
@@ -44,8 +43,7 @@ $(function () {
     },
 
     events: {
-      'click .dl-button': 'download',
-      'click .info-button': 'showInfo'
+      'click .dl-button': 'download'
     },
 
     download: function () {
@@ -68,22 +66,7 @@ $(function () {
           //TODO: display error msg
         }
       });
-    },
-
-    showInfo: function () {
-      let modal = $('#info-modal');
-      $('#info-modal-body').html(
-          '<span><strong>Id:</strong> ' + this.model.get('docId') + '</span><br>' +
-          '<span><strong>Dev:</strong> ' + this.model.get('developer') + '</span><br>' +
-          '<span><strong>Version:</strong> ' + this.model.get('version') + '</span><br>' +
-          '<span><strong>Uploaded:</strong> ' + this.model.get('uploadDate') + '</span><br>'
-      );
-      modal.show();
-      modal.click( function () {
-        modal.hide();
-      });
     }
-
   });
 
   app.TableView = Backbone.View.extend({
@@ -110,6 +93,18 @@ $(function () {
           model: m
         });
         this.tBody.append(view.render().el);
+        let title = m.get('title');
+        if (title.length > 35) {
+          title = title.substring(0, 32) + '..';
+        }
+        view.$('[data-toggle="popover"]').attr('title',
+          '<strong>' + title + '</strong>');
+        view.$('[data-toggle="popover"]').attr('data-content',
+          '<strong>Id:</strong> ' + m.get('docId') + '<br>' +
+          '<strong>Dev:</strong> ' + m.get('developer') + '<br>' +
+          '<strong>Size:</strong> ' + m.get('size') + '<br>' +
+          '<strong>Stars:</strong> ' + m.get('stars') + '<br>');
+        view.$('[data-toggle="popover"]').popover();
       });
       return this;
     }
@@ -123,8 +118,6 @@ $(function () {
     initialize: function () {
       this.tableBox = this.$('#table-box');
       this.searchInput = this.$('#search-input');
-      this.spinner = $('#loading-spinner');
-      this.spinner.hide();
       this.infoModal = $('#info-modal');
       this.infoModal.hide();
     },
@@ -140,7 +133,6 @@ $(function () {
 
       // reset the table view
       this.tableBox.html('');
-      this.spinner.show();
 
       let text = this.searchInput.val();
       if (text.length === 0) {
@@ -160,7 +152,6 @@ $(function () {
       }).then( text => {
         let data = JSON.parse(text);
         let table = new app.TableView();
-        this.spinner.hide();
         this.tableBox.html(table.render(data).el);
       })
     }
