@@ -45,19 +45,25 @@ $(function(){
 
   // after removing an element from collection
   // fire a delete request to the server
-  app.apkList.on('remove', app => {
+  app.apkList.on('remove', apk => {
 
     // delete app on server
     fetch('/gplay/delete', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
-          'delete': app.get('docId')
+          'delete': apk.get('docId')
         })
       }).then(response => {
         return response.text();
       }).then(text => {
         if (text === 'OK') {
+          console.log('I\'m in OK');
+          let notification = '<div class="alert message alert-success alert-dismissible fade in" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span></button>' +
+            apk.get('docId') + ' succesfuly removed!</div>';
+          $('body').append(notification);
         }
       }).catch(error => {
         console.log(error);

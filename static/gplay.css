@@ -5,11 +5,19 @@
 }
 
 #function-bar {
+  margin-top:30px;
   margin-bottom:30px;
 }
 
 .dl-button {
   cursor: pointer;
+}
+
+.message {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%
 }
 
 #update-all {
