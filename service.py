@@ -101,9 +101,9 @@ class Play(object):
         # get application ids from apk files
         appList = [os.path.splitext(apk)[0] for apk in os.listdir(downloadPath)
                    if os.path.splitext(apk)[1] == '.apk']
-        details = self.get_bulk_details(appList)
         toReturn = list()
         if len(appList) > 0:
+            details = self.get_bulk_details(appList)
             for appdetails in details:
                 filepath = os.path.join(downloadPath, appdetails['docId'] + '.apk')
                 a = APK(filepath)

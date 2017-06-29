@@ -96,7 +96,12 @@ $(function(){
     },
 
     onClickDelete: function() {
+      let appName = this.model.get('docId');
       app.apkList.remove(this.model);
+      let index = app.apkViews.findIndex(function (view) {
+        return view.model.get('docId') === appName;
+      });
+      app.apkViews.splice(index, 1);
       this.remove();
     },
 
