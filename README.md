@@ -20,6 +20,7 @@ On the other hand, the frontend is completely rewritten using modern web technol
 - [x] Implement /gplay/download
 - [ ] Add placeholder when there aren't local apps
 - [ ] Merge both AppViews in the same file (need to investigate)
+- [ ] Add some kind of notifications ([toasts](https://fezvrasta.github.io/snackbarjs/))
 
 ## Usage
 
