@@ -12,6 +12,7 @@ On the other hand, the frontend is completely rewritten using modern web technol
 - [x] Add API for deleting apk
 - [x] Save local apps in application state (for fast retrieving)
 - [ ] Implement configuration API (mainly for resetting/updating tokens)
+- [ ] Add fdroid integration
 
 ### Frontend
 - [x] Implement search page
