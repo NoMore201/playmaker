@@ -81,6 +81,10 @@ $(function(){
 
     template: _.template($('#apk-template').html()),
 
+    initialize: function () {
+      this.updateAvailable = false;
+    },
+
     render: function(){
       this.$el.html(this.template(this.model.toJSON()));
 
@@ -90,7 +94,6 @@ $(function(){
       this.$('#apk-item-update').prop('disabled', true);
       this.$('#apk-item-update').css('cursor', 'default');
 
-      this.updateAvailable = false;
       return this;
     },
 
@@ -110,9 +113,31 @@ $(function(){
     },
 
     onClickUpdate: function() {
+      //render loading bar
+      this.template = _.template($('#loading-template').html());
+      this.render();
+
+      let view = this;
       if (this.updateAvailable) {
-        console.log('Updating ' + this.model.get('docId'));
-        // TODO: update app and then reset boolean
+        console.log('Updating ' + view.model.get('docId'));
+        fetch('/gplay/download', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            download: [view.model.get('docId')]
+          })
+        }).then(response => {
+          return response.text();
+        }).then(text => {
+          let result = JSON.parse(text);
+          if (result.success.length > 0) {
+            view.model.set('version', result.success[0].version);
+          }
+
+          // restore view
+          view.template = _.template($('#apk-template').html());
+          view.render();
+        });
       }
     },
 
@@ -158,7 +183,6 @@ $(function(){
         return response.text();
       }).then(function (text) {
         let result = JSON.parse(text);
-        console.log(result);
         let viewSet = app.apkViews;
 
         if (result.length > 0) {

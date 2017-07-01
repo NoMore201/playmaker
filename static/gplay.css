@@ -20,6 +20,10 @@
   width:100%
 }
 
+.progress {
+  margin-bottom:15px;
+}
+
 #update-all {
   cursor: pointer;
 }
