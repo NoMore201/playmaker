@@ -27,7 +27,7 @@ def file_size(num):
 class Play(object):
     def __init__(self):
         self.currentSet = list()
-        
+
         # config parser
         self.configparser = configparser.ConfigParser()
         config_paths = [
@@ -46,14 +46,14 @@ class Play(object):
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
 
+        # configuring download folder
+        self.download_path = os.path.join(os.getcwd(), 'repo')
+
         # configuring fdroid data
         self.fdroid_exe = '/usr/bin/fdroid'
         self.fdroid_path = os.getcwd()
         self.fdroid_init()
-        
-        # configuring download folder
-        self.download_path = os.path.join(os.getcwd(), 'repo')
-        
+
         # no need of creating dir, fdroid will take care
         #if not os.path.isdir(self.config['download_path']):
         #    os.mkdir(self.config['download_path'])
