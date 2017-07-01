@@ -12,11 +12,11 @@ On the other hand, the frontend is completely rewritten using modern web technol
 - [x] Add API for deleting apk
 - [x] Save local apps in application state (for fast retrieving)
 - [ ] Implement configuration API (mainly for resetting/updating tokens)
-- [ ] Add fdroid integration
+- [x] Add fdroid integration
 
 ### Frontend
 - [x] Implement search page
-- [ ] Implement /gplay/check
+- [x] Implement /gplay/check
 - [x] Implement /gplay/download
 - [ ] Add placeholder when there aren't local apps
 - [ ] Merge both AppViews in the same file (need to investigate)
@@ -24,7 +24,19 @@ On the other hand, the frontend is completely rewritten using modern web technol
 
 ## Usage
 
-Install dependencies, then start the application
+### Docker
+
+There is a working Dockerfile (based on the [gplayweb one](https://github.com/matlink/gplayweb/blob/master/Dockerfile)). You can build and run by simply doing:
+
+```
+docker build -t playmaker .
+docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid playmaker
+```
+If you need to change the configuration, copy `playmaker.conf` inside `/srv/fdroid` and modify it. The app will look first there for a .conf file, and if it can't find anything, it will check system folders.
+### Directly
+
+Otherwise you can run it directly. Note that in order to run it you need [fdroidserver](https://gitlab.com/fdroid/fdroidserver) app, but you can also comment out the fdroid calls inside `service.py` and start it without.
+**!! If you use Ubuntu 16.04+** the fdroidserver package in the repositories is a but buggy, so I suggest you to install it through the guardianproject ppa (as explained in their repo).
 
 ```
 pip install -r requirements.txt  # consider using a virtualenv
