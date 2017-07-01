@@ -128,7 +128,7 @@ class Play(object):
         function to get names of downloaded apps (use get_state() instead)
         """
         # get application ids from apk files
-        appList = [os.path.splitext(apk)[0] for apk in os.listdir(self download_path)
+        appList = [os.path.splitext(apk)[0] for apk in os.listdir(self.download_path)
                    if os.path.splitext(apk)[1] == '.apk']
         toReturn = list()
         if len(appList) > 0:
