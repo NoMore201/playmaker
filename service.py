@@ -31,9 +31,9 @@ class Play(object):
         # config parser
         self.configparser = configparser.ConfigParser()
         config_paths = [
+            'playmaker.conf',
             '/etc/playmaker.conf',
-            os.path.expanduser('~') + '/.config/playmaker.conf',
-            'playmaker.conf'
+            os.path.expanduser('~') + '/.config/playmaker.conf'
         ]
         while not os.path.isfile(config_paths[0]):
             config_paths.pop(0)
