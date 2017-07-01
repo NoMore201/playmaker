@@ -69,7 +69,7 @@ class Play(object):
             p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                sys.stderr.write("error while initializing fdroid repository " + stderr)
+                sys.stderr.write("error while initializing fdroid repository " + stderr.decode('utf-8'))
                 sys.exit(1)
             else:
                 print('Fdroid repo initialized successfully')
@@ -80,7 +80,7 @@ class Play(object):
             p = Popen([self.fdroid_exe, 'update', '-c'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                sys.stderr.write("error while updating fdroid repository " + stderr)
+                sys.stderr.write("error while updating fdroid repository " + stderr.decode('utf-8'))
                 sys.exit(1)
             else:
                 print('Fdroid repo updated successfully')
