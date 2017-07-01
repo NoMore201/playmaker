@@ -76,13 +76,16 @@ class Play(object):
 
 
     def fdroid_update(self):
-        p = Popen([self.fdroid_exe, 'update', '-c'], stdout=PIPE, stderr=PIPE)
-        stdout, stderr = p.communicate()
-        if p.returncode != 0:
-            sys.stderr.write("error while updating fdroid repository " + stderr)
-            sys.exit(1)
-        else:
-            print('Fdroid repo updated successfully')
+        try:
+            p = Popen([self.fdroid_exe, 'update', '-c'], stdout=PIPE, stderr=PIPE)
+            stdout, stderr = p.communicate()
+            if p.returncode != 0:
+                sys.stderr.write("error while updating fdroid repository " + stderr)
+                sys.exit(1)
+            else:
+                print('Fdroid repo updated successfully')
+        except:
+            print(stderr)
 
 
     def fetch_new_token(self):
