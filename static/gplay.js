@@ -5,6 +5,34 @@ $(function(){
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
 
+  /**
+   * GENERIC FUNCTIONS
+   */
+
+  function genInfoAlert(message) {
+    let n = '<div class="alert message alert-info alert-dismissible fade in" role="alert">' +
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+      '<span aria-hidden="true">&times;</span></button>' +
+      message + '</div>';
+    return n;
+  }
+
+  function genSuccessAlertHtml(message) {
+    let n = '<div class="alert message alert-success alert-dismissible fade in" role="alert">' +
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+      '<span aria-hidden="true">&times;</span></button>' +
+      message + '</div>';
+    return n;
+  }
+
+  function genErrorAlertHtml(message) {
+    let n = '<div class="alert message alert-danger alert-dismissible fade in" role="alert">' +
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+      '<span aria-hidden="true">&times;</span></button>' +
+      message + '</div>';
+    return n;
+  }
+
   /*
    * MODELS
    */
@@ -58,15 +86,19 @@ $(function(){
         return response.text();
       }).then(text => {
         if (text === 'OK') {
-          console.log('I\'m in OK');
-          let notification = '<div class="alert message alert-success alert-dismissible fade in" role="alert">' +
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-            '<span aria-hidden="true">&times;</span></button>' +
-            apk.get('docId') + ' succesfuly removed!</div>';
-          $('body').append(notification);
+          let n = genSuccessAlertHtml( 'Successfully deleted ' + apk.get('docId') );
+          $('body').append(n);
+          let appName = apk.get('docId');
+          let index = app.apkViews.findIndex(function (view) {
+            return view.model.get('docId') === appName;
+          });
+          app.apkViews[index].remove();
+          app.apkViews.splice(index, 1);
         }
       }).catch(error => {
         console.log(error);
+        let n = genErrorAlertHtml( 'Error deleting ' + apk.get('docId') );
+        $('body').append(n);
       });
 
   });
@@ -105,11 +137,6 @@ $(function(){
     onClickDelete: function() {
       let appName = this.model.get('docId');
       app.apkList.remove(this.model);
-      let index = app.apkViews.findIndex(function (view) {
-        return view.model.get('docId') === appName;
-      });
-      app.apkViews.splice(index, 1);
-      this.remove();
     },
 
     onClickUpdate: function() {
@@ -137,6 +164,10 @@ $(function(){
           // restore view
           view.template = _.template($('#apk-template').html());
           view.render();
+        }).catch(error => {
+          console.log(error);
+          let n = genErrorAlertHtml( 'Error deleting ' + apk.get('docId') );
+          $('body').append(n);
         });
       }
     },
@@ -186,6 +217,9 @@ $(function(){
         let viewSet = app.apkViews;
 
         if (result.length > 0) {
+          let n = genSuccessAlertHtml(result.length.toString() +
+                    ' apps needs to be updated');
+          $('body').append(n);
           result.forEach( function (app) {
             let relatedView = viewSet.find( function(view) {
               return view.model.get('docId') === app;
@@ -194,6 +228,9 @@ $(function(){
               relatedView.enableUpdateBtn();
             }
           });
+        } else {
+          let n = genInfoAlert('No updates avaialble');
+          $('body').append(n);
         }
       }).catch(error => {
         console.log(error);

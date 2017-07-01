@@ -4,7 +4,7 @@ $(function () {
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
 
-  
+
   // Resources
   const loadingSpinner = '<i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>';
   const downloadIcon = '<i class="fa fa-download fa-2x" aria-hidden="true"></i>';
@@ -83,8 +83,11 @@ $(function () {
       this.$el.html(this.template());
 
       this.tBody = this.$('#table-body');
-
-      if (app.apkList.models.length !== 0) {
+      
+      if (data === undefined) {
+        return;
+      }
+      if (app.apkList.models.length > 0) {
         app.apkList.reset()
       }
       app.apkList.add(data);
@@ -97,14 +100,16 @@ $(function () {
         if (title.length > 35) {
           title = title.substring(0, 32) + '..';
         }
-        view.$('[data-toggle="popover"]').attr('title',
+        let popover = view.$('[data-toggle="popover"]');
+        popover.isVisible = false;
+        popover.attr('title',
           '<strong>' + title + '</strong>');
-        view.$('[data-toggle="popover"]').attr('data-content',
+        popover.attr('data-content',
           '<strong>Id:</strong> ' + m.get('docId') + '<br>' +
           '<strong>Dev:</strong> ' + m.get('developer') + '<br>' +
           '<strong>Size:</strong> ' + m.get('size') + '<br>' +
           '<strong>Stars:</strong> ' + m.get('stars') + '<br>');
-        view.$('[data-toggle="popover"]').popover();
+        popover.popover();
       });
       return this;
     }
