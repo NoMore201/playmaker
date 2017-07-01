@@ -2,3 +2,4 @@ requests
 pyaxmlparser
 protobuf
 Flask
+fdroidserver
