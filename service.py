@@ -28,11 +28,6 @@ class Play(object):
     def __init__(self):
         self.currentSet = list()
         
-        # configuring fdroid data
-        self.fdroid_exe = '/usr/bin/fdroid'
-        self.fdroid_path = os.getcwd()
-        self.fdroid_init()
-        
         # config parser
         self.configparser = configparser.ConfigParser()
         config_paths = [
@@ -50,6 +45,11 @@ class Play(object):
         self.config = dict()
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
+
+        # configuring fdroid data
+        self.fdroid_exe = '/usr/bin/fdroid'
+        self.fdroid_path = os.getcwd()
+        self.fdroid_init()
         
         # configuring download folder
         self.download_path = os.path.join(os.getcwd(), 'repo')
