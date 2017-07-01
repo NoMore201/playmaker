@@ -5,6 +5,7 @@ from pyaxmlparser import APK
 import configparser
 import urllib.request
 from urllib.error import URLError
+from subprocess import Popen, PIPE
 import os
 import sys
 
@@ -42,11 +43,44 @@ class Play(object):
         self.config = dict()
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
-        self.set_download_folder('.')
-        if not os.path.isdir(self.config['download_path']):
-            os.mkdir(self.config['download_path'])
+        
+        # configuring download folder
+        self.download_path = os.path.join(os.getcwd(), 'repo')
+        
+        # no need of creating dir, fdroid will take care
+        #if not os.path.isdir(self.config['download_path']):
+        #    os.mkdir(self.config['download_path'])
+        
+        # configuring fdroid data
+        self.fdroid_exe = '/usr/bin/fdroid'
+        self.fdroid_path = os.getcwd()
         self.service = GooglePlayAPI(self.config['id'], 'en', True)
         self.login()
+        self.fdroid_init()
+
+
+    def fdroid_init(self):
+        if not os.path.isfile(self.fdroid_exe):
+            raise OSError('Please install fdroid from repo')
+            sys.exit(1)
+        else:
+            p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE, cwd=self.config['download_path'])
+            stdout, stderr = process.communicate()
+            if p.returncode != 0:
+                sys.stderr.write("error while initializing fdroid repository " + stderr)
+                sys.exit(1)
+            else:
+                print('Fdroid repo initialized successfully')
+
+
+    def fdroid_update(self):
+        p = Popen([self.fdroid_exe, 'update', '-c'], stdout=PIPE, stderr=PIPE)
+        stdout, stderr = process.communicate()
+        if p.returncode != 0:
+            sys.stderr.write("error while updating fdroid repository " + stderr)
+            sys.exit(1)
+        else:
+            print('Fdroid repo updated successfully')
 
 
     def fetch_new_token(self):
@@ -87,25 +121,20 @@ class Play(object):
             sys.exit(1)
 
 
-    def set_download_folder(self, folder):
-        self.config['download_path'] = folder
-
-
     def fetch_details_for_local_apps(self):
         """
         Return list of details of the currently downloaded apps.
         Details are fetched from the google server. Don't use this
         function to get names of downloaded apps (use get_state() instead)
         """
-        downloadPath = self.config['download_path']
         # get application ids from apk files
-        appList = [os.path.splitext(apk)[0] for apk in os.listdir(downloadPath)
+        appList = [os.path.splitext(apk)[0] for apk in os.listdir(self download_path)
                    if os.path.splitext(apk)[1] == '.apk']
         toReturn = list()
         if len(appList) > 0:
             details = self.get_bulk_details(appList)
             for appdetails in details:
-                filepath = os.path.join(downloadPath, appdetails['docId'] + '.apk')
+                filepath = os.path.join(self.download_path, appdetails['docId'] + '.apk')
                 a = APK(filepath)
                 appdetails['version'] = int(a.version_code)
                 toReturn.append(appdetails)
@@ -194,7 +223,6 @@ class Play(object):
         failed = list()
         unavail = list()
 
-        downloadPath = self.config['download_path']
         details = self.get_bulk_details(appNames)
 
         for appname, appdetails in zip(appNames, details):
@@ -206,6 +234,7 @@ class Play(object):
             try:
                 data = self.service.download(appname, appdetails['version'])
                 success.append(appdetails)
+                self.fdroid_update()
                 print('Done!')
             except IndexError as exc:
                 print('Package %s does not exists' % appname)
@@ -215,7 +244,7 @@ class Play(object):
                 failed.append(appname)
             else:
                 filename = appname + '.apk'
-                filepath = os.path.join(downloadPath, filename)
+                filepath = os.path.join(self.download_path, filename)
                 try:
                     open(filepath, 'wb').write(data)
                 except IOError as exc:
@@ -234,7 +263,6 @@ class Play(object):
 
 
     def check_local_apks(self):
-        downloadPath = self.config['download_path']
         localDetails = self.currentSet
         onlineDetails = self.get_bulk_details(self.get_state())
         if len(localDetails) == 0 or len(onlineDetails) == 0:
@@ -251,8 +279,7 @@ class Play(object):
 
     def remove_local_app(self, appName):
         apkName = appName + '.apk'
-        downloadPath = self.config['download_path']
-        apkPath = os.path.join(downloadPath, apkName)
+        apkPath = os.path.join(self.download_path, apkName)
         if os.path.isfile(apkPath):
             os.remove(apkPath)
             for pos, app in enumerate(self.currentSet):
