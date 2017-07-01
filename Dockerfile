@@ -3,17 +3,22 @@ FROM ubuntu:16.04
 RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y python3-dev python3-pip git \
-	lib32stdc++6 \
-	lib32gcc1 \
-	lib32z1 \
-	lib32ncurses5 \
-	libffi-dev \
-	libssl-dev \
-	libjpeg-dev \
-	openjdk-8-jdk \
-	virtualenv \
-	wget \
-	zlib1g-dev
+    lib32stdc++6 \
+    lib32gcc1 \
+    lib32z1 \
+    lib32ncurses5 \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    openjdk-8-jdk \
+    virtualenv \
+    wget \
+    zlib1g-dev \
+    software-properties-common
+
+RUN add-apt-repository ppa:guardianproject/ppa && \
+    apt-get update && \
+    apt-get install fdroidserver
 
 WORKDIR /opt
 RUN git clone https://github.com/NoMore201/playmaker
@@ -30,8 +35,7 @@ RUN echo 'y' | android update sdk --no-ui -a --filter platform-tools,build-tools
 RUN mkdir -p /data/fdroid/repo
 
 WORKDIR /opt/playmaker
-RUN pip3 install -r requirements.txt && \
-    ln -s /usr/local/bin/fdroid /usr/bin/fdroid
+RUN pip3 install -r requirements.txt
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
