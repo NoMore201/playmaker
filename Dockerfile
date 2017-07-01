@@ -30,12 +30,13 @@ RUN echo 'y' | android update sdk --no-ui -a --filter platform-tools,build-tools
 RUN mkdir -p /data/fdroid/repo
 
 WORKDIR /opt/playmaker
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt && \
+    ln -s /usr/local/bin/fdroid /usr/bin/fdroid
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
 
-RUN cp /opt/playmaker/playmaker.conf .
+RUN cp /opt/playmaker/playmaker.conf /data/fdroid
 
 EXPOSE 5000
 ENTRYPOINT /opt/playmaker/playmaker.py
