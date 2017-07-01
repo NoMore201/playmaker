@@ -79,6 +79,7 @@ $(function(){
     fetch('/gplay/delete', {
         method: 'POST',
         headers: headers,
+        credentials: 'same-origin',
         body: JSON.stringify({
           'delete': apk.get('docId')
         })
@@ -150,6 +151,7 @@ $(function(){
         fetch('/gplay/download', {
           method: 'POST',
           headers: headers,
+          credentials: 'same-origin',
           body: JSON.stringify({
             download: [view.model.get('docId')]
           })
@@ -209,6 +211,7 @@ $(function(){
     updateAll: function(e) {
       fetch('/gplay/check', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: headers
       }).then(function (response) {
         return response.text();

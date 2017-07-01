@@ -51,6 +51,7 @@ $(function () {
       fetch('/gplay/download', {
         method: 'POST',
         headers: headers,
+        credentials: 'same-origin',
         body: JSON.stringify({
           download: [this.model.get('docId')]
         })
@@ -152,6 +153,7 @@ $(function () {
 
       fetch(url, {
         method: 'GET',
+        credentials: 'same-origin',
         headers: headers
       }).then( response => {
         return response.text();
