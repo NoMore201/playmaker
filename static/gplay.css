@@ -13,6 +13,10 @@
   cursor: pointer;
 }
 
+#dl-button-td {
+  width:80px;
+}
+
 .message {
   position: fixed;
   top:0;
@@ -22,6 +26,12 @@
 
 .progress {
   margin-bottom:15px;
+}
+
+#search-progress {
+  margin-top:40px;
+  margin-left:30px;
+  margin-right:30px;
 }
 
 #update-all {

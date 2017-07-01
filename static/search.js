@@ -132,7 +132,8 @@ $(function () {
       }
 
       // reset the table view
-      this.tableBox.html('');
+      let t =  _.template($('#loading-template').html())
+      this.tableBox.html(t());
 
       let text = this.searchInput.val();
       if (text.length === 0) {
