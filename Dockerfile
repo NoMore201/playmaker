@@ -34,5 +34,8 @@ RUN pip3 install -r requirements.txt
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
+
+RUN cp /opt/playmaker/playmaker.conf .
+
 EXPOSE 5000
 ENTRYPOINT /opt/playmaker/playmaker.py
