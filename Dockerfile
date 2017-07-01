@@ -16,12 +16,15 @@ RUN apt-get update && \
     zlib1g-dev \
     software-properties-common
 
+# Using guardian project ppa because the version in
+# ubuntu repositories is a bit buggy
 RUN add-apt-repository ppa:guardianproject/ppa && \
     apt-get update && \
-    apt-get install fdroidserver
+    apt-get install -y fdroidserver
 
 WORKDIR /opt
 RUN git clone https://github.com/NoMore201/playmaker
+
 
 RUN wget https://dl.google.com/android/android-sdk_r24.3.4-linux.tgz \
     && echo "fb293d7bca42e05580be56b1adc22055d46603dd  android-sdk_r24.3.4-linux.tgz" | sha1sum -c \
@@ -40,7 +43,7 @@ RUN pip3 install -r requirements.txt
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
 
-RUN cp /opt/playmaker/playmaker.conf /data/fdroid
+RUN cp /opt/playmaker/playmaker.conf /etc
 
 EXPOSE 5000
 ENTRYPOINT /opt/playmaker/playmaker.py
