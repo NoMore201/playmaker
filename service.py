@@ -66,7 +66,7 @@ class Play(object):
             raise OSError('Please install fdroid from repo')
             sys.exit(1)
         else:
-            p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE, cwd=self.config['download_path'])
+            p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE, cwd=self.download_path)
             stdout, stderr = process.communicate()
             if p.returncode != 0:
                 sys.stderr.write("error while initializing fdroid repository " + stderr)
