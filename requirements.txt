@@ -2,4 +2,3 @@ requests
 pyaxmlparser
 protobuf
 Flask
-pycrypto
