@@ -27,6 +27,13 @@ def file_size(num):
 class Play(object):
     def __init__(self):
         self.currentSet = list()
+        
+        # configuring fdroid data
+        self.fdroid_exe = '/usr/bin/fdroid'
+        self.fdroid_path = os.getcwd()
+        self.fdroid_init()
+        
+        # config parser
         self.configparser = configparser.ConfigParser()
         config_paths = [
             '/etc/playmaker.conf',
@@ -50,13 +57,8 @@ class Play(object):
         # no need of creating dir, fdroid will take care
         #if not os.path.isdir(self.config['download_path']):
         #    os.mkdir(self.config['download_path'])
-        
-        # configuring fdroid data
-        self.fdroid_exe = '/usr/bin/fdroid'
-        self.fdroid_path = os.getcwd()
         self.service = GooglePlayAPI(self.config['id'], 'en', True)
         self.login()
-        self.fdroid_init()
 
 
     def fdroid_init(self):
@@ -128,7 +130,7 @@ class Play(object):
         function to get names of downloaded apps (use get_state() instead)
         """
         # get application ids from apk files
-        appList = [os.path.splitext(apk)[0] for apk in os.listdir(self download_path)
+        appList = [os.path.splitext(apk)[0] for apk in os.listdir(self.download_path)
                    if os.path.splitext(apk)[1] == '.apk']
         toReturn = list()
         if len(appList) > 0:
