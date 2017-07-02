@@ -12,18 +12,20 @@ On the other hand, the frontend is completely rewritten using modern web technol
 ### Backend
 - [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/), [kyoukai](https://github.com/SunDwarf/Kyoukai) )
 - [ ] General python3 code check
-- [x] API for deleting apk
-- [x] Save local apps in application state (for fast retrieving)
 - [ ] configuration API (mainly for resetting/updating tokens)
 - [x] fdroid integration
 
 ### Frontend
-- [x] Implement search page
-- [x] Implement /gplay/check
-- [x] Implement /gplay/download
 - [ ] Add placeholder when there aren't local apps
-- [ ] Merge both AppViews in the same file (need to investigate)
-- [ ] Add some kind of notifications ([toasts](https://fezvrasta.github.io/snackbarjs/))
+- [ ] *Check* and *Fdroid update* buttons need some visual feedback while executing
+- [x] Add some kind of notification
+- [ ] Make notifications disappear after some seconds
+- [ ] gplay.js: populate collection manually (no fetch)
+
+### Dockerfile
+- [x] Start as normal user
+- [ ] Use updated Android SDK
+- [ ] Try to make image a bit smaller
 
 ## Usage
 
