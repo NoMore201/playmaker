@@ -291,5 +291,6 @@ class Play(object):
                 if app['docId'] == appName:
                     del self.currentSet[pos]
                     print(str(self.currentSet))
+            self.fdroid_update()
             return True
         return False
