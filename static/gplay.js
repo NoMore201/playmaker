@@ -136,6 +136,8 @@ $(function(){
     },
 
     onClickDelete: function() {
+      this.template = _.template($('#loading-template').html());
+      this.render();
       let appName = this.model.get('docId');
       app.apkList.remove(this.model);
     },
