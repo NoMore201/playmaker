@@ -8,11 +8,12 @@ On the other hand, the frontend is completely rewritten using modern web technol
 ## Development TODOs
 
 ### Backend
+- [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/), [kyoukai](https://github.com/SunDwarf/Kyoukai) )
 - [ ] General python3 code check
-- [x] Add API for deleting apk
+- [x] API for deleting apk
 - [x] Save local apps in application state (for fast retrieving)
-- [ ] Implement configuration API (mainly for resetting/updating tokens)
-- [x] Add fdroid integration
+- [ ] configuration API (mainly for resetting/updating tokens)
+- [x] fdroid integration
 
 ### Frontend
 - [x] Implement search page
