@@ -77,7 +77,7 @@ class Play(object):
 
     def fdroid_update(self):
         try:
-            p = Popen([self.fdroid_exe, 'update', '-c', '--clean'], stdout=PIPE, stderr=PIPE)
+            p = Popen([self.fdroid_exe, 'update', '-c'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
                 sys.stderr.write("error while updating fdroid repository " + stderr.decode('utf-8'))
