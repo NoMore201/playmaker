@@ -48,7 +48,7 @@ pip install -r requirements.txt  # consider using a virtualenv
 python3 playmaker.py
 ```
 
-it will listen on Flask default port 5000. By default the application uses [Matlink token-dispenser service](https://github.com/matlink/gplaycli#changelog). However, in order to avoid [problems](https://github.com/matlink/gplaycli/issues/80) I suggest you to host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser).
+it will listen on Flask default port 5000. By default the applicatiom uses a token-dispenser server provided by me. However, you can host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser).
 
 For additional informations on how to do this, consider checking the Docker images for token-dispenser: https://github.com/NoMore201/docker-token-dispenser
 
