@@ -1,5 +1,7 @@
 # Playmaker
 
+![screenshot](https://github.com/NoMore201/playmaker/raw/master/example1.png)
+
 ## Description
 
 Playmaker is a python3-only apk manager with a web interface. The backend is taken from gplaycli/gplayweb python3 branch, with a few modifications.
