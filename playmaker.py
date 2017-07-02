@@ -44,6 +44,14 @@ def check_local():
     return json.dumps(service.check_local_apks())
 
 
+@app.route('/gplay/fdroidupd', methods=['POST'])
+def update_fdroid():
+    result = service.fdroid_update()
+    if result is True:
+        return 'OK'
+    else:
+        abort(500)
+
 @app.route('/gplay/getapps', methods=['GET'])
 def get_apks():
     apps = sorted(service.currentSet, key=lambda k: k['title'])

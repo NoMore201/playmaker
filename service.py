@@ -77,15 +77,17 @@ class Play(object):
 
     def fdroid_update(self):
         try:
-            p = Popen([self.fdroid_exe, 'update', '-c'], stdout=PIPE, stderr=PIPE)
+            p = Popen([self.fdroid_exe, 'update', '-c', '--clean'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
                 sys.stderr.write("error while updating fdroid repository " + stderr.decode('utf-8'))
-                sys.exit(1)
+                return False
             else:
                 print('Fdroid repo updated successfully')
+                return True
         except:
             print(stderr)
+            return False
 
 
     def fetch_new_token(self):
@@ -239,7 +241,6 @@ class Play(object):
             try:
                 data = self.service.download(appname, appdetails['version'])
                 success.append(appdetails)
-                self.fdroid_update()
                 print('Done!')
             except IndexError as exc:
                 print('Package %s does not exists' % appname)
@@ -291,6 +292,5 @@ class Play(object):
                 if app['docId'] == appName:
                     del self.currentSet[pos]
                     print(str(self.currentSet))
-            self.fdroid_update()
             return True
         return False

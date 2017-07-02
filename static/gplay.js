@@ -207,7 +207,8 @@ $(function(){
     },
 
     events: {
-      'click #update-all': 'updateAll'
+      'click #update-all': 'updateAll',
+      'click #update-fdroid': 'updateFdroid'
     },
 
     updateAll: function(e) {
@@ -239,6 +240,21 @@ $(function(){
         }
       }).catch(error => {
         console.log(error);
+      });
+    },
+
+    updateFdroid: function(e) {
+      fetch('/gplay/fdroidupd', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: headers
+      }).then(function (response) {
+        return response.text();
+      }).then(function (text) {
+        if (text === 'OK') {
+          let n = genSuccessAlertHtml('Fdroid repo correctly updated');
+          $('body').append(n);
+        }
       });
     }
 
