@@ -77,6 +77,30 @@
       </div><!-- col -->
     </script>
 
+    <script type="text/template" id="alert-info-tmp">
+      <div class="alert message alert-info alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button><%- message %>
+      </div>
+    </script>
+
+    <script type="text/template" id="alert-success-tmp">
+      <div class="alert message alert-success alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button><%- message %>
+      </div>
+    </script>
+
+    <script type="text/template" id="alert-error-tmp">
+      <div class="alert message alert-danger alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button><%- message %>
+      </div>
+    </script>
+
     <!-- graphic js resources -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>

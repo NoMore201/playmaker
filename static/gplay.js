@@ -9,28 +9,34 @@ $(function(){
    * GENERIC FUNCTIONS
    */
 
-  function genInfoAlert(message) {
-    let n = '<div class="alert message alert-info alert-dismissible fade in" role="alert">' +
-      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-      '<span aria-hidden="true">&times;</span></button>' +
-      message + '</div>';
-    return n;
+  function genInfoAlertHtml(message) {
+    let n = _.template($('#alert-info-tmp').html());
+    n = n({ message: message });
+    let view = $(n);
+    $('body').append(view);
+    setTimeout( function() {
+      view.alert('close');
+    }, 5000);
   }
 
   function genSuccessAlertHtml(message) {
-    let n = '<div class="alert message alert-success alert-dismissible fade in" role="alert">' +
-      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-      '<span aria-hidden="true">&times;</span></button>' +
-      message + '</div>';
-    return n;
+    let n = _.template($('#alert-success-tmp').html());
+    n = n({ message: message });
+    let view = $(n);
+    $('body').append(view);
+    setTimeout( function() {
+      view.alert('close');
+    }, 5000);
   }
 
   function genErrorAlertHtml(message) {
-    let n = '<div class="alert message alert-danger alert-dismissible fade in" role="alert">' +
-      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-      '<span aria-hidden="true">&times;</span></button>' +
-      message + '</div>';
-    return n;
+    let n = _.template($('#alert-error-tmp').html());
+    n = n({ message: message });
+    let view = $(n);
+    $('body').append(view);
+    setTimeout( function() {
+      view.alert('close');
+    }, 5000);
   }
 
   /*
@@ -57,11 +63,7 @@ $(function(){
    */
 
   app.ApkList = Backbone.Collection.extend({
-
-    model: app.Apk,
-
-    url: '/gplay/getapps'
-
+    model: app.Apk
   });
 
   // initialize view list, used to enable
@@ -70,40 +72,6 @@ $(function(){
 
   // instance of the collection
   app.apkList = new app.ApkList();
-
-  // after removing an element from collection
-  // fire a delete request to the server
-  app.apkList.on('remove', apk => {
-
-    // delete app on server
-    fetch('/gplay/delete', {
-        method: 'POST',
-        headers: headers,
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          'delete': apk.get('docId')
-        })
-      }).then(response => {
-        return response.text();
-      }).then(text => {
-        if (text === 'OK') {
-          let n = genSuccessAlertHtml( 'Successfully deleted ' + apk.get('docId') );
-          $('body').append(n);
-          let appName = apk.get('docId');
-          let index = app.apkViews.findIndex(function (view) {
-            return view.model.get('docId') === appName;
-          });
-          app.apkViews[index].remove();
-          app.apkViews.splice(index, 1);
-        }
-      }).catch(error => {
-        console.log(error);
-        let n = genErrorAlertHtml( 'Error deleting ' + apk.get('docId') );
-        $('body').append(n);
-      });
-
-  });
-
 
 
   /*
@@ -121,9 +89,8 @@ $(function(){
     render: function(){
       this.$el.html(this.template(this.model.toJSON()));
 
-      // set update button as disables
+      // set update button as disabled
       this.$('#apk-item-update').attr('class', 'btn btn-default');
-      //this.$('#apk-item-update').removeAttr('href');
       this.$('#apk-item-update').prop('disabled', true);
       this.$('#apk-item-update').css('cursor', 'default');
 
@@ -138,8 +105,45 @@ $(function(){
     onClickDelete: function() {
       this.template = _.template($('#loading-template').html());
       this.render();
-      let appName = this.model.get('docId');
-      app.apkList.remove(this.model);
+      let apk = this.model;
+      let view = this;
+
+      fetch('/gplay/delete', {
+        method: 'POST',
+        headers: headers,
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          'delete': apk.get('docId')
+        })
+      }).then(response => {
+        if (response.status !== 200) {
+          genErrorAlertHtml( 'Error deleting ' + apk.get('docId'));
+          // restore original view
+          view.template = _.template($('#apk-template').html());
+          view.render();
+          return -1;
+        }
+        return response.text();
+      }).then(text => {
+        if (text === -1) return;
+        if (text === 'OK') {
+          genSuccessAlertHtml( 'Successfully deleted ' + apk.get('docId') );
+          // remove view from html and from apkViews array
+          // then remove apk from collection
+          let index = app.apkViews.findIndex(function (v) {
+            return v === view;
+          });
+          view.remove();
+          app.apkViews.splice(index, 1);
+          app.apkList.remove(apk);
+        }
+      }).catch(error => {
+        console.log(error);
+        genErrorAlertHtml( 'Error deleting ' + apk.get('docId'));
+        view.template = _.template($('#apk-template').html());
+        view.render();
+      });
+
     },
 
     onClickUpdate: function() {
@@ -170,8 +174,7 @@ $(function(){
           view.render();
         }).catch(error => {
           console.log(error);
-          let n = genErrorAlertHtml( 'Error deleting ' + apk.get('docId') );
-          $('body').append(n);
+          genErrorAlertHtml( 'Error updating ' + apk.get('docId') );
         });
       }
     },
@@ -192,17 +195,30 @@ $(function(){
     initialize: function () {
       this.updateAllBtn = $('#update-all');
 
-      // fetch apks from server
-      app.apkList.fetch({
-        success: function(apks, response) {
-          apks.models.forEach(apk => {
-            let view = new app.ApkView({
-              model: apk
-            });
-            this.$('#container').append(view.render().el);
-            app.apkViews.push(view);
-          });
+      fetch('/gplay/getapps', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: headers
+      }).then(response => {
+        if (response.status === 500) {
+          genErrorAlertHtml('Cannot fetch applications :(');
+          return -1;
         }
+        return response.text();
+      }).then(text => {
+        if (text === -1) return;
+
+        let data = JSON.parse(text);
+        app.apkList.add(data);
+        app.apkList.models.forEach( function(m) {
+          let view = new app.ApkView({
+            model: m
+          });
+          $('#container').append(view.render().el);
+          app.apkViews.push(view);
+        });
+      }).catch(error => {
+        console.log(error);
       });
     },
 
@@ -217,8 +233,14 @@ $(function(){
         credentials: 'same-origin',
         headers: headers
       }).then(function (response) {
+        if (response.status === 500) {
+          genErrorAlertHtml('Cannot check for updates :(');
+          return -1;
+        }
         return response.text();
       }).then(function (text) {
+        if (text === -1) return;
+
         let result = JSON.parse(text);
         let viewSet = app.apkViews;
 
@@ -235,11 +257,12 @@ $(function(){
             }
           });
         } else {
-          let n = genInfoAlert('No updates avaialble');
+          let n = genInfoAlertHtml('No updates avaialble');
           $('body').append(n);
         }
       }).catch(error => {
         console.log(error);
+        genErrorAlertHtml('Cannot check for updates :(');
       });
     },
 
@@ -249,12 +272,20 @@ $(function(){
         credentials: 'same-origin',
         headers: headers
       }).then(function (response) {
+        if (response.status === 500) {
+          genErrorAlertHtml('Cannot check for updates :(');
+          return -1;
+        }
         return response.text();
       }).then(function (text) {
+        if (text === -1) return;
         if (text === 'OK') {
           let n = genSuccessAlertHtml('Fdroid repo correctly updated');
           $('body').append(n);
         }
+      }).catch(error => {
+        console.log(error);
+        let n = genErrorAlertHtml('Cannot update Fdroid repo :(');
       });
     }
 

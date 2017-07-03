@@ -4,6 +4,40 @@ $(function () {
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
 
+  /**
+   * GENERIC FUNCTIONS
+   */
+
+  function genInfoAlertHtml(message) {
+    let n = _.template($('#alert-info-tmp').html());
+    n = n({ message: message });
+    let view = $(n);
+    $('body').append(view);
+    setTimeout( function() {
+      view.alert('close');
+    }, 5000);
+  }
+
+  function genSuccessAlertHtml(message) {
+    let n = _.template($('#alert-success-tmp').html());
+    n = n({ message: message });
+    let view = $(n);
+    $('body').append(view);
+    setTimeout( function() {
+      view.alert('close');
+    }, 5000);
+  }
+
+  function genErrorAlertHtml(message) {
+    let n = _.template($('#alert-error-tmp').html());
+    n = n({ message: message });
+    let view = $(n);
+    $('body').append(view);
+    setTimeout( function() {
+      view.alert('close');
+    }, 5000);
+  }
+
 
   // Resources
   const loadingSpinner = '<i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>';
@@ -84,7 +118,7 @@ $(function () {
       this.$el.html(this.template());
 
       this.tBody = this.$('#table-body');
-      
+
       if (data === undefined) {
         return;
       }
@@ -161,7 +195,11 @@ $(function () {
         let data = JSON.parse(text);
         let table = new app.TableView();
         this.tableBox.html(table.render(data).el);
-      })
+      }).catch(error => {
+        console.log(error);
+        this.tableBox.html('');
+        genErrorAlertHtml('Error while searching');
+      });
     }
 
   });
