@@ -34,6 +34,11 @@
   margin-right:30px;
 }
 
+#fdroid-progress {
+  margin-left:30px;
+  margin-right:30px;
+}
+
 #update-all {
   cursor: pointer;
 }

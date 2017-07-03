@@ -33,7 +33,26 @@
     <div class="container" id="container">
       <div id="function-bar">
         <a id="update-all" class="btn btn-default"><i class="fa fa-refresh" aria-hidden="true"></i> check</a>
-        <a id="update-fdroid" class="btn btn-default"><i class="fa fa-android" aria-hidden="true"></i> fdroid update</a>
+        <a id="update-fdroid" class="btn btn-default" data-toggle="modal" data-target="#fdroid-modal"><i class="fa fa-android" aria-hidden="true"></i> fdroid update</a>
+        <!-- Modal -->
+        <div class="modal fade" id="fdroid-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Updating Fdroid</h4>
+              </div>
+              <div class="modal-body">
+              The updating process could take some time, depending on number of apks
+              </div>
+              <div id="fdroid-progress" class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                  <span class="sr-only">Updating</span>
+                </div>
+              </div><!-- progress -->
+            </div>
+          </div>
+        </div><!-- modal -->
       </div>
     </div>
 

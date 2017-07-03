@@ -273,6 +273,7 @@ $(function(){
         headers: headers
       }).then(function (response) {
         if (response.status === 500) {
+          $('#fdroid-modal').modal('hide');
           genErrorAlertHtml('Cannot check for updates :(');
           return -1;
         }
@@ -280,11 +281,13 @@ $(function(){
       }).then(function (text) {
         if (text === -1) return;
         if (text === 'OK') {
+          $('#fdroid-modal').modal('hide');
           let n = genSuccessAlertHtml('Fdroid repo correctly updated');
           $('body').append(n);
         }
       }).catch(error => {
         console.log(error);
+        $('#fdroid-modal').modal('hide');
         let n = genErrorAlertHtml('Cannot update Fdroid repo :(');
       });
     }
