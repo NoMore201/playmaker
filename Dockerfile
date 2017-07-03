@@ -48,6 +48,7 @@ RUN groupadd -g 666 abc && \
     useradd -g abc -u 666 -s /bin/bash abc && \
     chown -R abc:abc /data/fdroid
 
+USER abc
 EXPOSE 5000
-ENTRYPOINT su -c "/usr/bin/env python3 -u /opt/playmaker/playmaker.py" abc
+ENTRYPOINT /usr/bin/env python3 -u /opt/playmaker/playmaker.py
 
