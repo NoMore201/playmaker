@@ -19,8 +19,8 @@ On the other hand, the frontend is completely rewritten using modern web technol
 - [ ] Add placeholder when there aren't local apps
 - [ ] *Check* and *Fdroid update* buttons need some visual feedback while executing
 - [x] Add some kind of notification
-- [ ] Make notifications disappear after some seconds
-- [ ] gplay.js: populate collection manually (no fetch)
+- [x] Make notifications disappear after some seconds
+- [x] gplay.js: populate collection manually (no fetch)
 
 ### Dockerfile
 - [x] Start as normal user
