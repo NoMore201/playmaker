@@ -10,7 +10,7 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 ## Development TODOs
 
 ### Backend
-- [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/), [kyoukai](https://github.com/SunDwarf/Kyoukai) )
+- [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
 - [ ] General python3 code check
 - [ ] configuration API (mainly for resetting/updating tokens)
 - [x] fdroid integration

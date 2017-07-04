@@ -5,13 +5,8 @@ from service import Play
 
 import json, os
 
-static = '/usr/share/playmaker/static'
-static_path = static if os.path.isdir(static) else 'static'
-templates = '/usr/share/playmaker/templates'
-templates_path = templates if os.path.isdir(templates) else 'templates'
-
 # application setup
-app = Flask(__name__, static_folder=static_path, template_folder=templates_path)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 service = Play()
 
 
