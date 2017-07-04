@@ -108,7 +108,7 @@ $(function(){
       let apk = this.model;
       let view = this;
 
-      fetch('/gplay/delete', {
+      fetch('/api/delete', {
         method: 'POST',
         headers: headers,
         credentials: 'same-origin',
@@ -117,15 +117,10 @@ $(function(){
         })
       }).then(response => {
         if (response.status !== 200) {
-          genErrorAlertHtml( 'Error deleting ' + apk.get('docId'));
-          // restore original view
-          view.template = _.template($('#apk-template').html());
-          view.render();
-          return -1;
+          throw new Error();
         }
         return response.text();
       }).then(text => {
-        if (text === -1) return;
         if (text === 'OK') {
           genSuccessAlertHtml( 'Successfully deleted ' + apk.get('docId') );
           // remove view from html and from apkViews array
@@ -138,8 +133,9 @@ $(function(){
           app.apkList.remove(apk);
         }
       }).catch(error => {
-        console.log(error);
         genErrorAlertHtml( 'Error deleting ' + apk.get('docId'));
+
+        // restore original view
         view.template = _.template($('#apk-template').html());
         view.render();
       });
@@ -154,7 +150,7 @@ $(function(){
       let view = this;
       if (this.updateAvailable) {
         console.log('Updating ' + view.model.get('docId'));
-        fetch('/gplay/download', {
+        fetch('/api/download', {
           method: 'POST',
           headers: headers,
           credentials: 'same-origin',
@@ -167,14 +163,19 @@ $(function(){
           let result = JSON.parse(text);
           if (result.success.length > 0) {
             view.model.set('version', result.success[0].version);
+          } else {
+            throw new Error();
           }
 
           // restore view
           view.template = _.template($('#apk-template').html());
           view.render();
         }).catch(error => {
-          console.log(error);
           genErrorAlertHtml( 'Error updating ' + apk.get('docId') );
+
+          // restore view
+          view.template = _.template($('#apk-template').html());
+          view.render();
         });
       }
     },
@@ -195,19 +196,16 @@ $(function(){
     initialize: function () {
       this.updateAllBtn = $('#update-all');
 
-      fetch('/gplay/getapps', {
+      fetch('/api/apks', {
         method: 'GET',
         credentials: 'same-origin',
         headers: headers
       }).then(response => {
-        if (response.status === 500) {
-          genErrorAlertHtml('Cannot fetch applications :(');
-          return -1;
+        if (response.status !== 200) {
+          throw new Error();
         }
         return response.text();
       }).then(text => {
-        if (text === -1) return;
-
         let data = JSON.parse(text);
         app.apkList.add(data);
         app.apkList.models.forEach( function(m) {
@@ -218,7 +216,7 @@ $(function(){
           app.apkViews.push(view);
         });
       }).catch(error => {
-        console.log(error);
+        genErrorAlertHtml('Cannot fetch applications :(');
       });
     },
 
@@ -228,19 +226,16 @@ $(function(){
     },
 
     updateAll: function(e) {
-      fetch('/gplay/check', {
+      fetch('/api/check', {
         method: 'POST',
         credentials: 'same-origin',
         headers: headers
       }).then(function (response) {
-        if (response.status === 500) {
-          genErrorAlertHtml('Cannot check for updates :(');
-          return -1;
+        if (response.status !== 200) {
+          throw new Error();
         }
         return response.text();
       }).then(function (text) {
-        if (text === -1) return;
-
         let result = JSON.parse(text);
         let viewSet = app.apkViews;
 
@@ -261,34 +256,29 @@ $(function(){
           $('body').append(n);
         }
       }).catch(error => {
-        console.log(error);
         genErrorAlertHtml('Cannot check for updates :(');
       });
     },
 
     updateFdroid: function(e) {
-      fetch('/gplay/fdroidupd', {
+      fetch('/api/fdroid', {
         method: 'POST',
         credentials: 'same-origin',
         headers: headers
       }).then(function (response) {
-        if (response.status === 500) {
-          $('#fdroid-modal').modal('hide');
-          genErrorAlertHtml('Cannot check for updates :(');
-          return -1;
+        if (response.status !== 200) {
+          throw new Error();
         }
         return response.text();
       }).then(function (text) {
-        if (text === -1) return;
         if (text === 'OK') {
           $('#fdroid-modal').modal('hide');
           let n = genSuccessAlertHtml('Fdroid repo correctly updated');
           $('body').append(n);
         }
       }).catch(error => {
-        console.log(error);
         $('#fdroid-modal').modal('hide');
-        let n = genErrorAlertHtml('Cannot update Fdroid repo :(');
+        genErrorAlertHtml('Cannot update Fdroid repo :(');
       });
     }
 

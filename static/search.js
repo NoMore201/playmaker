@@ -82,7 +82,7 @@ $(function () {
 
     download: function () {
       this.$('.dl-button').html(loadingSpinner);
-      fetch('/gplay/download', {
+      fetch('/api/download', {
         method: 'POST',
         headers: headers,
         credentials: 'same-origin',
@@ -98,8 +98,13 @@ $(function () {
           this.$('.dl-button').css('cursor', 'default');
           this.$('.dl-button').css('pointer-events', 'none');
           this.$('.dl-button').css('color', '#BABABA');
-          //TODO: display error msg
+        } else {
+          genErrorAlertHtml('Error while downloading ' + this.model.get('docId'));
+          this.$('.dl-button').html(downloadIcon);
         }
+      }).catch(error => {
+        genErrorAlertHtml('Error while downloading ' + this.model.get('docId'));
+        this.$('.dl-button').html(downloadIcon);
       });
     }
   });
@@ -181,7 +186,7 @@ $(function () {
       }
 
       //TODO filter text
-      let url = '/gplay/search';
+      let url = '/api/search';
       url = url + '?search=' + text;
       url = url + '&numEntries=15';
 
@@ -196,7 +201,6 @@ $(function () {
         let table = new app.TableView();
         this.tableBox.html(table.render(data).el);
       }).catch(error => {
-        console.log(error);
         this.tableBox.html('');
         genErrorAlertHtml('Error while searching');
       });
