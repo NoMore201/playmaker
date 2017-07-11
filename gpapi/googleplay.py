@@ -114,19 +114,20 @@ class GooglePlayAPI(object):
         else:
             if (email is None or password is None):
                 raise Exception("You should provide at least authSubToken or (email and password)")
-            params = {"Email": email,
-                      "Passwd": password,
-                      "service": self.SERVICE,
-                      "accountType": self.ACCOUNT_TYPE_HOSTED_OR_GOOGLE,
-                      "has_permission": "1",
-                      "source": "android",
-                      "androidId": self.androidId,
-                      "app": "com.android.vending",
-                      # "client_sig": self.client_sig,
-                      "device_country": "fr",
-                      "operatorCountry": "fr",
-                      "lang": self.lang,
-                      "sdk_version": "19"}
+            params = {
+                "Email": email,
+                "Passwd": password,
+                "service": self.SERVICE,
+                "accountType": self.ACCOUNT_TYPE_HOSTED_OR_GOOGLE,
+                "has_permission": "1",
+                "source": "android",
+                "androidId": self.androidId,
+                "app": "com.android.vending",
+                "device_country": "en",
+                "operatorCountry": "en",
+                "lang": self.lang,
+                "sdk_version": "24"
+            }
             headers = {
                 "Accept-Encoding": "",
             }
@@ -151,18 +152,19 @@ class GooglePlayAPI(object):
         if (datapost is None and path in self.preFetch):
             data = self.preFetch[path]
         else:
-            headers = {"Accept-Language": self.lang,
-                       "Authorization": "GoogleLogin auth=%s" % self.authSubToken,
-                       "X-DFE-Enabled-Experiments": "cl:billing.select_add_instrument_by_default",
-                       "X-DFE-Unsupported-Experiments": "nocache:billing.use_charging_poller,market_emails,buyer_currency,prod_baseline,checkin.set_asset_paid_app_field,shekel_test,content_ratings,buyer_currency_in_app,nocache:encrypted_apk,recent_changes",
-                       "X-DFE-Device-Id": self.androidId,
-                       "X-DFE-Client-Id": "am-android-google",
-                       # "X-DFE-Logging-Id": self.loggingId2, # Deprecated?
-                       "User-Agent": "Android-Finsky/4.4.3 (api=3,versionCode=8013013,sdk=19,device=hammerhead,hardware=hammerhead,product=hammerhead)",
-                       "X-DFE-SmallestScreenWidthDp": "335",
-                       "X-DFE-Filter-Level": "3",
-                       "Accept-Encoding": "",
-                       "Host": "android.clients.google.com"}
+            headers = {
+                "Accept-Language": self.lang,
+                "Authorization": "GoogleLogin auth=%s" % self.authSubToken,
+                "X-DFE-Enabled-Experiments": "cl:billing.select_add_instrument_by_default",
+                "X-DFE-Unsupported-Experiments": "nocache:billing.use_charging_poller,market_emails,buyer_currency,prod_baseline,checkin.set_asset_paid_app_field,shekel_test,content_ratings,buyer_currency_in_app,nocache:encrypted_apk,recent_changes",
+                "X-DFE-Device-Id": self.androidId,
+                "X-DFE-Client-Id": "am-android-google",
+                "User-Agent": "Android-Finsky/4.4.3 (api=3,versionCode=8013013,sdk=24,device=angler,hardware=angler,product=angler)",
+                "X-DFE-SmallestScreenWidthDp": "335",
+                "X-DFE-Filter-Level": "3",
+                "Accept-Encoding": "",
+                "Host": "android.clients.google.com"
+            }
 
             if datapost is not None:
                 headers["Content-Type"] = post_content_type
@@ -176,21 +178,11 @@ class GooglePlayAPI(object):
                                         verify=ssl_verify)
             data = response.content
 
-        '''
-        data = StringIO.StringIO(data)
-        gzipper = gzip.GzipFile(fileobj=data)
-        data = gzipper.read()
-        '''
         message = googleplay_pb2.ResponseWrapper.FromString(data)
         self._try_register_preFetch(message)
 
-        # Debug
-        # print(text_format.MessageToString(message))
         return message
 
-    #####################################
-    # Google Play API Methods
-    #####################################
 
     def search(self, query, nb_results=None, offset=None):
         """Search for apps."""
