@@ -26,7 +26,7 @@ def file_size(num):
 
 class Play(object):
     def __init__(self):
-        self.currentSet = list()
+        self.currentSet = []
 
         # config parser
         self.configparser = configparser.ConfigParser()
@@ -42,7 +42,7 @@ class Play(object):
                 sys.exit(1)
         self.configfile = config_paths[0]
         self.configparser.read(config_paths[0])
-        self.config = dict()
+        self.config = {}
         for key, value in self.configparser.items('Main'):
             self.config[key] = value
 
@@ -137,7 +137,7 @@ class Play(object):
         # get application ids from apk files
         appList = [os.path.splitext(apk)[0] for apk in os.listdir(self.download_path)
                    if os.path.splitext(apk)[1] == '.apk']
-        toReturn = list()
+        toReturn = []
         if len(appList) > 0:
             details = self.get_bulk_details(appList)
             for appdetails in details:
@@ -204,7 +204,7 @@ class Play(object):
         except DecodeError:
             print('Cannot decode data')
             return []
-        details = list()
+        details = []
         for pos, apk in enumerate(apksList):
             current = results.entry[pos]
             doc = current.doc
@@ -226,9 +226,9 @@ class Play(object):
 
 
     def download_selection(self, appNames):
-        success = list()
-        failed = list()
-        unavail = list()
+        success = []
+        failed = []
+        unavail = []
 
         details = self.get_bulk_details(appNames)
 
