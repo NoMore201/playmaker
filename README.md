@@ -37,7 +37,15 @@ There is a working Dockerfile (based on the [gplayweb one](https://github.com/ma
 docker build -t playmaker .
 docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid playmaker
 ```
-If you need to change the configuration, copy `playmaker.conf` inside `/srv/fdroid` and modify it. The app will look first there for a .conf file, and if it can't find anything, it will check system folders.
+or use the already built image on docker hub:
+
+```
+docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
+```
+Notice that:
+1) If you need to change the configuration, copy `playmaker.conf` inside `/srv/fdroid` and modify it. The app will look first there for a .conf file, and if it can't find anything, it will check system folders.
+2) The folder */srv/fdroid* on the host machine should be owned by user with uid=666 and gid=666
+
 ### Directly
 
 Otherwise you can run it directly. Note that in order to run it you need [fdroidserver](https://gitlab.com/fdroid/fdroidserver) app, but you can also comment out the fdroid calls inside `service.py` and start it without.
