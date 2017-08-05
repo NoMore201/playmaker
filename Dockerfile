@@ -46,4 +46,4 @@ WORKDIR /data/fdroid
 RUN cp /opt/playmaker/playmaker.conf /etc
 
 EXPOSE 5000
-ENTRYPOINT /usr/bin/env python3 -u /opt/playmaker/playmaker.py
+ENTRYPOINT /usr/bin/env python3 -u /opt/playmaker/playmaker.py --fdroid --debug

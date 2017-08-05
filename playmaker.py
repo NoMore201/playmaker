@@ -3,11 +3,17 @@
 from flask import Flask, render_template, request
 from service import Play
 
-import json, os
+import json
+import os
+import argparse
 
 # application setup
+ap = argparse.ArgumentParser(description='Apk and fdroid repository manager with a web interface.')
+ap.add_argument('--fdroid', dest='fdroid', action='store_true', default=False)
+ap.add_argument('--debug', dest='debug', action='store_true', default=False)
+args = ap.parse_args()
 app = Flask(__name__, static_folder='static', template_folder='templates')
-service = Play()
+service = Play(debug=args.debug, fdroid=args.fdroid)
 
 
 @app.route('/')

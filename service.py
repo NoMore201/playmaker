@@ -25,8 +25,10 @@ def file_size(num):
 
 
 class Play(object):
-    def __init__(self):
+    def __init__(self, debug=True, fdroid=False):
         self.currentSet = []
+        self.debug = debug
+        self.fdroid = fdroid
 
         # config parser
         self.configparser = configparser.ConfigParser()
@@ -49,10 +51,11 @@ class Play(object):
         # configuring download folder
         self.download_path = os.path.join(os.getcwd(), 'repo')
 
-        # configuring fdroid data
-        self.fdroid_exe = '/usr/bin/fdroid'
-        self.fdroid_path = os.getcwd()
-        self.fdroid_init()
+        # configuring fdroid data		
+        if self.fdroid:
+            self.fdroid_exe = '/usr/bin/fdroid'
+            self.fdroid_path = os.getcwd()
+            self.fdroid_init()
 
         # no need of creating dir, fdroid will take care
         #if not os.path.isdir(self.config['download_path']):
@@ -76,24 +79,28 @@ class Play(object):
 
 
     def fdroid_update(self):
-        try:
-            p = Popen([self.fdroid_exe, 'update', '-c', '--clean'], stdout=PIPE, stderr=PIPE)
-            stdout, stderr = p.communicate()
-            if p.returncode != 0:
-                sys.stderr.write("error while updating fdroid repository " + stderr.decode('utf-8'))
+        if self.fdroid:
+            try:
+                p = Popen([self.fdroid_exe, 'update', '-c', '--clean'], stdout=PIPE, stderr=PIPE)
+                stdout, stderr = p.communicate()
+                if p.returncode != 0:
+                    sys.stderr.write("error while updating fdroid repository " + stderr.decode('utf-8'))
+                    return False
+                else:
+                    print('Fdroid repo updated successfully')
+                    return True
+            except:
+                print(stderr)
                 return False
-            else:
-                print('Fdroid repo updated successfully')
-                return True
-        except:
-            print(stderr)
-            return False
+        else:
+            return True
 
 
     def fetch_new_token(self):
         token = ""
         for i in range(1, 4):
-            print('#%d try' % i)
+            if self.debug:
+                print('#%d try' % i)
             token = get_token(self.config)
             if token == "":
                 continue
@@ -162,11 +169,13 @@ class Play(object):
         for pos, app in enumerate(self.currentSet):
             if app['docId'] == newApp['docId']:
                 found = True
-                print('%s is already in currentState, updating..' % newApp['docId'])
+                if self.debug:
+                    print('%s is already in currentState, updating..' % newApp['docId'])
                 self.currentSet[pos] = newApp
                 break
         if found is False:
-            print('Adding %s into currentState..' % newApp['docId'])
+            if self.debug:
+                print('Adding %s into currentState..' % newApp['docId'])
             self.currentSet.append(newApp)
 
 
@@ -277,8 +286,9 @@ class Play(object):
         else:
             toUpdate = list()
             for local, online in zip(localDetails, onlineDetails):
-                print('Checking %s - %s' % (local['docId'], online['docId']))
-                print('%d == %d ?' % (local['version'], online['version']))
+                if self.debug:
+                    print('Checking %s - %s' % (local['docId'], online['docId']))
+                    print('%d == %d ?' % (local['version'], online['version']))
                 if local['version'] != online['version']:
                     toUpdate.append(online['docId'])
             return toUpdate
