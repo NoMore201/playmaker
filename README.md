@@ -12,18 +12,17 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 ### Backend
 - [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
 - [ ] General python3 code check
-- [ ] configuration API (mainly for resetting/updating tokens)
+- [ ] configuration API (token management, fdroid repository configuration)
 - [x] fdroid integration
 
 ### Frontend
 - [ ] Add placeholder when there aren't local apps
-- [ ] *Check* and *Fdroid update* buttons need some visual feedback while executing
+- [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
 - [x] Add some kind of notification
 - [x] Make notifications disappear after some seconds
 - [x] gplay.js: populate collection manually (no fetch)
 
 ### Dockerfile
-- [x] Start as normal user
 - [ ] Use updated Android SDK
 - [ ] Try to make image a bit smaller
 
