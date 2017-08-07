@@ -221,8 +221,11 @@ class Play(object):
             if doc.docid != apk:
                 raise Error('Wrong order in get_bulk_details')
                 sys.exit(1)
+            title = doc.title
+            if len(title) > 33:
+                title = title[0:30] + '...'
             details.append({
-               'title': doc.title,
+               'title': title,
                'developer': doc.creator,
                'size': file_size(appDetails.installationSize),
                'numDownloads': appDetails.numDownloads,
