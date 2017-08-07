@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
 
 RUN apt-get update && \
-    apt-get -y upgrade && \
     apt-get install -y python3-dev python3-pip git \
     lib32stdc++6 \
     lib32gcc1 \
@@ -24,7 +23,6 @@ RUN add-apt-repository ppa:guardianproject/ppa && \
 
 WORKDIR /opt
 RUN git clone https://github.com/NoMore201/playmaker
-
 
 RUN wget https://dl.google.com/android/android-sdk_r24.3.4-linux.tgz \
     && echo "fb293d7bca42e05580be56b1adc22055d46603dd  android-sdk_r24.3.4-linux.tgz" | sha1sum -c \
