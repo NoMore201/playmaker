@@ -301,6 +301,5 @@ class Play(object):
             for pos, app in enumerate(self.currentSet):
                 if app['docId'] == appName:
                     del self.currentSet[pos]
-                    print(str(self.currentSet))
             return True
         return False
