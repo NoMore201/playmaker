@@ -111,6 +111,7 @@ class GooglePlayAPI(object):
         - a valid Google authSubToken"""
         if (authSubToken is not None):
             self.setAuthSubToken(authSubToken)
+            self.search('firefox', 1, None)
         else:
             if (email is None or password is None):
                 raise Exception("You should provide at least authSubToken or (email and password)")

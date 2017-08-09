@@ -51,7 +51,7 @@ class Play(object):
         # configuring download folder
         self.download_path = os.path.join(os.getcwd(), 'repo')
 
-        # configuring fdroid data		
+        # configuring fdroid data
         if self.fdroid:
             self.fdroid_exe = '/usr/bin/fdroid'
             self.fdroid_path = os.getcwd()
@@ -60,7 +60,7 @@ class Play(object):
         # no need of creating dir, fdroid will take care
         #if not os.path.isdir(self.config['download_path']):
         #    os.mkdir(self.config['download_path'])
-        self.service = GooglePlayAPI(self.config['id'], 'en', True)
+        self.service = GooglePlayAPI(self.config['id'], 'en', self.debug)
         self.login()
 
 
@@ -123,16 +123,29 @@ class Play(object):
             token = ''
             if self.config['token'] != '':
                 token = self.config['token']
+                if self.debug:
+                    print('Reusing saved token' % token)
             else:
+                if self.debug:
+                    print('Fetching new token')
                 token = self.fetch_new_token()
             self.service.login(None, None, token)
+            self.config['token'] = token
+            self.save_config()
             self.update_state()
         except URLError:
             print('Failed to fetch url')
             sys.exit(1)
         except LoginError:
-            print('Login failed, trying with credentials in playmaker.conf')
+            print('Login failed, resetting the token')
+            self.config['token'] = ''
+            self.save_config()
             sys.exit(1)
+        except Exception as e:
+            print('Login failed, resetting the token')
+            self.config['token'] = ''
+            self.save_config()
+            self.login()
 
 
     def fetch_details_for_local_apps(self):
