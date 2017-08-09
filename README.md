@@ -47,8 +47,7 @@ docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/dat
 
 ### Directly
 
-Otherwise you can run it directly. Note that in order to run it you need [fdroidserver](https://gitlab.com/fdroid/fdroidserver) app, but you can also comment out the fdroid calls inside `service.py` and start it without.
-**!! If you use Ubuntu 16.04+** the fdroidserver package in the repositories is a but buggy, so I suggest you to install it through the guardianproject ppa (as explained in their repo).
+Otherwise you can run it from the command line.
 
 ```
 usage: playmaker.py [-h] [-f] [-d]
@@ -60,6 +59,9 @@ optional arguments:
   -f, --fdroid  Enable fdroid integration
   -d, --debug   Enable debug output
 ```
+
+If you enable the fdroid integration, you need the [fdroidserver](https://gitlab.com/fdroid/fdroidserver) package.
+**!! If you use Ubuntu 16.04+** the fdroidserver package in the repositories is a but buggy, so I suggest you to install it through the guardianproject ppa (as explained in their repo).
 
 By default the application uses a token-dispenser server provided by me. However, you can host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser) and then change the tokenurl variable in the config file.
 
