@@ -66,7 +66,7 @@ class Play(object):
 
     def fdroid_init(self):
         if not os.path.isfile(self.fdroid_exe):
-            raise OSError('Please install fdroid from repo')
+            print('Please install fdroid from repo')
             sys.exit(1)
         else:
             p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)

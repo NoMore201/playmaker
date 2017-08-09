@@ -7,10 +7,12 @@ import json
 import os
 import argparse
 
-# application setup
+# argument parsing
 ap = argparse.ArgumentParser(description='Apk and fdroid repository manager with a web interface.')
-ap.add_argument('--fdroid', dest='fdroid', action='store_true', default=False)
-ap.add_argument('--debug', dest='debug', action='store_true', default=False)
+ap.add_argument('-f', '--fdroid', dest='fdroid', action='store_true', default=False,
+                help='Enable fdroid integration')
+ap.add_argument('-d', '--debug', dest='debug', action='store_true', default=False,
+                help='Enable debug output')
 args = ap.parse_args()
 app = Flask(__name__, static_folder='static', template_folder='templates')
 service = Play(debug=args.debug, fdroid=args.fdroid)
