@@ -226,6 +226,10 @@ $(function(){
     },
 
     updateAll: function(e) {
+      if (app.apkViews.length === 0) {
+        return;
+      }
+
       fetch('/api/check', {
         method: 'POST',
         credentials: 'same-origin',

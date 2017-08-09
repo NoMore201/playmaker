@@ -49,7 +49,10 @@ class Play(object):
             self.config[key] = value
 
         # configuring download folder
-        self.download_path = os.path.join(os.getcwd(), 'repo')
+        if self.fdroid:
+            self.download_path = os.path.join(os.getcwd(), 'repo')
+        else:
+            self.download_path = os.getcwd()
 
         # configuring fdroid data
         if self.fdroid:
