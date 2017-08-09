@@ -12,10 +12,12 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 ### Backend
 - [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
 - [ ] General python3 code check
-- [ ] configuration API (token management, fdroid repository configuration)
+- [ ] Fdroid repo configuration
 - [x] fdroid integration
 
 ### Frontend
+- [ ] Fdroid repo configuration page
+- [ ] Integrate both Apps and Search views in a single page
 - [ ] Add placeholder when there aren't local apps
 - [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
 - [x] Add some kind of notification
@@ -41,9 +43,7 @@ or use the already built image on docker hub:
 ```
 docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
-Notice that:
-1) If you need to change the configuration, copy `playmaker.conf` inside `/srv/fdroid` and modify it. The app will look first there for a .conf file, and if it can't find anything, it will check system folders.
-2) The folder */srv/fdroid* on the host machine should be owned by user with uid=666 and gid=666
+**Notice that** If you need to change the configuration, copy `playmaker.conf` inside `/srv/fdroid` and modify it. The app will look first there for a .conf file, and if it can't find anything, it will check system folders.
 
 ### Directly
 
@@ -51,12 +51,16 @@ Otherwise you can run it directly. Note that in order to run it you need [fdroid
 **!! If you use Ubuntu 16.04+** the fdroidserver package in the repositories is a but buggy, so I suggest you to install it through the guardianproject ppa (as explained in their repo).
 
 ```
-pip install -r requirements.txt  # consider using a virtualenv
-python3 playmaker.py
+usage: playmaker.py [-h] [-f] [-d]
+
+Apk and fdroid repository manager with a web interface.
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -f, --fdroid  Enable fdroid integration
+  -d, --debug   Enable debug output
 ```
 
-it will listen on Flask default port 5000. By default the application uses a token-dispenser server provided by me. However, you can host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser).
+By default the application uses a token-dispenser server provided by me. However, you can host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser) and then change the tokenurl variable in the config file.
 
-For additional informations on how to do this, consider checking the Docker images for token-dispenser: https://github.com/NoMore201/docker-token-dispenser
-
-After correctly setting up the server, change the `tokenurl` variable inside `playmaker.conf`.
+For additional informations, check out Dockerfiles for token-dispenser: https://github.com/NoMore201/docker-token-dispenser
