@@ -119,12 +119,13 @@ class Play(object):
 
 
     def login(self):
+        print(self.config['token'])
         try:
             token = ''
             if self.config['token'] != '':
                 token = self.config['token']
                 if self.debug:
-                    print('Reusing saved token' % token)
+                    print('Reusing saved token')
             else:
                 if self.debug:
                     print('Fetching new token')
@@ -141,8 +142,8 @@ class Play(object):
             self.config['token'] = ''
             self.save_config()
             sys.exit(1)
-        except Exception as e:
-            print('Login failed, resetting the token')
+        except DecodeError:
+            print('Invalid token')
             self.config['token'] = ''
             self.save_config()
             self.login()
@@ -235,8 +236,8 @@ class Play(object):
                 raise Error('Wrong order in get_bulk_details')
                 sys.exit(1)
             title = doc.title
-            if len(title) > 33:
-                title = title[0:30] + '...'
+            if len(title) > 40:
+                title = title[0:36] + '...'
             details.append({
                'title': title,
                'developer': doc.creator,
