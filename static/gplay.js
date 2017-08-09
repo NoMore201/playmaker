@@ -269,6 +269,8 @@ $(function(){
         return;
       }
 
+      $('#fdroid-modal').modal('show');
+
       fetch('/api/fdroid', {
         method: 'POST',
         credentials: 'same-origin',
