@@ -193,28 +193,28 @@ class Play(object):
             self.currentSet.append(newApp)
 
 
-    def search(self, appName, numItems=20):
+    def search(self, appName, numItems=10):
         results = self.service.search(appName, numItems, None).doc
         all_apps = []
-        if len(results) > 0:
-            results = results[0].child
-        else:
+        if len(results) < 1:
             return "[]"
-        for result in results:
-            if result.offer[0].checkoutFlowRequired:
-                continue
-            appDetails = result.details.appDetails
-            app = {
-                'title': result.title,
-                'developer': result.creator,
-                'version': appDetails.versionCode,
-                'size': file_size(appDetails.installationSize),
-                'docId': result.docid,
-                'numDownloads': appDetails.numDownloads,
-                'uploadDate': appDetails.uploadDate,
-                'stars': '%.2f' % result.aggregateRating.starRating
-            }
-            all_apps.append(app)
+        for doc in results:
+            for result in doc.child:
+                if result.offer[0].checkoutFlowRequired:
+                    continue
+                appDetails = result.details.appDetails
+                app = {
+                    'title': result.title,
+                    'developer': result.creator,
+                    'version': appDetails.versionCode,
+                    'size': file_size(appDetails.installationSize),
+                    'docId': result.docid,
+                    'numDownloads': appDetails.numDownloads,
+                    'uploadDate': appDetails.uploadDate,
+                    'stars': '%.2f' % result.aggregateRating.starRating
+                }
+                if len(all_apps) < int(numItems)+1:
+                    all_apps.append(app)
         return all_apps
 
 
