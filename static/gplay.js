@@ -265,6 +265,10 @@ $(function(){
     },
 
     updateFdroid: function(e) {
+      if (app.apkViews.length === 0) {
+        return;
+      }
+
       fetch('/api/fdroid', {
         method: 'POST',
         credentials: 'same-origin',
