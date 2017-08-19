@@ -1,23 +1,68 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, request
 from service import Play
+import tornado
+from tornado import ioloop as io
+from tornado import web
+from tornado import httpserver
+from tornado.concurrent import run_on_executor
+from concurrent.futures import ThreadPoolExecutor
 
 import json
 import os
 import argparse
 
-# argument parsing
+# arguments
 ap = argparse.ArgumentParser(description='Apk and fdroid repository manager with a web interface.')
 ap.add_argument('-f', '--fdroid', dest='fdroid', action='store_true', default=False,
                 help='Enable fdroid integration')
 ap.add_argument('-d', '--debug', dest='debug', action='store_true', default=False,
                 help='Enable debug output')
 args = ap.parse_args()
-app = Flask(__name__, static_folder='static', template_folder='templates')
 service = Play(debug=args.debug, fdroid=args.fdroid)
 
+# tornado setup
 
+global_executor = ThreadPoolExecutor(max_workers=4)
+
+class HomeHandler(web.RequestHandler):
+    def get(self):
+        self.render('index.html', title='Playmaker')
+
+class SearchHandler(web.RequestHandler):
+    def get(self):
+        self.render('search.html', title='Playmaker')
+
+class ApiApksHandler(web.RequestHandler):
+    executor = global_executor
+
+    @run_on_executor
+    def get_apps(self):
+        apps = sorted(service.currentSet, key=lambda k: k['title'])
+        return apps
+
+    @tornado.gen.coroutine
+    def get(self):
+        apps = yield self.get_apps()
+        self.write(json.dumps(apps))
+        self.finish()
+
+
+app = web.Application([
+    (r'/', HomeHandler),
+    (r'/search', SearchHandler),
+    (r'/api/apks', ApiApksHandler),
+    (r'/static/(.*)', web.StaticFileHandler, {'path': 'static'}),
+], debug=True)
+app.settings['template_path'] = './templates'
+app.settings['static_path'] = ''
+server = httpserver.HTTPServer(app)
+server.listen(5000)
+io.IOLoop.instance().start()
+
+
+
+"""
 @app.route('/')
 def render_home():
     return render_template('index.html')
@@ -74,3 +119,4 @@ def delete_app():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
+"""
