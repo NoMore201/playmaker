@@ -142,6 +142,9 @@ class ApiFdroidHandler(web.RequestHandler):
             self.finish()
 
 
+app_dir = os.path.dirname(os.path.realpath(__file__))
+template_dir = os.path.join(app_dir, 'templates')
+static_dir = os.path.join(app_dir, 'static')
 
 app = web.Application([
     (r'/', HomeHandler),
@@ -152,11 +155,11 @@ app = web.Application([
     (r'/api/check', ApiCheckHandler),
     (r'/api/delete', ApiDeleteHandler),
     (r'/api/fdroid', ApiFdroidHandler),
-    (r'/static/(.*)', web.StaticFileHandler, {'path': 'static'}),
+    (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
 ], debug=True)
 
 # overwrite settings
-app.settings['template_path'] = './templates'
+app.settings['template_path'] = template_dir
 app.settings['static_path'] = ''
 
 if __name__ == '__main__':
