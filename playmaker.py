@@ -6,6 +6,7 @@ from tornado import ioloop as io
 from tornado import web
 from tornado import httpserver
 from tornado.concurrent import run_on_executor
+from tornado.web import MissingArgumentError
 from concurrent.futures import ThreadPoolExecutor
 
 import json
@@ -23,7 +24,7 @@ service = Play(debug=args.debug, fdroid=args.fdroid)
 
 # tornado setup
 
-global_executor = ThreadPoolExecutor(max_workers=4)
+MAX_WORKERS=4
 
 class HomeHandler(web.RequestHandler):
     def get(self):
@@ -33,90 +34,132 @@ class SearchHandler(web.RequestHandler):
     def get(self):
         self.render('search.html', title='Playmaker')
 
+
 class ApiApksHandler(web.RequestHandler):
-    executor = global_executor
+
+    def get(self):
+        apps = sorted(service.currentSet, key=lambda k: k['title'])
+        apps = json.dumps(apps)
+        self.write(apps)
+        self.finish()
+
+
+class ApiSearchHandler(web.RequestHandler):
+    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
     @run_on_executor
-    def get_apps(self):
-        apps = sorted(service.currentSet, key=lambda k: k['title'])
-        return apps
+    def search(self):
+        try:
+            keyword = self.get_argument('search')
+        except MissingArgumentError:
+            return None
+        return json.dumps(service.search(self.get_argument('search')))
 
     @tornado.gen.coroutine
     def get(self):
-        apps = yield self.get_apps()
-        self.write(json.dumps(apps))
+        apps = yield self.search()
+        if apps is not None:
+            self.write(apps)
+            self.finish()
+        else:
+            self.clear()
+            self.set_status(400)
+            self.finish()
+
+
+class ApiDownloadHandler(web.RequestHandler):
+    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+
+    @run_on_executor
+    def download(self):
+        data = tornado.escape.json_decode(self.request.body)
+        if data.get('download') is None:
+            return None
+        apps = service.download_selection(data['download'])
+        return json.dumps(apps)
+
+    @tornado.gen.coroutine
+    def post(self):
+        result = yield self.download()
+        if result is None:
+            self.clear()
+            self.set_status(400)
+            self.finish()
+        else:
+            self.write(result)
+            self.finish()
+
+class ApiCheckHandler(web.RequestHandler):
+    executor = ThreadPoolExecutor(max_workers=1)
+
+    @run_on_executor
+    def check(self):
+        apps = service.check_local_apks()
+        return json.dumps(apps)
+
+    @tornado.gen.coroutine
+    def post(self):
+        result = yield self.check()
+        self.write(result)
         self.finish()
+
+
+class ApiDeleteHandler(web.RequestHandler):
+
+    def post(self):
+        data = tornado.escape.json_decode(self.request.body)
+        if data.get('delete') is None:
+            self.clear()
+            self.set_status(400)
+            self.finish()
+        else:
+            result = service.remove_local_app(data['delete'])
+            if result:
+                self.write('OK')
+                self.finish()
+            else:
+                self.clear()
+                self.set_status(500)
+                self.finish()
+
+
+class ApiFdroidHandler(web.RequestHandler):
+    executor = ThreadPoolExecutor(max_workers=1)
+
+    @run_on_executor
+    def update(self):
+        return service.fdroid_update()
+
+    @tornado.gen.coroutine
+    def post(self):
+        result = yield self.update()
+        if result:
+            self.write('OK')
+            self.finish()
+        else:
+            self.clear()
+            self.set_status(500)
+            self.finish()
+
 
 
 app = web.Application([
     (r'/', HomeHandler),
     (r'/search', SearchHandler),
     (r'/api/apks', ApiApksHandler),
+    (r'/api/search', ApiSearchHandler),
+    (r'/api/download', ApiDownloadHandler),
+    (r'/api/check', ApiCheckHandler),
+    (r'/api/delete', ApiDeleteHandler),
+    (r'/api/fdroid', ApiFdroidHandler),
     (r'/static/(.*)', web.StaticFileHandler, {'path': 'static'}),
 ], debug=True)
+
+# overwrite settings
 app.settings['template_path'] = './templates'
 app.settings['static_path'] = ''
-server = httpserver.HTTPServer(app)
-server.listen(5000)
-io.IOLoop.instance().start()
-
-
-
-"""
-@app.route('/')
-def render_home():
-    return render_template('index.html')
-
-
-@app.route('/search')
-def render_search():
-    return render_template('search.html')
-
-
-@app.route('/api/search', methods=['GET'])
-def search_app():
-    number = request.args.get('numEntries')
-    if number is not None:
-        return json.dumps(service.search(request.args.get('search'),
-                                         int(number)))
-    return json.dumps(service.search(request.args.get('search')))
-
-
-@app.route('/api/download', methods=['POST'])
-def download_app():
-    toDownload = service.download_selection(request.json['download'])
-    return json.dumps(toDownload)
-
-
-@app.route('/api/check', methods=['POST'])
-def check_local():
-    return json.dumps(service.check_local_apks())
-
-
-@app.route('/api/fdroid', methods=['POST'])
-def update_fdroid():
-    result = service.fdroid_update()
-    if result is True:
-        return 'OK'
-    else:
-        abort(500)
-
-
-@app.route('/api/apks', methods=['GET'])
-def get_apks():
-    apps = sorted(service.currentSet, key=lambda k: k['title'])
-    return json.dumps(apps)
-
-
-@app.route('/api/delete', methods=['POST'])
-def delete_app():
-    res = service.remove_local_app(request.json['delete'])
-    if res:
-        return 'OK'
-    else:
-        abort(500)
-
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
-"""
+    server = httpserver.HTTPServer(app)
+    server.listen(5000)
+    io.IOLoop.instance().start()

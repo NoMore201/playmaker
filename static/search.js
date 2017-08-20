@@ -188,7 +188,6 @@ $(function () {
       //TODO filter text
       let url = '/api/search';
       url = url + '?search=' + text;
-      url = url + '&numEntries=15';
 
       fetch(url, {
         method: 'GET',

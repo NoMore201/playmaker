@@ -269,7 +269,7 @@ $(function(){
         return;
       }
 
-      $('#fdroid-modal').modal('show');
+      genInfoAlertHtml('Fdroid update process started');
 
       fetch('/api/fdroid', {
         method: 'POST',
@@ -282,12 +282,10 @@ $(function(){
         return response.text();
       }).then(function (text) {
         if (text === 'OK') {
-          $('#fdroid-modal').modal('hide');
           let n = genSuccessAlertHtml('Fdroid repo correctly updated');
           $('body').append(n);
         }
       }).catch(error => {
-        $('#fdroid-modal').modal('hide');
         genErrorAlertHtml('Cannot update Fdroid repo :(');
       });
     }
