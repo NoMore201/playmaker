@@ -196,7 +196,7 @@ class Play(object):
             self.currentSet.append(newApp)
 
 
-    def search(self, appName, numItems=10):
+    def search(self, appName, numItems=20):
         results = self.service.search(appName, numItems, None).doc
         all_apps = []
         if len(results) < 1:

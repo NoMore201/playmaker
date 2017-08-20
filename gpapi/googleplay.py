@@ -5,7 +5,7 @@ import requests
 from google.protobuf import descriptor
 from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
 from google.protobuf import text_format
-from google.protobuf.message import Message
+from google.protobuf.message import Message, DecodeError
 
 from . import googleplay_pb2
 from . import config
@@ -193,6 +193,8 @@ class GooglePlayAPI(object):
             path += "&o=%d" % int(offset)
 
         message = self.executeRequestApi2(path)
+        if len(message.payload.searchResponse.doc) == 0:
+            raise DecodeError
         remaining = int(nb_results) - len(message.payload.searchResponse.doc[0].child)
         messagenext = message
         allmessages = message

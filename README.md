@@ -10,14 +10,14 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 ## Development TODOs
 
 ### Backend
-- [ ] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
-- [ ] General python3 code check
-- [ ] Fdroid repo configuration
+- [ ] Auto-update apks
+- [ ] System settings (fdroid, auto-update, etc.)
+- [x] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
 - [x] fdroid integration
 
 ### Frontend
-- [ ] Fdroid repo configuration page
 - [ ] Integrate both Apps and Search views in a single page
+- [ ] Fdroid repo configuration page
 - [ ] Add placeholder when there aren't local apps
 - [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
 - [x] Add some kind of notification
@@ -25,7 +25,7 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 - [x] gplay.js: populate collection manually (no fetch)
 
 ### Dockerfile
-- [ ] Use updated Android SDK
+- [ ] Update Android SDK to Android 6.0+
 - [ ] Try to make image a bit smaller
 
 ## Usage
