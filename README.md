@@ -2,7 +2,18 @@
 
 ![screenshot](https://github.com/NoMore201/playmaker/raw/master/example1.png)
 
-## Description & features
+## Table of Content
+
+* [Description & Features](#desc)
+* [Usage](#usage)
+* [TODOs](#todos)
+  * [Backend](#todos-backend)
+  * [Frontend](#todos-frontend)
+  * [Dockerfile](#todos-docker)
+
+<a name="desc"/>
+
+## Description & Features
 
 Playmaker is a python3 apk manager with a web interface. The backend uses the python3 branch of googleplay-api, taken from [gplaycli](https://github.com/matlink/gplaycli)
 with a few fixes, together with WebTornado non-blocking web server. Frontend code uses BackboneJS as the JS framework, bootstrap and font-awesome.
@@ -14,27 +25,7 @@ Features:
 * Automatically handle google login tokens using token-dispenser
 * Responsive UI
 
-## TODOs
-
-### Backend
-- [ ] Auto-update apks
-- [ ] System settings (fdroid, auto-update, etc.)
-- [x] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
-- [x] fdroid integration
-
-### Frontend
-- [ ] Switch to angular (less code, one page app)
-- [ ] Integrate both Apps and Search views in a single page
-- [ ] Fdroid repo configuration page
-- [ ] Add placeholder when there aren't local apps
-- [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
-- [x] Add some kind of notification
-- [x] Make notifications disappear after some seconds
-- [x] gplay.js: populate collection manually (no fetch)
-
-### Dockerfile
-- [ ] Try to make image a bit smaller
-- [x] Update Android SDK to Android 6.0+
+<a name="usage"/>
 
 ## Usage
 
@@ -74,3 +65,33 @@ If you enable the fdroid integration, you need the [fdroidserver](https://gitlab
 By default the application uses a token-dispenser server provided by me. However, you can host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser) and then change the tokenurl variable in the config file.
 
 For additional informations, check out Dockerfiles for token-dispenser: https://github.com/NoMore201/docker-token-dispenser
+
+<a name="todos"/>
+
+## TODOs
+
+<a name="todos-backend"/>
+
+### Backend
+- [ ] Auto-update apks
+- [ ] System settings (fdroid, auto-update, etc.)
+- [x] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
+- [x] fdroid integration
+
+<a name="todos-frontend"/>
+
+### Frontend
+- [ ] Switch to angular (less code, one page app)
+- [ ] Integrate both Apps and Search views in a single page
+- [ ] Fdroid repo configuration page
+- [ ] Add placeholder when there aren't local apps
+- [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
+- [x] Add some kind of notification
+- [x] Make notifications disappear after some seconds
+- [x] gplay.js: populate collection manually (no fetch)
+
+<a name="todos-docker"/>
+
+### Dockerfile
+- [ ] Try to make image a bit smaller
+- [x] Update Android SDK to Android 6.0+
