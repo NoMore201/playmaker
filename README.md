@@ -2,12 +2,19 @@
 
 ![screenshot](https://github.com/NoMore201/playmaker/raw/master/example1.png)
 
-## Description
+## Description & features
 
-Playmaker is a python3-only apk manager with a web interface. The backend is taken from gplaycli/gplayweb python3 branch, with a few modifications.
-On the other hand, the frontend is completely rewritten using Backbonejs web framework.
+Playmaker is a python3 apk manager with a web interface. The backend uses the python3 branch of googleplay-api, taken from [gplaycli](https://github.com/matlink/gplaycli)
+with a few fixes, together with WebTornado non-blocking web server. Frontend code uses BackboneJS as the JS framework, bootstrap and font-awesome.
 
-## Development TODOs
+Features:
+* Download/Update/Delete apks from google play store
+* Automatically setup a fdroid repository with the downloaded apks
+* Update fdroid and downloads work in background, without blocking UI
+* Automatically handle google login tokens using token-dispenser
+* Responsive UI
+
+## TODOs
 
 ### Backend
 - [ ] Auto-update apks
