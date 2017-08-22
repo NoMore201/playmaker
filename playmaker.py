@@ -24,7 +24,8 @@ service = Play(debug=args.debug, fdroid=args.fdroid)
 
 # tornado setup
 
-MAX_WORKERS=4
+MAX_WORKERS = 4
+fdroid_running = False
 
 class HomeHandler(web.RequestHandler):
     def get(self):
@@ -126,18 +127,16 @@ class ApiDeleteHandler(web.RequestHandler):
 class ApiFdroidHandler(web.RequestHandler):
     executor = ThreadPoolExecutor(max_workers=1)
 
-    def initialize(self):
-        self.is_running = False
-
     @run_on_executor
     def update(self):
-        self.is_running = True
+        global fdroid_running
+        fdroid_running = True
         return service.fdroid_update()
 
     @tornado.gen.coroutine
     def post(self):
-        print('Is fdroid already running? %s' % ('Yes' if self.is_running else 'No'))
-        if self.is_running:
+        global fdroid_running
+        if fdroid_running:
             self.write('PENDING')
             self.finish()
             return
@@ -145,12 +144,12 @@ class ApiFdroidHandler(web.RequestHandler):
         if result:
             self.write('OK')
             self.finish()
-            self.is_running = False
+            fdroid_running = False
         else:
             self.clear()
             self.set_status(500)
             self.finish()
-            self.is_running = False
+            fdroid_running = False
 
 
 app_dir = os.path.dirname(os.path.realpath(__file__))
