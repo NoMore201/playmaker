@@ -16,7 +16,7 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 - [x] fdroid integration
 
 ### Frontend
-- [ ] Switch to backbone.marionette
+- [ ] Switch to angular (less code, one page app)
 - [ ] Integrate both Apps and Search views in a single page
 - [ ] Fdroid repo configuration page
 - [ ] Add placeholder when there aren't local apps
