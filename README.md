@@ -73,6 +73,7 @@ For additional informations, check out Dockerfiles for token-dispenser: https://
 <a name="todos-backend"/>
 
 ### Backend
+
 - [ ] Auto-update apks
 - [ ] System settings (fdroid, auto-update, etc.)
 - [x] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
@@ -81,6 +82,7 @@ For additional informations, check out Dockerfiles for token-dispenser: https://
 <a name="todos-frontend"/>
 
 ### Frontend
+
 - [ ] Switch to angular (less code, one page app)
 - [ ] Integrate both Apps and Search views in a single page
 - [ ] Fdroid repo configuration page
@@ -93,5 +95,6 @@ For additional informations, check out Dockerfiles for token-dispenser: https://
 <a name="todos-docker"/>
 
 ### Dockerfile
+
 - [ ] Try to make image a bit smaller
 - [x] Update Android SDK to Android 6.0+
