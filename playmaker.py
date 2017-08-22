@@ -125,14 +125,16 @@ class ApiDeleteHandler(web.RequestHandler):
 
 class ApiFdroidHandler(web.RequestHandler):
     executor = ThreadPoolExecutor(max_workers=1)
+    is_running = False
 
     @run_on_executor
     def update(self):
+        self.is_running = True
         return service.fdroid_update()
 
     @tornado.gen.coroutine
     def post(self):
-        if len(self.executor._threads) > 0:
+        if is_running:
             self.write('PENDING')
             self.finish()
             return
@@ -140,10 +142,12 @@ class ApiFdroidHandler(web.RequestHandler):
         if result:
             self.write('OK')
             self.finish()
+            self.is_running = False
         else:
             self.clear()
             self.set_status(500)
             self.finish()
+            self.is_running = False
 
 
 app_dir = os.path.dirname(os.path.realpath(__file__))
