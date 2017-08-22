@@ -26,8 +26,8 @@ On the other hand, the frontend is completely rewritten using Backbonejs web fra
 - [x] gplay.js: populate collection manually (no fetch)
 
 ### Dockerfile
-- [ ] Update Android SDK to Android 6.0+
 - [ ] Try to make image a bit smaller
+- [x] Update Android SDK to Android 6.0+
 
 ## Usage
 
