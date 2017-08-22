@@ -2,6 +2,7 @@ from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
 from google.protobuf.message import DecodeError
 from pyaxmlparser import APK
 
+import concurrent.futures
 import configparser
 import urllib.request
 from urllib.error import URLError
@@ -152,6 +153,13 @@ class Play(object):
             self.login()
 
 
+    def get_details_from_apk(self, details):
+        filepath = os.path.join(self.download_path, details['docId'] + '.apk')
+        a = APK(filepath)
+        details['version'] = int(a.version_code)
+        return details
+
+
     def fetch_details_for_local_apps(self):
         """
         Return list of details of the currently downloaded apps.
@@ -164,16 +172,19 @@ class Play(object):
         toReturn = []
         if len(appList) > 0:
             details = self.get_bulk_details(appList)
-            for appdetails in details:
-                filepath = os.path.join(self.download_path, appdetails['docId'] + '.apk')
-                a = APK(filepath)
-                appdetails['version'] = int(a.version_code)
-                toReturn.append(appdetails)
+            executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+            futures = {executor.submit(self.get_details_from_apk, app):
+                       app for app in details}
+            for future in concurrent.futures.as_completed(futures):
+                app = future.result()
+                toReturn.append(app)
+                if self.debug:
+                    print('Added %s to cache' % app['docId'])
         return toReturn
 
 
     def update_state(self):
-        print('Updating local app state')
+        print('Updating cache')
         self.currentSet = self.fetch_details_for_local_apps()
 
 
@@ -187,12 +198,12 @@ class Play(object):
             if app['docId'] == newApp['docId']:
                 found = True
                 if self.debug:
-                    print('%s is already in currentState, updating..' % newApp['docId'])
+                    print('%s is already cached, updating..' % newApp['docId'])
                 self.currentSet[pos] = newApp
                 break
         if found is False:
             if self.debug:
-                print('Adding %s into currentState..' % newApp['docId'])
+                print('Adding %s into cache..' % newApp['docId'])
             self.currentSet.append(newApp)
 
 
