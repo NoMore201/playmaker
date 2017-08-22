@@ -109,7 +109,7 @@ $(function(){
       let view = this;
 
       fetch('/api/delete', {
-        method: 'POST',
+        method: 'DELETE',
         headers: headers,
         credentials: 'same-origin',
         body: JSON.stringify({

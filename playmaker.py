@@ -106,7 +106,7 @@ class ApiCheckHandler(web.RequestHandler):
 
 class ApiDeleteHandler(web.RequestHandler):
 
-    def post(self):
+    def delete(self):
         data = tornado.escape.json_decode(self.request.body)
         if data.get('delete') is None:
             self.clear()
