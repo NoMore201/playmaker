@@ -9,13 +9,7 @@ from urllib.error import URLError
 from subprocess import Popen, PIPE
 import os
 import sys
-
-
-def get_token(config):
-    print('Retrieving token from %s' % config['tokenurl'])
-    r = urllib.request.urlopen(config['tokenurl'])
-    token = r.read().decode('utf-8')
-    return token
+import itertools
 
 
 def file_size(num):
@@ -100,6 +94,13 @@ class Play(object):
 
 
     def fetch_new_token(self):
+
+        def get_token(config):
+            print('Retrieving token from %s' % config['tokenurl'])
+            r = urllib.request.urlopen(config['tokenurl'])
+            token = r.read().decode('utf-8')
+            return token
+
         token = ""
         for i in range(1, 4):
             if self.debug:
@@ -193,75 +194,74 @@ class Play(object):
 
     def insert_app_into_state(self, newApp):
         found = False
-        for pos, app in enumerate(self.currentSet):
-            if app['docId'] == newApp['docId']:
-                found = True
-                if self.debug:
-                    print('%s is already cached, updating..' % newApp['docId'])
-                self.currentSet[pos] = newApp
-                break
-        if found is False:
+        result = filter(lambda x: x['docId'] == newApp['docId'], self.currentSet)
+        result = list(result)
+        if len(result) > 0:
+            found = True
+            if self.debug:
+                print('%s is already cached, updating..' % newApp['docId'])
+                i = self.currentSet.index(result[0])
+                self.currentSet[i] = newApp
+        if not found:
             if self.debug:
                 print('Adding %s into cache..' % newApp['docId'])
             self.currentSet.append(newApp)
 
 
-    def search(self, appName, numItems=20):
+    def search(self, appName, numItems=15):
         results = self.service.search(appName, numItems, None).doc
         all_apps = []
         if len(results) < 1:
             return "[]"
-        for doc in results:
-            for result in doc.child:
-                if result.offer[0].checkoutFlowRequired:
-                    continue
-                appDetails = result.details.appDetails
-                app = {
-                    'title': result.title,
-                    'developer': result.creator,
-                    'version': appDetails.versionCode,
-                    'size': file_size(appDetails.installationSize),
-                    'docId': result.docid,
-                    'numDownloads': appDetails.numDownloads,
-                    'uploadDate': appDetails.uploadDate,
-                    'stars': '%.2f' % result.aggregateRating.starRating
-                }
-                if len(all_apps) < int(numItems)+1:
-                    all_apps.append(app)
+        # takes an array of iterables and joins all the elements in
+        # a single iterable
+        apps = itertools.chain.from_iterable([doc.child for doc in results])
+        for x in apps:
+            if x.offer[0].checkoutFlowRequired:
+                continue
+            details = x.details.appDetails
+            app = {
+                'title': x.title,
+                'developer': x.creator,
+                'version': details.versionCode,
+                'size': file_size(details.installationSize),
+                'docId': x.docid,
+                'numDownloads': details.numDownloads,
+                'uploadDate': details.uploadDate,
+                'stars': '%.2f' % x.aggregateRating.starRating
+            }
+            if len(all_apps) <= numItems:
+                all_apps.append(app)
+            else:
+                break
         return all_apps
 
 
     def get_bulk_details(self, apksList):
-        try:
-            results = self.service.bulkDetails(apksList)
-            if len(results.entry) == 0:
-                print('Authentication error, try to reset the token')
-                sys.exit(1)
-        except DecodeError:
-            print('Cannot decode data')
+        results = self.service.bulkDetails(apksList)
+        if len(results.entry) == 0:
             return []
-        details = []
-        for pos, apk in enumerate(apksList):
-            current = results.entry[pos]
-            doc = current.doc
-            appDetails = doc.details.appDetails
-            if doc.docid != apk:
-                raise Error('Wrong order in get_bulk_details')
-                sys.exit(1)
+
+        def from_entry_to_dict(e):
+            doc = e.doc
+            details = doc.details.appDetails
             title = doc.title
             if len(title) > 40:
                 title = title[0:36] + '...'
-            details.append({
-               'title': title,
-               'developer': doc.creator,
-               'size': file_size(appDetails.installationSize),
-               'numDownloads': appDetails.numDownloads,
-               'uploadDate': appDetails.uploadDate,
-               'docId': doc.docid,
-               'version': appDetails.versionCode,
-               'stars': '%.2f' % doc.aggregateRating.starRating
-            })
-        return details
+            return {
+                'title': title,
+                'developer': doc.creator,
+                'size': file_size(details.installationSize),
+                'numDownloads': details.numDownloads,
+                'uploadDate': details.uploadDate,
+                'docId': doc.docid,
+                'version': details.versionCode,
+                'stars': '%.2f' % doc.aggregateRating.starRating
+            }
+
+        a = [entry for entry in results.entry]
+        result = list(map(from_entry_to_dict, a))
+        return result
 
 
     def download_selection(self, appNames):
