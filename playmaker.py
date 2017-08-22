@@ -125,7 +125,9 @@ class ApiDeleteHandler(web.RequestHandler):
 
 class ApiFdroidHandler(web.RequestHandler):
     executor = ThreadPoolExecutor(max_workers=1)
-    is_running = False
+
+    def initialize(self):
+        self.is_running = False
 
     @run_on_executor
     def update(self):
@@ -134,6 +136,7 @@ class ApiFdroidHandler(web.RequestHandler):
 
     @tornado.gen.coroutine
     def post(self):
+        print('Is fdroid already running? %s' % ('Yes' if self.is_running else 'No'))
         if self.is_running:
             self.write('PENDING')
             self.finish()

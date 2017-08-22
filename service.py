@@ -94,7 +94,6 @@ class Play(object):
                     print('Fdroid repo updated successfully')
                     return True
             except:
-                print(stderr)
                 return False
         else:
             return True
@@ -153,19 +152,19 @@ class Play(object):
             self.login()
 
 
-    def get_details_from_apk(self, details):
-        filepath = os.path.join(self.download_path, details['docId'] + '.apk')
-        a = APK(filepath)
-        details['version'] = int(a.version_code)
-        return details
-
-
     def fetch_details_for_local_apps(self):
         """
         Return list of details of the currently downloaded apps.
         Details are fetched from the google server. Don't use this
         function to get names of downloaded apps (use get_state() instead)
         """
+
+        def get_details_from_apk(details):
+            filepath = os.path.join(self.download_path, details['docId'] + '.apk')
+            a = APK(filepath)
+            details['version'] = int(a.version_code)
+            return details
+
         # get application ids from apk files
         appList = [os.path.splitext(apk)[0] for apk in os.listdir(self.download_path)
                    if os.path.splitext(apk)[1] == '.apk']
@@ -173,7 +172,7 @@ class Play(object):
         if len(appList) > 0:
             details = self.get_bulk_details(appList)
             executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
-            futures = {executor.submit(self.get_details_from_apk, app):
+            futures = {executor.submit(get_details_from_apk, app):
                        app for app in details}
             for future in concurrent.futures.as_completed(futures):
                 app = future.result()
