@@ -132,6 +132,10 @@ class ApiFdroidHandler(web.RequestHandler):
 
     @tornado.gen.coroutine
     def post(self):
+        if self.executor._work_queue.qsize() > 0:
+            self.write('PENDING')
+            self.finish()
+            return
         result = yield self.update()
         if result:
             self.write('OK')

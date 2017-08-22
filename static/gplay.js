@@ -281,6 +281,10 @@ $(function(){
         }
         return response.text();
       }).then(function (text) {
+        if (text === 'PENDING') {
+          let n = genInfoAlertHtml('Fdroid repo is still updating');
+          $('body').append(n);
+        }
         if (text === 'OK') {
           let n = genSuccessAlertHtml('Fdroid repo correctly updated');
           $('body').append(n);
