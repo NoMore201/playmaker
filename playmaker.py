@@ -25,14 +25,12 @@ service = Play(debug=args.debug, fdroid=args.fdroid)
 # tornado setup
 
 MAX_WORKERS = 4
+app_dir = os.path.dirname(os.path.realpath(__file__))
 
 class HomeHandler(web.RequestHandler):
     def get(self):
-        self.render('index.html', title='Playmaker')
-
-class SearchHandler(web.RequestHandler):
-    def get(self):
-        self.render('search.html', title='Playmaker')
+        with open(app_dir + '/index.html', 'r') as f:
+            self.write(f.read())
 
 
 class ApiApksHandler(web.RequestHandler):
@@ -151,13 +149,10 @@ class ApiFdroidHandler(web.RequestHandler):
             singleton = {}
 
 
-app_dir = os.path.dirname(os.path.realpath(__file__))
-template_dir = os.path.join(app_dir, 'templates')
 static_dir = os.path.join(app_dir, 'static')
 
 app = web.Application([
     (r'/', HomeHandler),
-    (r'/search', SearchHandler),
     (r'/api/apks', ApiApksHandler),
     (r'/api/search', ApiSearchHandler),
     (r'/api/download', ApiDownloadHandler),
@@ -168,7 +163,6 @@ app = web.Application([
 ], debug=True)
 
 # overwrite settings
-app.settings['template_path'] = template_dir
 app.settings['static_path'] = ''
 
 if __name__ == '__main__':

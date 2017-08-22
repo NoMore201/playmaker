@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="playmaker">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Playmaker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/app.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Playmaker</a>
+        </div>
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a id="app-page-link"><i class="fa fa-android fa-1x" aria-hidden="true"></i> Apps</a></li>
+            <li><a href="/search" id="search-page-link"><i class="fa fa-search fa-1x" aria-hidden="true"></i> Search</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container" id="container">
+      <div id="function-bar">
+        <a id="update-all" class="btn btn-default"><i class="fa fa-refresh" aria-hidden="true"></i> check</a>
+        <a id="update-fdroid" class="btn btn-default" data-toggle="modal"><i class="fa fa-android" aria-hidden="true"></i> fdroid update</a>
+      </div>
+    </div>
+
+    <div ng-view></div>
+   
+    <!-- graphic js resources -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- backbone libraries -->
+    <script src="/static/js/angular.min.js"></script>
+    <script src="/static/js/angular-route.min.js"></script>
+
+    <!-- playmaker app -->
+    <script src="/static/app.module.js"></script>
+    <script src="/static/app.config.js"></script>
+    <script src="/static/app-list/app-list.module.js"></script>
+    <script src="/static/app-list/app-list.component.js"></script>
+  </body>
+</html>
