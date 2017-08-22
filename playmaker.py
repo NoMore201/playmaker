@@ -134,7 +134,7 @@ class ApiFdroidHandler(web.RequestHandler):
 
     @tornado.gen.coroutine
     def post(self):
-        if is_running:
+        if self.is_running:
             self.write('PENDING')
             self.finish()
             return
