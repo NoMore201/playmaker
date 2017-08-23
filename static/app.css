@@ -4,6 +4,11 @@
   padding:0;
 }
 
+#apk-item-update[disabled] {
+  background-color: #BBBBBB;
+  border-color: #BBBBBB;
+}
+
 #function-bar {
   margin-top:30px;
   margin-bottom:30px;
@@ -48,7 +53,7 @@
   padding-right:10px;
 }
 
-#search-table {
+.table {
   margin-top:40px;
 }
 

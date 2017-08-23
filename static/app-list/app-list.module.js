@@ -1,3 +1,0 @@
-angular.module('appList', [
-  'ngRoute'
-]);

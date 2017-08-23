@@ -1,0 +1,28 @@
+<div id="function-bar">
+  <a ng-click="$ctrl.check()" id="update-all" class="btn btn-default">
+    <i class="fa fa-refresh" aria-hidden="true"></i> check
+  </a>
+  <a id="update-fdroid" class="btn btn-default" data-toggle="modal">
+    <i class="fa fa-android" aria-hidden="true"></i> fdroid update
+  </a>
+</div>
+
+<div ng-repeat="app in $ctrl.apps" class="col-xs-12 col-md-6">
+  <div id="apk-item" class="panel panel-default">
+    <div class="panel-body">
+      <strong><h3 class="apk-item-title">{{app.title}}</h3></strong>
+      <span><strong>Developer: </strong>{{app.developer}}</span><br>
+      <span><strong>Version: </strong>{{app.version}}</span><br>
+      <span><strong>Size: </strong>{{app.size}}</span><br>
+      <span><strong>PackageId: </strong>{{app.docId}}</span><br>
+      <span><strong>Stars: </strong>{{app.stars}}</span><br><br>
+      <div ng-hide="!app.updating" class="progress">
+        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+          <span class="sr-only">Updating</span>
+        </div><!-- progress-bar -->
+      </div><!-- progress -->
+      <button ng-hide="app.updating" ng-disabled="!app.needsUpdate" ng-click="$ctrl.updateApp(app)" id="apk-item-update" class="btn btn-raised btn-primary" type="button"><i class="fa fa-download" aria-hidden="true"></i> update</button>
+      <a ng-hide="app.updating" ng-click="$ctrl.delete(app)" id="apk-item-delete" class="btn btn-raised btn-danger pull-right"><i class="fa fa-trash-o" aria-hidden="true"></i> delete</a>
+    </div><!-- panel-body -->
+  </div><!-- panel -->
+</div><!-- main -->

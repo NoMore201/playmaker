@@ -1,0 +1,28 @@
+<div class="container" id="container">
+  <div id="search-area" class="input-group input-group-lg">
+    <span class="input-group-addon" id="search-input-label"><i class="fa fa-search" aria-hidden="true"></i></span>
+    <input ng-model="searchString" on-enter="$ctrl.search(searchString)" type="text" class="form-control" id="search-input" placeholder="Search" aria-describedby="search-input-label">
+  </div>
+  <div class="row" id="table-box">
+    <table class="table" ng-hide="$ctrl.results.length === 0">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Title</th>
+          <th>Developer</th>
+          <th>Id</th>
+          <th>Version</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr ng-repeat="app in $ctrl.results">
+          <td id="dl-button-td"><a class="dl-button"><i class="fa fa-download fa-2x" aria-hidden="true"></i></a></td>
+          <td>{{app.title}}</td>
+          <td>{{app.developer}}</td>
+          <td>{{app.docId}}</td>
+          <td>{{app.version}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

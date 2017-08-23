@@ -153,13 +153,14 @@ static_dir = os.path.join(app_dir, 'static')
 
 app = web.Application([
     (r'/', HomeHandler),
-    (r'/api/apks', ApiApksHandler),
+    (r'/api/apps', ApiApksHandler),
     (r'/api/search', ApiSearchHandler),
     (r'/api/download', ApiDownloadHandler),
     (r'/api/check', ApiCheckHandler),
     (r'/api/delete', ApiDeleteHandler),
     (r'/api/fdroid', ApiFdroidHandler),
     (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
+    (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
 ], debug=True)
 
 # overwrite settings
