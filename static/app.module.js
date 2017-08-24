@@ -3,30 +3,26 @@ var app = angular.module('playmaker', [
   'ui.bootstrap'
 ]);
 
-app.controller('navbar', [
-  '$location',
-  '$scope',
-  '$rootScope',
-  function($location, $scope, $rootScope) {
-    $rootScope.$on('$routeChangeSuccess', function() {
-      $scope.path = $location.path();
-    });
-  }]);
+app.config(['$locationProvider', '$routeProvider',
+  function config($locationProvider, $routeProvider) {
+    $locationProvider.hashPrefix('!');
 
-app.service('global', function() {
-  this.addAlert = {};
-
-  this.desktop = false;
-  this.mobile = false;
-
-  var screenWidth = window.innerWidth;
-  if (screenWidth < 700) {
-    this.mobile = true;
-  } else {
-    this.desktop = true
+    $routeProvider.
+      when('/', {
+        template: '<app-list></app-list>'
+      }).
+      when('/search', {
+        template: '<search-view></search-view>'
+      }).
+      otherwise('/');
   }
+]);
 
-});
+
+/*************
+ * CONTROLLERS
+ *************/
+
 
 app.controller('notify', [
   '$scope',
@@ -47,20 +43,37 @@ app.controller('notify', [
     };
   }]);
 
-app.config(['$locationProvider', '$routeProvider',
-  function config($locationProvider, $routeProvider) {
-    $locationProvider.hashPrefix('!');
+app.controller('navbar', [
+  '$location',
+  '$scope',
+  '$rootScope',
+  function($location, $scope, $rootScope) {
+    $rootScope.$on('$routeChangeSuccess', function() {
+      $scope.path = $location.path();
+    });
+  }]);
 
-    $routeProvider.
-      when('/', {
-        template: '<app-list></app-list>'
-      }).
-      when('/search', {
-        template: '<search-view></search-view>'
-      }).
-      otherwise('/');
+
+/**********
+ * SERVICES
+ **********/
+
+
+app.service('global', function() {
+  this.addAlert = {};
+
+  this.desktop = false;
+  this.mobile = false;
+
+  var screenWidth = window.innerWidth;
+  if (screenWidth < 700) {
+    this.mobile = true;
+  } else {
+    this.desktop = true
   }
-]);
+
+});
+
 
 app.service('api', ['$http', function($http) {
 
@@ -71,7 +84,7 @@ app.service('api', ['$http', function($http) {
     }).then(function success(response) {
       callback(response.data);
     }, function error(response) {
-      callback(response.data);
+      callback('err');
     });
   };
 
@@ -82,7 +95,7 @@ app.service('api', ['$http', function($http) {
     }).then(function success(response) {
       callback(response.data);
     }, function error(response) {
-      callback(response.data);
+      callback('err');
     });
   };
 
@@ -91,7 +104,7 @@ app.service('api', ['$http', function($http) {
       .then(function success(response) {
         callback(response.data);
       }, function error(response) {
-        callback(response.data);
+        callback('err');
       });
   };
 
@@ -106,7 +119,7 @@ app.service('api', ['$http', function($http) {
     }).then(function success(response) {
         callback(response.data);
       }, function error(response) {
-        callback(response.data);
+        callback('err');
       });
   };
 
@@ -121,20 +134,30 @@ app.service('api', ['$http', function($http) {
     }).then(function success(response) {
         callback(response.data);
       }, function error(response) {
-        callback(response.data);
+        callback('err');
       });
   };
 
 }]);
 
+
+/************
+ * COMPONENTS
+ ************/
+
+
 app.component('appList', {
   templateUrl: '/views/app.html',
-  controller: function AppController($routeParams, api, global) {
+  controller: function AppController(api, global) {
     var ctrl = this;
 
     ctrl.check = function() {
       global.addAlert('info', 'Checking for updates');
       api.check(function(data) {
+        if (data === 'err') {
+          global.addAlert('danger', 'Cannot check for updates');
+          return;
+        }
         if (data.length === 0) {
           global.addAlert('success', 'All apps are up-to-date!');
         }
@@ -163,9 +186,17 @@ app.component('appList', {
       app.needsUpdate = false;
       app.updating = true;
       api.download(app.docId, function(data) {
-        if (data.success.length === 0) return;
-        newApp = data.success[0];
-        app.version = newApp.version;
+        if (data === 'err') {
+          global.addAlert('danger', 'Unable to update ' + app.docId);
+          app.updating = false;
+          return;
+        }
+        if (data.success !== undefined && data.success.length === 0) {
+          global.addAlert('danger', 'Unable to update ' + app.docId);
+          app.updating = false;
+          return;
+        }
+        app.version = data.success[0].version;
         app.updating = false;
       });
     };
@@ -208,15 +239,9 @@ app.directive('onEnter', function() {
   };
 });
 
-app.controller('modalviewer', [
-  '$uibModal',
-  function($uibModal) {
-
-  }]);
-
 app.component('searchView', {
   templateUrl: '/views/search.html',
-  controller: function SearchController($routeParams, $uibModal, api, global) {
+  controller: function SearchController($uibModal, api, global) {
     var ctrl = this;
     ctrl.desktop = global.desktop;
     ctrl.mobile = global.mobile;
@@ -236,10 +261,21 @@ app.component('searchView', {
     };
 
     ctrl.search = function(app) {
+      // no input by the user
       if (app === undefined) return;
       ctrl.results = [];
       ctrl.searching = true;
       api.search(app, function(data) {
+        if (data === 'err') {
+          global.addAlert('danger', 'Error while searching');
+          ctrl.searching = false;
+          return;
+        }
+        if (data !== undefined && data.length === 0) {
+          global.addAlert('danger', 'No result for "' + app + '"');
+          ctrl.searching = false;
+          return;
+        }
         data.forEach(function(d) {
           d.dling = false;
           d.dled = false;
@@ -249,14 +285,15 @@ app.component('searchView', {
       });
     };
 
-    ctrl.doNothing = function() {
-      console.log('Doing nothing');
-    };
-
     ctrl.download = function(app) {
       app.dling = true;
       api.download(app.docId, function(data) {
-        if (data.success.length === 0) {
+        if (data === 'err') {
+          global.addAlert('danger', 'Error downloading app');
+          app.dling = false;
+          return;
+        }
+        if (data !== undefined && data.success.length === 0) {
           app.dling = false;
           return;
         }
