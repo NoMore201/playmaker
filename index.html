@@ -19,7 +19,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Playmaker</a>
+          <a class="navbar-brand">Playmaker</a>
         </div>
         <div class="navbar-collapse collapse navbar-responsive-collapse">
           <ul class="nav navbar-nav">
@@ -30,16 +30,28 @@
       </div>
     </div>
 
+    <div id="notification-panel" ng-controller="notify">
+      <script type="text/ng-template" id="alert.html">
+        <div ng-transclude></div>
+      </script>
+
+      <div uib-alert ng-repeat="alert in alerts" ng-class="'alert-' + (alert.type || 'warning')" close="closeAlert($index)" dismiss-on-timeout="2000">{{alert.msg}}</div>
+    </div>
+
+
     <div class="container">
       <div ng-view></div>
     </div>
-   
+
     <!-- graphic js resources -->
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <!-- backbone libraries -->
     <script src="/static/js/angular.min.js"></script>
     <script src="/static/js/angular-route.min.js"></script>
+    <script src="/static/js/angular-animate.min.js"></script>
+    <script src="/static/js/angular-touch.min.js"></script>
+    <script src="/static/js/ui-bootstrap.min.js"></script>
 
     <!-- playmaker app -->
     <script src="/static/app.module.js"></script>

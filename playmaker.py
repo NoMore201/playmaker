@@ -168,5 +168,5 @@ app.settings['static_path'] = ''
 
 if __name__ == '__main__':
     server = httpserver.HTTPServer(app)
-    server.listen(5000)
+    server.listen(5000, address='0.0.0.0')
     io.IOLoop.instance().start()

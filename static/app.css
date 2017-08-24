@@ -4,9 +4,12 @@
   padding:0;
 }
 
-#apk-item-update[disabled] {
-  background-color: #BBBBBB;
-  border-color: #BBBBBB;
+#notification-panel {
+  position: fixed;
+  right: 30px;
+  top: 75px;
+  width: 300px;
+  z-index: 10;
 }
 
 #function-bar {
@@ -16,6 +19,21 @@
 
 .dl-button {
   cursor: pointer;
+  color: #333333;
+}
+
+.dl-button:hover {
+  color: #333333;
+}
+
+.dl-button-disabled {
+  cursor: default;
+  pointer-event: none;
+  color: #BABABA;
+}
+
+.dl-button-disabled:hover {
+  color: #BABABA;
 }
 
 #dl-button-td {
@@ -64,8 +82,4 @@
 
 #table-body > tr > td {
   vertical-align: middle;
-}
-
-#table-body > tr > td > a {
-  color: #333333;
 }
