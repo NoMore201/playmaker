@@ -138,6 +138,17 @@ app.service('api', ['$http', function($http) {
       });
   };
 
+  this.fdroid = function(callback) {
+    $http({
+      method: 'POST',
+      url: '/api/fdroid'
+    }).then(function success(response) {
+      callback(response.data);
+    }, function error(response) {
+      callback('err');
+    });
+  };
+
 }]);
 
 
@@ -213,6 +224,23 @@ app.component('appList', {
         }
       });
     };
+
+    ctrl.fdroid = function() {
+      global.addAlert('info', 'Updating fdroid repository');
+      api.fdroid(function (data) {
+        if (data === 'err') {
+          global.addAlert('danger', 'Error updating repository');
+          return;
+        }
+        if (data === 'PENDING') {
+          global.addAlert('warning', 'Update process still running');
+          return;
+        }
+        if (data === 'OK') {
+          global.addAlert('success', 'Fdroid repository updated succesfully');
+        }
+      });
+    }
 
     api.getApps(function(data) {
       var apps = data;
