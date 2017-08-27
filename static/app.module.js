@@ -69,7 +69,7 @@ app.service('global', function() {
   if (screenWidth < 700) {
     this.mobile = true;
   } else {
-    this.desktop = true
+    this.desktop = true;
   }
 
 });
@@ -240,7 +240,7 @@ app.component('appList', {
           global.addAlert('success', 'Fdroid repository updated succesfully');
         }
       });
-    }
+    };
 
     api.getApps(function(data) {
       var apps = data;

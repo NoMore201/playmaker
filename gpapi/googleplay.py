@@ -93,7 +93,7 @@ class GooglePlayAPI(object):
         return text_format.MessageToString(protoObj)
 
     def _try_register_preFetch(self, protoObj):
-        fields = [i.name for (i,_) in protoObj.ListFields()]
+        fields = [i.name for (i, _) in protoObj.ListFields()]
         if ("preFetch" in fields):
             for p in protoObj.preFetch:
                 self.preFetch[p.url] = p.response
@@ -111,10 +111,12 @@ class GooglePlayAPI(object):
         - a valid Google authSubToken"""
         if (authSubToken is not None):
             self.setAuthSubToken(authSubToken)
+            # check if token is valid with a simple search
             self.search('firefox', 1, None)
         else:
             if (email is None or password is None):
-                raise Exception("You should provide at least authSubToken or (email and password)")
+                raise Exception("You should provide at least " +
+                                "authSubToken or (email and password)")
             params = {
                 "Email": email,
                 "Passwd": password,
@@ -184,7 +186,6 @@ class GooglePlayAPI(object):
 
         return message
 
-
     def search(self, query, nb_results, offset=None):
         """Search for apps."""
         path = "search?c=3&q=%s" % requests.utils.quote(query)
@@ -193,15 +194,16 @@ class GooglePlayAPI(object):
             path += "&o=%d" % int(offset)
 
         message = self.executeRequestApi2(path)
-        if len(message.payload.searchResponse.doc) == 0:
+        response = message.payload.searchResponse
+        if len(response.doc) == 0:
             raise DecodeError
-        remaining = int(nb_results) - len(message.payload.searchResponse.doc[0].child)
+        remaining = int(nb_results) - len(response.doc[0].child)
         messagenext = message
         allmessages = message
         while remaining > 0:
-            pathnext = messagenext.payload.searchResponse.doc[0].containerMetadata.nextPageUrl
+            pathnext = response.doc[0].containerMetadata.nextPageUrl
             messagenext = self.executeRequestApi2(pathnext)
-            remaining -= len(messagenext.payload.searchResponse.doc[0].child)
+            remaining -= len(response.doc[0].child)
             allmessages.MergeFrom(messagenext)
         return allmessages.payload.searchResponse
 
@@ -223,16 +225,18 @@ class GooglePlayAPI(object):
         req = googleplay_pb2.BulkDetailsRequest()
         req.docid.extend(packageNames)
         data = req.SerializeToString()
-        message = self.executeRequestApi2(path, data.decode("utf-8"), "application/x-protobuf")
+        message = self.executeRequestApi2(path,
+                                          data.decode("utf-8"),
+                                          "application/x-protobuf")
         return message.payload.bulkDetailsResponse
 
     def browse(self, cat=None, ctr=None):
         """Browse categories.
         cat (category ID) and ctr (subcategory ID) are used as filters."""
         path = "browse?c=3"
-        if (cat != None):
+        if cat is not None:
             path += "&cat=%s" % requests.utils.quote(cat)
-        if (ctr != None):
+        if ctr is not None:
             path += "&ctr=%s" % requests.utils.quote(ctr)
         message = self.executeRequestApi2(path)
         return message.payload.browseResponse
@@ -244,16 +248,17 @@ class GooglePlayAPI(object):
 
         If ctr is provided, list apps within this subcategory."""
         path = "list?c=3&cat=%s" % requests.utils.quote(cat)
-        if (ctr != None):
+        if ctr is not None:
             path += "&ctr=%s" % requests.utils.quote(ctr)
-        if (nb_results != None):
+        if nb_results is not None:
             path += "&n=%s" % requests.utils.quote(nb_results)
-        if (offset != None):
+        if offset is not None:
             path += "&o=%s" % requests.utils.quote(offset)
         message = self.executeRequestApi2(path)
         return message.payload.listResponse
 
-    def reviews(self, packageName, filterByDevice=False, sort=2, nb_results=None, offset=None):
+    def reviews(self, packageName, filterByDevice=False, sort=2,
+                nb_results=None, offset=None):
         """Browse reviews.
         packageName is the app unique ID.
         If filterByDevice is True, return only reviews for your device."""
@@ -267,7 +272,8 @@ class GooglePlayAPI(object):
         message = self.executeRequestApi2(path)
         return message.payload.reviewResponse
 
-    def download(self, packageName, versionCode, offerType=1,progress_bar=False):
+    def download(self, packageName, versionCode,
+                 offerType=1, progress_bar=False):
         """Download an app and return its raw data (APK file).
 
         packageName is the app unique ID (usually starting with 'com.').
@@ -277,28 +283,37 @@ class GooglePlayAPI(object):
         path = "purchase"
         data = "ot=%d&doc=%s&vc=%d" % (offerType, packageName, versionCode)
         message = self.executeRequestApi2(path, data)
-
-        url = message.payload.buyResponse.purchaseStatusResponse.appDeliveryData.downloadUrl
-        cookie = message.payload.buyResponse.purchaseStatusResponse.appDeliveryData.downloadAuthCookie[0]
+        response = message.payload.buyResponse.purchaseStatusResponse
+        if len(response.appDeliveryData.downloadAuthCookie) == 0:
+            raise DecodeError
+        url = response.appDeliveryData.downloadUrl
+        cookie = response.appDeliveryData.downloadAuthCookie[0]
 
         cookies = {
-            str(cookie.name): str(cookie.value) # python-requests #459 fixes this
+            str(cookie.name): str(cookie.value)
         }
 
         headers = {
-                   "User-Agent" : "AndroidDownloadManager/4.4.3 (Linux; U; Android 4.4.3; Nexus S Build/JRO03E)",
-                   "Accept-Encoding": "",
-                  }
+            "User-Agent": "AndroidDownloadManager/4.4.3 (Linux; U; " +
+                          "Android 4.4.3; Nexus S Build/JRO03E)",
+            "Accept-Encoding": "",
+        }
 
         if not progress_bar:
-            response = requests.get(url, headers=headers, cookies=cookies, verify=ssl_verify)
+            response = requests.get(url, headers=headers,
+                                    cookies=cookies, verify=ssl_verify)
             return response.content
         # If progress_bar is asked
         from clint.textui import progress
         response_content = str()
-        response = requests.get(url, headers=headers, cookies=cookies, verify=ssl_verify,stream=True)
+        response = requests.get(url,
+                                headers=headers,
+                                cookies=cookies,
+                                verify=ssl_verify,
+                                stream=True)
         total_length = int(response.headers.get('content-length'))
-        for chunk in progress.bar(response.iter_content(chunk_size=1024),expected_size=(total_length/1024) + 1):
+        for chunk in progress.bar(response.iter_content(chunk_size=1024),
+                                  expected_size=(total_length/1024) + 1):
             if chunk:
-                response_content+=chunk
+                response_content += chunk
         return response_content

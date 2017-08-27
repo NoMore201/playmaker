@@ -1,4 +1,4 @@
-from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
+from gpapi.googleplay import GooglePlayAPI, LoginError
 from google.protobuf.message import DecodeError
 from pyaxmlparser import APK
 
@@ -55,12 +55,8 @@ class Play(object):
             self.fdroid_path = os.getcwd()
             self.fdroid_init()
 
-        # no need of creating dir, fdroid will take care
-        #if not os.path.isdir(self.config['download_path']):
-        #    os.mkdir(self.config['download_path'])
         self.service = GooglePlayAPI(self.config['id'], 'en', self.debug)
         self.login()
-
 
     def fdroid_init(self):
         if not os.path.isfile(self.fdroid_exe):
@@ -70,19 +66,21 @@ class Play(object):
             p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                sys.stderr.write("error while initializing fdroid repository " + stderr.decode('utf-8'))
+                sys.stderr.write("error initializing fdroid repository " +
+                                 stderr.decode('utf-8'))
                 sys.exit(1)
             else:
                 print('Fdroid repo initialized successfully')
 
-
     def fdroid_update(self):
         if self.fdroid:
             try:
-                p = Popen([self.fdroid_exe, 'update', '-c', '--clean'], stdout=PIPE, stderr=PIPE)
+                p = Popen([self.fdroid_exe, 'update', '-c', '--clean'],
+                          stdout=PIPE, stderr=PIPE)
                 stdout, stderr = p.communicate()
                 if p.returncode != 0:
-                    sys.stderr.write("error while updating fdroid repository " + stderr.decode('utf-8'))
+                    sys.stderr.write("error updating fdroid repository " +
+                                     stderr.decode('utf-8'))
                     return False
                 else:
                     print('Fdroid repo updated successfully')
@@ -91,7 +89,6 @@ class Play(object):
                 return False
         else:
             return True
-
 
     def fetch_new_token(self):
 
@@ -115,12 +112,10 @@ class Play(object):
             sys.exit(1)
         return token
 
-
     def save_config(self):
         with open(self.configfile, 'w') as configfile:
             self.configparser['Main'] = self.config
             self.configparser.write(configfile)
-
 
     def login(self):
         print(self.config['token'])
@@ -152,7 +147,6 @@ class Play(object):
             self.save_config()
             self.login()
 
-
     def fetch_details_for_local_apps(self):
         """
         Return list of details of the currently downloaded apps.
@@ -161,13 +155,15 @@ class Play(object):
         """
 
         def get_details_from_apk(details):
-            filepath = os.path.join(self.download_path, details['docId'] + '.apk')
+            filepath = os.path.join(self.download_path,
+                                    details['docId'] + '.apk')
             a = APK(filepath)
             details['version'] = int(a.version_code)
             return details
 
         # get application ids from apk files
-        appList = [os.path.splitext(apk)[0] for apk in os.listdir(self.download_path)
+        appList = [os.path.splitext(apk)[0]
+                   for apk in os.listdir(self.download_path)
                    if os.path.splitext(apk)[1] == '.apk']
         toReturn = []
         if len(appList) > 0:
@@ -182,19 +178,17 @@ class Play(object):
                     print('Added %s to cache' % app['docId'])
         return toReturn
 
-
     def update_state(self):
         print('Updating cache')
         self.currentSet = self.fetch_details_for_local_apps()
 
-
     def get_state(self):
         return [app['docId'] for app in self.currentSet]
 
-
     def insert_app_into_state(self, newApp):
         found = False
-        result = filter(lambda x: x['docId'] == newApp['docId'], self.currentSet)
+        result = filter(lambda x: x['docId'] == newApp['docId'],
+                        self.currentSet)
         result = list(result)
         if len(result) > 0:
             found = True
@@ -206,7 +200,6 @@ class Play(object):
             if self.debug:
                 print('Adding %s into cache..' % newApp['docId'])
             self.currentSet.append(newApp)
-
 
     def search(self, appName, numItems=15):
         results = self.service.search(appName, numItems, None).doc
@@ -236,7 +229,6 @@ class Play(object):
                 break
         return all_apps
 
-
     def get_bulk_details(self, apksList):
         results = self.service.bulkDetails(apksList)
         if len(results.entry) == 0:
@@ -262,7 +254,6 @@ class Play(object):
         a = [entry for entry in results.entry]
         result = list(map(from_entry_to_dict, a))
         return result
-
 
     def download_selection(self, appNames):
         success = []
@@ -295,9 +286,6 @@ class Play(object):
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
                     failed.append(appname)
-        # Now we should save the new app into the currentSet, we can
-        # 1) just fire update_state, (more computation) or
-        # 2) add objects in the success list to currentSet (taking care of duplicates)
         for x in success:
             self.insert_app_into_state(x)
         return {
@@ -305,7 +293,6 @@ class Play(object):
             'failed': failed,
             'unavail': unavail
         }
-
 
     def check_local_apks(self):
         localDetails = self.currentSet
@@ -317,7 +304,7 @@ class Play(object):
             toUpdate = list()
             for local, online in zip(localDetails, onlineDetails):
                 if self.debug:
-                    print('Checking %s - %s' % (local['docId'], online['docId']))
+                    print('Checking %s' % local['docId'])
                     print('%d == %d ?' % (local['version'], online['version']))
                 if local['version'] != online['version']:
                     toUpdate.append(online['docId'])
