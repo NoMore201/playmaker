@@ -24,8 +24,47 @@ ap.add_argument('-d', '--debug', dest='debug',
 args = ap.parse_args()
 service = Play(debug=args.debug, fdroid=args.fdroid)
 
+
+def update_routine():
+    toUpdate = service.check_local_apks()
+    if toUpdate.get('result', []) != []:
+        service.download_selection(toUpdate)
+    service.fdroid_update()
+
+
+class Options(object):
+    def __init__(self):
+        self.opts = {
+                'timeout': 3600000,
+                'max_workers': 4
+        }
+        self.routine = io.PeriodicCallback(update_routine,
+                                           self.get_timeout())
+        self.routine.start()
+
+    def get_timeout(self):
+        return self.opts.get('timeout')
+
+    def update(self, new_opts):
+        print('Updating options')
+        old_timeout = self.get_timeout()
+        self.opts = new_opts
+        if new_opts['timeout'] != old_timeout:
+            print('Refreshing routine')
+            if self.routine.is_running():
+                self.routine.stop()
+            self.routine = io.PeriodicCallback(update_routine,
+                                               new_opts['timeout'])
+            self.routine.start()
+
+    def get_threads(self):
+        return self.opts.get('max_workers')
+
+
+options = Options()
+
+
 # tornado setup
-MAX_WORKERS = 4
 app_dir = os.path.dirname(os.path.realpath(__file__))
 static_dir = os.path.join(app_dir, 'static')
 
@@ -36,9 +75,11 @@ class HomeHandler(web.RequestHandler):
             self.write(f.read())
 
 
+fdroid_instance = {}
+
+
 class ApiHandler(web.RequestHandler):
-    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-    fdroid_instance = {}
+    executor = ThreadPoolExecutor(max_workers=options.get_threads())
 
     @run_on_executor
     def get_apps(self):
@@ -85,6 +126,8 @@ class ApiHandler(web.RequestHandler):
             else:
                 self.clear()
                 self.set_status(400)
+        elif path == 'options':
+            self.write(options.opts)
         self.finish()
 
     @tornado.gen.coroutine
@@ -100,18 +143,22 @@ class ApiHandler(web.RequestHandler):
             result = yield self.check()
             self.write(result)
         elif path == 'fdroid':
-            if self.fdroid_instance != {}:
+            global fdroid_instance
+            if fdroid_instance != {}:
                 self.write('PENDING')
             else:
-                self.fdroid_instance = self
+                fdroid_instance = self
                 result = yield self.update_fdroid()
                 if result:
                     self.write('OK')
-                    self.fdroid_instance = {}
+                    fdroid_instance = {}
                 else:
                     self.clear()
                     self.set_status(500)
-                    self.fdroid_instance = {}
+                    fdroid_instance = {}
+        elif path == 'options':
+            body = tornado.escape.json_decode(self.request.body)
+            options.update(body)
         self.finish()
 
     @tornado.gen.coroutine
