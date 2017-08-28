@@ -22,9 +22,6 @@ RUN add-apt-repository ppa:guardianproject/ppa && \
     apt-get update && \
     apt-get install -y fdroidserver
 
-WORKDIR /opt
-RUN git clone https://github.com/NoMore201/playmaker
-
 RUN wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
     && echo "444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0  sdk-tools-linux-3859397.zip" | sha256sum -c \
     && unzip sdk-tools-linux-3859397.zip \
@@ -39,6 +36,9 @@ RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose 
     && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "tools"
 
 RUN mkdir -p /data/fdroid/repo
+
+WORKDIR /opt
+RUN git clone https://github.com/NoMore201/playmaker
 
 WORKDIR /opt/playmaker
 RUN pip3 install -r requirements.txt
