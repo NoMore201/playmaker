@@ -9,7 +9,6 @@ from tornado.concurrent import run_on_executor
 from tornado.web import MissingArgumentError
 from concurrent.futures import ThreadPoolExecutor
 
-import json
 import os
 import argparse
 
@@ -40,8 +39,7 @@ class HomeHandler(web.RequestHandler):
 class ApiApksHandler(web.RequestHandler):
 
     def get(self):
-        apps = sorted(service.currentSet, key=lambda k: k['title'])
-        apps = json.dumps(apps)
+        apps = service.get_apps()
         self.write(apps)
         self.finish()
 
@@ -55,7 +53,7 @@ class ApiSearchHandler(web.RequestHandler):
             keyword = self.get_argument('search')
         except MissingArgumentError:
             return None
-        return json.dumps(service.search(keyword))
+        return service.search(keyword)
 
     @tornado.gen.coroutine
     def get(self):
@@ -78,7 +76,7 @@ class ApiDownloadHandler(web.RequestHandler):
         if data.get('download') is None:
             return None
         apps = service.download_selection(data['download'])
-        return json.dumps(apps)
+        return apps
 
     @tornado.gen.coroutine
     def post(self):
@@ -98,7 +96,7 @@ class ApiCheckHandler(web.RequestHandler):
     @run_on_executor
     def check(self):
         apps = service.check_local_apks()
-        return json.dumps(apps)
+        return apps
 
     @tornado.gen.coroutine
     def post(self):

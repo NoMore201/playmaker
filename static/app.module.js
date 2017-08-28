@@ -82,7 +82,7 @@ app.service('api', ['$http', function($http) {
       method: 'GET',
       url: '/api/apps'
     }).then(function success(response) {
-      callback(response.data);
+      callback(response.data.result);
     }, function error(response) {
       callback('err');
     });
@@ -93,7 +93,7 @@ app.service('api', ['$http', function($http) {
       method: 'GET',
       url: '/api/search?search=' + app
     }).then(function success(response) {
-      callback(response.data);
+      callback(response.data.result);
     }, function error(response) {
       callback('err');
     });
@@ -102,7 +102,7 @@ app.service('api', ['$http', function($http) {
   this.check = function(callback) {
     $http.post('/api/check')
       .then(function success(response) {
-        callback(response.data);
+        callback(response.data.result);
       }, function error(response) {
         callback('err');
       });

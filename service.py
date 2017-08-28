@@ -90,6 +90,11 @@ class Play(object):
         else:
             return True
 
+    def get_apps(self):
+        return {
+            'result': sorted(self.currentSet, key=lambda k: k['title'])
+        }
+
     def fetch_new_token(self):
 
         def get_token(config):
@@ -178,7 +183,7 @@ class Play(object):
         print('Updating cache')
         self.currentSet = fetch_details_for_local_apps()
 
-    def get_state(self):
+    def get_apps_from_state(self):
         return [app['docId'] for app in self.currentSet]
 
     def insert_app_into_state(self, newApp):
@@ -201,7 +206,9 @@ class Play(object):
         results = self.service.search(appName, numItems, None).doc
         all_apps = []
         if len(results) < 1:
-            return "[]"
+            return {
+                'result': []
+            }
         # takes an array of iterables and joins all the elements in
         # a single iterable
         apps = itertools.chain.from_iterable([doc.child for doc in results])
@@ -223,7 +230,9 @@ class Play(object):
                 all_apps.append(app)
             else:
                 break
-        return all_apps
+        return {
+            'result': all_apps
+        }
 
     def get_bulk_details(self, apksList):
         results = self.service.bulkDetails(apksList)
@@ -292,10 +301,12 @@ class Play(object):
 
     def check_local_apks(self):
         localDetails = self.currentSet
-        onlineDetails = self.get_bulk_details(self.get_state())
+        onlineDetails = self.get_bulk_details(self.get_apps_from_state())
         if len(localDetails) == 0 or len(onlineDetails) == 0:
             print('There is no package locally')
-            return []
+            return {
+                'result': []
+            }
         else:
             toUpdate = list()
             for local, online in zip(localDetails, onlineDetails):
@@ -304,7 +315,9 @@ class Play(object):
                     print('%d == %d ?' % (local['version'], online['version']))
                 if local['version'] != online['version']:
                     toUpdate.append(online['docId'])
-            return toUpdate
+            return {
+                'result': toUpdate
+            }
 
     def remove_local_app(self, appName):
         apkName = appName + '.apk'
