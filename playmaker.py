@@ -162,7 +162,7 @@ class ApiHandler(web.RequestHandler):
         self.finish()
 
     @tornado.gen.coroutine
-    def delete(self):
+    def delete(self, path):
         data = tornado.escape.json_decode(self.request.body)
         if data.get('delete') is None:
             self.clear()
