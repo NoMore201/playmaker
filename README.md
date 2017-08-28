@@ -83,10 +83,10 @@ For additional informations, check out Dockerfiles for token-dispenser: https://
 
 ### Frontend
 
-- [ ] Switch to angular (less code, one page app)
-- [ ] Integrate both Apps and Search views in a single page
 - [ ] Fdroid repo configuration page
 - [ ] Add placeholder when there aren't local apps
+- [x] Switch to angular (less code, one page app)
+- [x] Integrate both Apps and Search views in a single page
 - [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
 - [x] Add some kind of notification
 - [x] Make notifications disappear after some seconds
