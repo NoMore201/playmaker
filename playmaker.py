@@ -14,10 +14,13 @@ import os
 import argparse
 
 # arguments
-ap = argparse.ArgumentParser(description='Apk and fdroid repository manager with a web interface.')
-ap.add_argument('-f', '--fdroid', dest='fdroid', action='store_true', default=False,
+ap = argparse.ArgumentParser(description='Apk and fdroid repository ' +
+                             'manager with a web interface.')
+ap.add_argument('-f', '--fdroid', dest='fdroid',
+                action='store_true', default=False,
                 help='Enable fdroid integration')
-ap.add_argument('-d', '--debug', dest='debug', action='store_true', default=False,
+ap.add_argument('-d', '--debug', dest='debug',
+                action='store_true', default=False,
                 help='Enable debug output')
 args = ap.parse_args()
 service = Play(debug=args.debug, fdroid=args.fdroid)
@@ -26,6 +29,7 @@ service = Play(debug=args.debug, fdroid=args.fdroid)
 
 MAX_WORKERS = 4
 app_dir = os.path.dirname(os.path.realpath(__file__))
+
 
 class HomeHandler(web.RequestHandler):
     def get(self):
@@ -51,7 +55,7 @@ class ApiSearchHandler(web.RequestHandler):
             keyword = self.get_argument('search')
         except MissingArgumentError:
             return None
-        return json.dumps(service.search(self.get_argument('search')))
+        return json.dumps(service.search(keyword))
 
     @tornado.gen.coroutine
     def get(self):
@@ -87,6 +91,7 @@ class ApiDownloadHandler(web.RequestHandler):
             self.write(result)
             self.finish()
 
+
 class ApiCheckHandler(web.RequestHandler):
     executor = ThreadPoolExecutor(max_workers=1)
 
@@ -120,7 +125,9 @@ class ApiDeleteHandler(web.RequestHandler):
                 self.set_status(500)
                 self.finish()
 
+
 singleton = {}
+
 
 class ApiFdroidHandler(web.RequestHandler):
     executor = ThreadPoolExecutor(max_workers=1)
