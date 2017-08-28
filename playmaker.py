@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import argparse
 
-# arguments
+# arguments parsing
 ap = argparse.ArgumentParser(description='Apk and fdroid repository ' +
                              'manager with a web interface.')
 ap.add_argument('-f', '--fdroid', dest='fdroid',
@@ -25,9 +25,9 @@ args = ap.parse_args()
 service = Play(debug=args.debug, fdroid=args.fdroid)
 
 # tornado setup
-
 MAX_WORKERS = 4
 app_dir = os.path.dirname(os.path.realpath(__file__))
+static_dir = os.path.join(app_dir, 'static')
 
 
 class HomeHandler(web.RequestHandler):
@@ -36,16 +36,13 @@ class HomeHandler(web.RequestHandler):
             self.write(f.read())
 
 
-class ApiApksHandler(web.RequestHandler):
-
-    def get(self):
-        apps = service.get_apps()
-        self.write(apps)
-        self.finish()
-
-
-class ApiSearchHandler(web.RequestHandler):
+class ApiHandler(web.RequestHandler):
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+    fdroid_instance = {}
+
+    @run_on_executor
+    def get_apps(self):
+        return service.get_apps()
 
     @run_on_executor
     def search(self):
@@ -55,21 +52,6 @@ class ApiSearchHandler(web.RequestHandler):
             return None
         return service.search(keyword)
 
-    @tornado.gen.coroutine
-    def get(self):
-        apps = yield self.search()
-        if apps is not None:
-            self.write(apps)
-            self.finish()
-        else:
-            self.clear()
-            self.set_status(400)
-            self.finish()
-
-
-class ApiDownloadHandler(web.RequestHandler):
-    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-
     @run_on_executor
     def download(self):
         data = tornado.escape.json_decode(self.request.body)
@@ -78,95 +60,81 @@ class ApiDownloadHandler(web.RequestHandler):
         apps = service.download_selection(data['download'])
         return apps
 
-    @tornado.gen.coroutine
-    def post(self):
-        result = yield self.download()
-        if result is None:
-            self.clear()
-            self.set_status(400)
-            self.finish()
-        else:
-            self.write(result)
-            self.finish()
-
-
-class ApiCheckHandler(web.RequestHandler):
-    executor = ThreadPoolExecutor(max_workers=1)
-
     @run_on_executor
     def check(self):
         apps = service.check_local_apks()
         return apps
 
+    @run_on_executor
+    def remove_app(self, app):
+        return service.remove_local_app(app)
+
+    @run_on_executor
+    def update_fdroid(self):
+        return service.fdroid_update()
+
     @tornado.gen.coroutine
-    def post(self):
-        result = yield self.check()
-        self.write(result)
+    def get(self, path):
+        if path == 'apps':
+            apps = yield self.get_apps()
+            self.write(apps)
+        elif path == 'search':
+            apps = yield self.search()
+            if apps is not None:
+                self.write(apps)
+            else:
+                self.clear()
+                self.set_status(400)
         self.finish()
 
+    @tornado.gen.coroutine
+    def post(self, path):
+        if path == 'download':
+            result = yield self.download()
+            if result is None:
+                self.clear()
+                self.set_status(400)
+            else:
+                self.write(result)
+        elif path == 'check':
+            result = yield self.check()
+            self.write(result)
+        elif path == 'fdroid':
+            if self.fdroid_instance != {}:
+                self.write('PENDING')
+            else:
+                self.fdroid_instance = self
+                result = yield self.update_fdroid()
+                if result:
+                    self.write('OK')
+                    self.fdroid_instance = {}
+                else:
+                    self.clear()
+                    self.set_status(500)
+                    self.fdroid_instance = {}
+        self.finish()
 
-class ApiDeleteHandler(web.RequestHandler):
-
+    @tornado.gen.coroutine
     def delete(self):
         data = tornado.escape.json_decode(self.request.body)
         if data.get('delete') is None:
             self.clear()
             self.set_status(400)
-            self.finish()
         else:
-            result = service.remove_local_app(data['delete'])
+            result = yield self.remove_app(data['delete'])
             if result:
                 self.write('OK')
-                self.finish()
             else:
-                self.clear()
                 self.set_status(500)
-                self.finish()
+        self.finish()
 
-
-singleton = {}
-
-
-class ApiFdroidHandler(web.RequestHandler):
-    executor = ThreadPoolExecutor(max_workers=1)
-
-    @run_on_executor
-    def update(self):
-        return service.fdroid_update()
-
-    @tornado.gen.coroutine
-    def post(self):
-        global singleton
-        if singleton != {}:
-            self.write('PENDING')
-            self.finish()
-            return
-        singleton = self
-        result = yield self.update()
-        if result:
-            self.write('OK')
-            self.finish()
-            singleton = {}
-        else:
-            self.clear()
-            self.set_status(500)
-            self.finish()
-            singleton = {}
-
-
-static_dir = os.path.join(app_dir, 'static')
 
 app = web.Application([
     (r'/', HomeHandler),
-    (r'/api/apps', ApiApksHandler),
-    (r'/api/search', ApiSearchHandler),
-    (r'/api/download', ApiDownloadHandler),
-    (r'/api/check', ApiCheckHandler),
-    (r'/api/delete', ApiDeleteHandler),
-    (r'/api/fdroid', ApiFdroidHandler),
+    (r'/api/(.*?)/?', ApiHandler),
     (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
     (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
-], debug=True)
+], debug=args.debug)
 
 # overwrite settings
 app.settings['static_path'] = ''
