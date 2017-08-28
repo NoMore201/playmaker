@@ -163,17 +163,18 @@ class ApiHandler(web.RequestHandler):
 
     @tornado.gen.coroutine
     def delete(self, path):
-        data = tornado.escape.json_decode(self.request.body)
-        if data.get('delete') is None:
-            self.clear()
-            self.set_status(400)
-        else:
-            result = yield self.remove_app(data['delete'])
-            if result:
-                self.write('OK')
+        if path == 'delete':
+            data = tornado.escape.json_decode(self.request.body)
+            if data.get('delete') is None:
+                self.clear()
+                self.set_status(400)
             else:
-                self.set_status(500)
-        self.finish()
+                result = yield self.remove_app(data['delete'])
+                if result:
+                    self.write('OK')
+                else:
+                    self.set_status(500)
+            self.finish()
 
 
 app = web.Application([
