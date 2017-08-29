@@ -175,12 +175,12 @@ app.component('appList', {
         if (data.length > 0) {
           global.addAlert('info', data.length.toString() + ' apps must be updated');
 
-          data.forEach(function(a) {
-            var oldApp = ctrl.apps.find(function(elem) {
-              return elem.docId === a.docId;
+          data.forEach(function(newApp) {
+            var oldAppIndex = ctrl.apps.findIndex(function(elem) {
+              return elem.docId === newApp;
             });
-            if (oldApp === undefined) return;
-            oldApp.needsUpdate = true;
+            if (oldAppIndex === -1) return;
+            ctrl.apps[oldAppIndex].needsUpdate = true;
           });
         }
       });
