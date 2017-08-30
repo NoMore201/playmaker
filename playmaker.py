@@ -32,39 +32,8 @@ def update_routine():
     service.fdroid_update()
 
 
-class Options(object):
-    def __init__(self):
-        self.opts = {
-                'timeout': 3600000,
-                'max_workers': 4
-        }
-        self.routine = io.PeriodicCallback(update_routine,
-                                           self.get_timeout())
-        self.routine.start()
-
-    def get_timeout(self):
-        return self.opts.get('timeout')
-
-    def update(self, new_opts):
-        print('Updating options')
-        old_timeout = self.get_timeout()
-        self.opts = new_opts
-        if new_opts['timeout'] != old_timeout:
-            print('Refreshing routine')
-            if self.routine.is_running():
-                self.routine.stop()
-            self.routine = io.PeriodicCallback(update_routine,
-                                               new_opts['timeout'])
-            self.routine.start()
-
-    def get_threads(self):
-        return self.opts.get('max_workers')
-
-
-options = Options()
-
-
 # tornado setup
+MAX_WORKERS=4
 app_dir = os.path.dirname(os.path.realpath(__file__))
 static_dir = os.path.join(app_dir, 'static')
 
@@ -79,7 +48,7 @@ fdroid_instance = {}
 
 
 class ApiHandler(web.RequestHandler):
-    executor = ThreadPoolExecutor(max_workers=options.get_threads())
+    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
     @run_on_executor
     def get_apps(self):
@@ -126,8 +95,8 @@ class ApiHandler(web.RequestHandler):
             else:
                 self.clear()
                 self.set_status(400)
-        elif path == 'options':
-            self.write(options.opts)
+        else:
+            self.set_status(404)
         self.finish()
 
     @tornado.gen.coroutine
@@ -156,9 +125,8 @@ class ApiHandler(web.RequestHandler):
                     self.clear()
                     self.set_status(500)
                     fdroid_instance = {}
-        elif path == 'options':
-            body = tornado.escape.json_decode(self.request.body)
-            options.update(body)
+        else:
+            self.set_status(404)
         self.finish()
 
     @tornado.gen.coroutine
@@ -174,7 +142,9 @@ class ApiHandler(web.RequestHandler):
                     self.write('OK')
                 else:
                     self.set_status(500)
-            self.finish()
+        else:
+            self.set_status(404)
+        self.finish()
 
 
 app = web.Application([
