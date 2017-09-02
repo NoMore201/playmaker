@@ -216,6 +216,9 @@ class Play(object):
             if x.offer[0].checkoutFlowRequired:
                 continue
             details = x.details.appDetails
+            for img in x.image:
+                if img.imageType == 4:
+                    imageUrl = img.imageUrl
             app = {
                 'title': x.title,
                 'developer': x.creator,
@@ -224,6 +227,7 @@ class Play(object):
                 'docId': x.docid,
                 'numDownloads': details.numDownloads,
                 'uploadDate': details.uploadDate,
+                'imageUrl': imageUrl,
                 'stars': '%.2f' % x.aggregateRating.starRating
             }
             if len(all_apps) <= numItems:
