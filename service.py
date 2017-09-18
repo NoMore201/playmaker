@@ -65,6 +65,8 @@ class Play(object):
         if not found:
             print('Please install fdroid')
             sys.exit(1)
+        else if os.path.isdir('./repo'):
+            print('Repo already initalized, skipping')
         else:
             p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
