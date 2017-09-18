@@ -15,7 +15,7 @@
       <span><strong>Version: </strong>{{app.versionCode}}</span><br>
       <span><strong>Files: </strong>{{app.files.length}}</span><br>
       <span><strong>PackageId: </strong>{{app.docId}}</span><br>
-      <span><strong>Stars: </strong></span><br><br>
+      <span><strong>Stars: </strong>{{app.aggregateRating.starRating}}</span><br><br>
       <div ng-hide="!app.updating" class="progress">
         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
           <span class="sr-only">Updating</span>

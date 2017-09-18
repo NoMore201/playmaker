@@ -1,8 +1,8 @@
+from . import googleplay_pb2
+
 import time
 import os
 import configparser
-
-from . import googleplay_pb2
 
 # separator used by search.py, categories.py, ...
 SEPARATOR = ";"

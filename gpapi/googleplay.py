@@ -15,9 +15,7 @@ import base64
 import struct
 import itertools
 
-from . import googleplay_pb2
-from . import config
-from . import utils
+from . import config, googleplay_pb2, utils
 
 ssl_verify = True
 
