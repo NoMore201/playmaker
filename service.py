@@ -58,7 +58,7 @@ class Play(object):
 
     def fdroid_init(self):
         found = False
-        for path in os.environ['PATH']:
+        for path in ['/usr/bin', '/usr/local/bin']:
             exe = os.path.join(path, self.fdroid_exe)
             if os.path.isfile(exe):
                 found = True
