@@ -18,6 +18,7 @@
         <th>Developer</th>
         <th>Id</th>
         <th>Version</th>
+        <th>Size</th>
       </tr>
     </thead>
     <tbody id="table-body">
@@ -29,9 +30,10 @@
           </a>
         </td>
         <td>{{app.title}}</td>
-        <td>{{app.developer}}</td>
+        <td>{{app.author}}</td>
         <td>{{app.docId}}</td>
-        <td>{{app.version}}</td>
+        <td>{{app.files[0].size}}</td>
+        <td>{{app.versionCode}}</td>
       </tr>
     </tbody>
   </table>

@@ -1,11 +1,9 @@
-from gpapi.googleplay import GooglePlayAPI, LoginError
-from google.protobuf.message import DecodeError
+from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
 from pyaxmlparser import APK
 
 import concurrent.futures
 import configparser
 import urllib.request
-from urllib.error import URLError
 from subprocess import Popen, PIPE
 import os
 import sys
@@ -55,7 +53,7 @@ class Play(object):
             self.fdroid_path = os.getcwd()
             self.fdroid_init()
 
-        self.service = GooglePlayAPI(self.config['id'], 'en', self.debug)
+        self.service = GooglePlayAPI(self.debug)
         self.login()
 
     def fdroid_init(self):
@@ -123,34 +121,42 @@ class Play(object):
             self.configparser.write(configfile)
 
     def login(self):
-        print(self.config['token'])
         try:
-            token = ''
-            if self.config['token'] != '':
-                token = self.config['token']
-                if self.debug:
-                    print('Reusing saved token')
+            if self.config['ac2dmtoken'] != '' and self.config['gsfid'] != 0:
+                if self.config['authtoken'] == '':
+                    self.service.login(self.config['email'],
+                                       self.config['password'],
+                                       self.config['ac2dmtoken'],
+                                       int(self.config['gsfid']))
+                else:
+                    # we have all information we need, update the state of
+                    # self.service and skip login
+                    self.service.authSubToken = self.config['authtoken']
+                    self.service.ac2dmToken = self.config['ac2dmtoken']
+                    self.service.gsfId = int(self.config['gsfid'])
             else:
-                if self.debug:
-                    print('Fetching new token')
-                token = self.fetch_new_token()
-            self.service.login(None, None, token)
-            self.config['token'] = token
-            self.save_config()
-            self.update_state()
-        except URLError:
-            print('Failed to fetch url')
+                self.service.login(self.config['email'],
+                                   self.config['password'],
+                                   None, None)
+        except LoginError as e:
+            print(e)
             sys.exit(1)
-        except LoginError:
-            print('Login failed, resetting the token')
-            self.config['token'] = ''
+        except RequestError as e:
+            # probably tokens are invalid, so it is better to
+            # invalidate them
+            print(e)
+            self.config['ac2dmtoken'] = ''
+            self.config['authtoken'] = ''
+            self.config['gsfid'] = 0
             self.save_config()
-            sys.exit(1)
-        except DecodeError:
-            print('Invalid token')
-            self.config['token'] = ''
-            self.save_config()
+            # try another login
             self.login()
+
+        self.config['ac2dmtoken'] = self.service.ac2dmToken
+        self.config['gsfid'] = self.service.gsfId
+        self.config['authtoken'] = self.service.authSubToken
+        self.save_config()
+        self.update_state()
 
     def update_state(self):
 
@@ -158,7 +164,7 @@ class Play(object):
             filepath = os.path.join(self.download_path,
                                     details['docId'] + '.apk')
             a = APK(filepath)
-            details['version'] = int(a.version_code)
+            details['versionCode'] = int(a.version_code)
             return details
 
         def fetch_details_for_local_apps():
@@ -203,66 +209,21 @@ class Play(object):
             self.currentSet.append(newApp)
 
     def search(self, appName, numItems=15):
-        results = self.service.search(appName, numItems, None).doc
-        all_apps = []
-        if len(results) < 1:
-            return {
-                'result': []
-            }
-        # takes an array of iterables and joins all the elements in
-        # a single iterable
-        apps = itertools.chain.from_iterable([doc.child for doc in results])
-        for x in apps:
-            if x.offer[0].checkoutFlowRequired:
-                continue
-            details = x.details.appDetails
-            for img in x.image:
-                if img.imageType == 4:
-                    imageUrl = img.imageUrl
-            app = {
-                'title': x.title,
-                'developer': x.creator,
-                'version': details.versionCode,
-                'size': file_size(details.installationSize),
-                'docId': x.docid,
-                'numDownloads': details.numDownloads,
-                'uploadDate': details.uploadDate,
-                'imageUrl': imageUrl,
-                'stars': '%.2f' % x.aggregateRating.starRating
-            }
-            if len(all_apps) <= numItems:
-                all_apps.append(app)
-            else:
-                break
+        try:
+            apps = self.service.search(appName, numItems, None)
+        except Exception as e:
+            print(e)
+            return []
         return {
-            'result': all_apps
+            'result': apps
         }
 
     def get_bulk_details(self, apksList):
-        results = self.service.bulkDetails(apksList)
-        if len(results.entry) == 0:
-            return []
-
-        def from_entry_to_dict(e):
-            doc = e.doc
-            details = doc.details.appDetails
-            title = doc.title
-            if len(title) > 40:
-                title = title[0:36] + '...'
-            return {
-                'title': title,
-                'developer': doc.creator,
-                'size': file_size(details.installationSize),
-                'numDownloads': details.numDownloads,
-                'uploadDate': details.uploadDate,
-                'docId': doc.docid,
-                'version': details.versionCode,
-                'stars': '%.2f' % doc.aggregateRating.starRating
-            }
-
-        a = [entry for entry in results.entry]
-        result = list(map(from_entry_to_dict, a))
-        return result
+        try:
+            apps = self.service.bulkDetails(apksList)
+        except Exception as e:
+            print(e)
+        return apps
 
     def download_selection(self, appNames):
         success = []
@@ -278,7 +239,7 @@ class Play(object):
                 continue
             print('Downloading %s' % appname)
             try:
-                data = self.service.download(appname, appdetails['version'])
+                data = self.service.download(appname, appdetails['versionCode'])
                 success.append(appdetails)
                 print('Done!')
             except IndexError as exc:
@@ -316,7 +277,7 @@ class Play(object):
             for local, online in zip(localDetails, onlineDetails):
                 if self.debug:
                     print('Checking %s' % local['docId'])
-                    print('%d == %d ?' % (local['version'], online['version']))
+                    print('%d == %d ?' % (local['versionCode'], online['versionCode']))
                 if local['version'] != online['version']:
                     toUpdate.append(online['docId'])
             return {
