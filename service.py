@@ -49,7 +49,7 @@ class Play(object):
 
         # configuring fdroid data
         if self.fdroid:
-            self.fdroid_exe = '/usr/bin/fdroid'
+            self.fdroid_exe = 'fdroid'
             self.fdroid_path = os.getcwd()
             self.fdroid_init()
 
@@ -57,8 +57,13 @@ class Play(object):
         self.login()
 
     def fdroid_init(self):
-        if not os.path.isfile(self.fdroid_exe):
-            print('Please install fdroid from repo')
+        found = False
+        for path in os.environ['PATH']:
+            exe = os.path.join(path, self.fdroid_exe)
+            if os.path.isfile(exe):
+                found = True
+        if not found:
+            print('Please install fdroid')
             sys.exit(1)
         else:
             p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)
