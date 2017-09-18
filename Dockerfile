@@ -1,7 +1,7 @@
-FROM ubuntu:16.04
+FROM python:stretch
 
 RUN apt-get update && \
-    apt-get install -y python3-dev python3-pip git \
+    apt-get install -y git \
     lib32stdc++6 \
     lib32gcc1 \
     lib32z1 \
@@ -13,14 +13,10 @@ RUN apt-get update && \
     virtualenv \
     wget \
     unzip \
-    zlib1g-dev \
-    software-properties-common
+    zlib1g-dev
 
-# Using guardian project ppa because the version in
-# ubuntu repositories is a bit buggy
-RUN add-apt-repository ppa:guardianproject/ppa && \
-    apt-get update && \
-    apt-get install -y fdroidserver
+RUN cd /opt && git clone https://gitlab.com/fdroid/fdroidserver.git && \
+    cd fdroidserver && pip3 install pyasn1 && python3 setup.py install
 
 RUN wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
     && echo "444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0  sdk-tools-linux-3859397.zip" | sha256sum -c \
@@ -38,7 +34,7 @@ RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose 
 RUN mkdir -p /data/fdroid/repo
 
 WORKDIR /opt
-RUN git clone https://github.com/NoMore201/playmaker
+RUN echo "" && git clone https://github.com/NoMore201/playmaker
 
 WORKDIR /opt/playmaker
 RUN pip3 install -r requirements.txt
@@ -46,7 +42,7 @@ RUN pip3 install -r requirements.txt
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
 
-RUN cp /opt/playmaker/playmaker.conf /etc
+RUN cp /opt/playmaker/playmaker.conf /data/fdroid
 
 EXPOSE 5000
-ENTRYPOINT /usr/bin/env python3 -u /opt/playmaker/playmaker.py --fdroid --debug
+ENTRYPOINT python3 -u /opt/playmaker/playmaker.py --fdroid --debug
