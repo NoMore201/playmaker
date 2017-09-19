@@ -285,7 +285,7 @@ class Play(object):
                 if self.debug:
                     print('Checking %s' % local['docId'])
                     print('%d == %d ?' % (local['versionCode'], online['versionCode']))
-                if local['version'] != online['version']:
+                if local['versionCode'] != online['versionCode']:
                     toUpdate.append(online['docId'])
             return {
                 'result': toUpdate
