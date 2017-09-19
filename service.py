@@ -100,32 +100,16 @@ class Play(object):
             'result': sorted(self.currentSet, key=lambda k: k['title'])
         }
 
-    def fetch_new_token(self):
-
-        def get_token(config):
-            print('Retrieving token from %s' % config['tokenurl'])
-            r = urllib.request.urlopen(config['tokenurl'])
-            token = r.read().decode('utf-8')
-            return token
-
-        token = ""
-        for i in range(1, 4):
-            if self.debug:
-                print('#%d try' % i)
-            token = get_token(self.config)
-            if token == "":
-                continue
-            else:
-                break
-        if token == "":
-            raise LoginError()
-            sys.exit(1)
-        return token
-
     def save_config(self):
         with open(self.configfile, 'w') as configfile:
             self.configparser['Main'] = self.config
             self.configparser.write(configfile)
+
+    def invalidate_login(self):
+        self.config['ac2dmtoken'] = ''
+        self.config['authtoken'] = ''
+        self.config['gsfid'] = 0
+        self.save_config()
 
     def login(self):
         try:
@@ -152,12 +136,8 @@ class Play(object):
             # probably tokens are invalid, so it is better to
             # invalidate them
             print(e)
-            self.config['ac2dmtoken'] = ''
-            self.config['authtoken'] = ''
-            self.config['gsfid'] = 0
-            self.save_config()
-            # try another login
-            self.login()
+            self.invalidate_login()
+            sys.exit(1)
 
         self.config['ac2dmtoken'] = self.service.ac2dmToken
         self.config['gsfid'] = self.service.gsfId
@@ -196,9 +176,6 @@ class Play(object):
         print('Updating cache')
         self.currentSet = fetch_details_for_local_apps()
 
-    def get_apps_from_state(self):
-        return [app['docId'] for app in self.currentSet]
-
     def insert_app_into_state(self, newApp):
         found = False
         result = filter(lambda x: x['docId'] == newApp['docId'],
@@ -216,11 +193,14 @@ class Play(object):
             self.currentSet.append(newApp)
 
     def search(self, appName, numItems=15):
+        # numItems will be ignored by googleplay-api
+        # because needs to be implemented
         try:
             apps = self.service.search(appName, numItems, None)
-        except Exception as e:
+        except RequestError as e:
             print(e)
-            return []
+            self.invalidate_login()
+            sys.exit(1)
         return {
             'result': apps
         }
@@ -228,8 +208,10 @@ class Play(object):
     def get_bulk_details(self, apksList):
         try:
             apps = self.service.bulkDetails(apksList)
-        except Exception as e:
+        except RequestError as e:
             print(e)
+            self.invalidate_login()
+            sys.exit(1)
         return apps
 
     def download_selection(self, appNames):
@@ -273,7 +255,7 @@ class Play(object):
 
     def check_local_apks(self):
         localDetails = self.currentSet
-        onlineDetails = self.get_bulk_details(self.get_apps_from_state())
+        onlineDetails = self.get_bulk_details([app['docId'] for app in localDetails])
         if len(localDetails) == 0 or len(onlineDetails) == 0:
             print('There is no package locally')
             return {
