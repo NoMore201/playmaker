@@ -29,24 +29,21 @@ Features:
 
 ## Usage
 
-### Docker
-
-There is a working Dockerfile (based on the [gplayweb one](https://github.com/matlink/gplayweb/blob/master/Dockerfile)). You can build and run by simply doing:
-
-```
-docker build -t playmaker .
-docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid playmaker
-```
-or use the already built image on docker hub:
+There is a working Dockerfile. You can build and run it, or use a pre-built image on docker hub:
 
 ```
 docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
-**Notice that** If you need to change the configuration, copy `playmaker.conf` inside `/srv/fdroid` and modify it. The app will look first there for a .conf file, and if it can't find anything, it will check system folders.
 
-### Directly
+**REQUIRED** **You need to insert you google credentials in the configuration file!!**. Copy `playmaker.conf` inside `/srv/fdroid` and modify it. Credentials have this structure:
 
-Otherwise you can run it from the command line.
+```
+# parts inside square brackets are not mandatory
+email = <google_user>[@gmail.com]
+password = <google_passowrd> | <app specific_password>
+```
+
+Otherwise you can run it from the command line, but this is not recommended since you need to setup the android sdk and the fdroidserver tools
 
 ```
 usage: playmaker.py [-h] [-f] [-d]
@@ -58,13 +55,6 @@ optional arguments:
   -f, --fdroid  Enable fdroid integration
   -d, --debug   Enable debug output
 ```
-
-If you enable the fdroid integration, you need the [fdroidserver](https://gitlab.com/fdroid/fdroidserver) package.
-**!! If you use Ubuntu 16.04+** the fdroidserver package in the repositories is a but buggy, so I suggest you to install it through the guardianproject ppa (as explained in their repo).
-
-By default the application uses a token-dispenser server provided by me. However, you can host your own instance of [token-dispenser](https://github.com/yeriomin/token-dispenser) and then change the tokenurl variable in the config file.
-
-For additional informations, check out Dockerfiles for token-dispenser: https://github.com/NoMore201/docker-token-dispenser
 
 <a name="todos"/>
 
