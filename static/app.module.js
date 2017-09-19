@@ -207,7 +207,7 @@ app.component('appList', {
           app.updating = false;
           return;
         }
-        app.version = data.success[0].version;
+        app.version = data.success[0].versionCode;
         app.updating = false;
       });
     };

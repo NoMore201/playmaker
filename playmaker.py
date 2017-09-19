@@ -25,13 +25,6 @@ args = ap.parse_args()
 service = Play(debug=args.debug, fdroid=args.fdroid)
 
 
-def update_routine():
-    toUpdate = service.check_local_apks()
-    if toUpdate.get('result', []) != []:
-        service.download_selection(toUpdate)
-    service.fdroid_update()
-
-
 # tornado setup
 MAX_WORKERS=4
 app_dir = os.path.dirname(os.path.realpath(__file__))
