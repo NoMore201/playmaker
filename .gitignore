@@ -6,3 +6,7 @@
 dist/
 build/
 node_modules/
+eggs/
+.eggs/
+*.egg-info/
+*.egg

@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+import os
+import argparse
+from tornado import httpserver
+from tornado import ioloop as io
+
+from playmaker.server import createServer
+
+# tornado setup
+if __name__ == '__main__':
+    # arguments parsing
+    ap = argparse.ArgumentParser(description='Apk and fdroid repository ' +
+                                 'manager with a web interface.')
+    ap.add_argument('-f', '--fdroid', dest='fdroid',
+                    action='store_true', default=False,
+                    help='Enable fdroid integration')
+    ap.add_argument('-d', '--debug', dest='debug',
+                    action='store_true', default=False,
+                    help='Enable debug output')
+    args = ap.parse_args()
+    app = createServer(args)
+    server = httpserver.HTTPServer(app)
+    server.listen(5000, address='0.0.0.0')
+    io.IOLoop.instance().start()

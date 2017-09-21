@@ -1,5 +1,3 @@
-requests
 pyaxmlparser
-protobuf
 tornado
-pycrypto
+git+git://github.com/NoMore201/googleplay-api
