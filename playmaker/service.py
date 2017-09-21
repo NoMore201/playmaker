@@ -33,8 +33,13 @@ class Play(object):
         while not os.path.isfile(config_paths[0]):
             config_paths.pop(0)
             if len(config_paths) == 0:
-                raise OSError('No configuration file found')
-                sys.exit(1)
+                print('No configuration file found.')
+                print('One will be created for you in the current directory')
+                with open('playmaker.conf', 'w') as f:
+                    f.write('[Main]\nemail =\npassword =\n'
+                            'authtoken =\nac2dmtoken =\ngsfid =')
+                    f.close()
+                    config_paths.append('playmaker.conf')
         self.configfile = config_paths[0]
         self.configparser.read(config_paths[0])
         self.config = {}
