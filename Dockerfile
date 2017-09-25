@@ -44,12 +44,11 @@ WORKDIR /opt/googleplay-api
 RUN python3 setup.py install && cd /opt && rm -rf googleplay-api
 
 WORKDIR /opt/playmaker
-RUN python3 setup.py install
+RUN python3 setup.py install && \
+    cp /opt/playmaker/playmaker.conf /data/fdroid
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
-
-RUN cp /opt/playmaker/playmaker.conf /data/fdroid
 
 EXPOSE 5000
 ENTRYPOINT python3 -u /usr/local/bin/pm-server --fdroid --debug

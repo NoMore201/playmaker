@@ -13,7 +13,6 @@ fdroid_instance = {}
 
 def createServer(service):
 
-
     class HomeHandler(web.RequestHandler):
         def get(self):
             with open(app_dir + '/index.html', 'r') as f:
