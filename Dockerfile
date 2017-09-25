@@ -18,9 +18,6 @@ RUN apt-get update && \
     fdroidserver \
     zlib1g-dev
 
-# python deps setup
-RUN pip3 install pyaxmlparser pyasn1 tornado pycrypto requests
-
 RUN wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
     && echo "444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0  sdk-tools-linux-3859397.zip" | sha256sum -c \
     && unzip sdk-tools-linux-3859397.zip \
