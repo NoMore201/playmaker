@@ -5,16 +5,14 @@ from tornado.concurrent import run_on_executor
 from tornado.web import MissingArgumentError
 from concurrent.futures import ThreadPoolExecutor
 
-from playmaker.service import Play
 
 MAX_WORKERS=4
 app_dir = os.path.dirname(os.path.realpath(__file__))
 static_dir = os.path.join(app_dir, 'static')
 fdroid_instance = {}
 
-def createServer(args):
+def createServer(service):
 
-    service = Play(debug=args.debug, fdroid=args.fdroid)
 
     class HomeHandler(web.RequestHandler):
         def get(self):
@@ -126,7 +124,7 @@ def createServer(args):
         (r'/api/(.*?)/?', ApiHandler),
         (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
         (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
-    ], debug=args.debug)
+    ], debug=True)
 
     # overwrite settings
     app.settings['static_path'] = ''

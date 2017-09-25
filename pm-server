@@ -6,6 +6,7 @@ from tornado import httpserver
 from tornado import ioloop as io
 
 from playmaker.server import createServer
+from playmaker.service import Play
 
 # tornado setup
 if __name__ == '__main__':
@@ -19,7 +20,8 @@ if __name__ == '__main__':
                     action='store_true', default=False,
                     help='Enable debug output')
     args = ap.parse_args()
-    app = createServer(args)
+    service = Play(debug=args.debug, fdroid=args.fdroid)
+    app = createServer(service)
     server = httpserver.HTTPServer(app)
     server.listen(5000, address='0.0.0.0')
     io.IOLoop.instance().start()
