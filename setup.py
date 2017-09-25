@@ -9,7 +9,14 @@ setup(name='playmaker',
       license='MIT',
       packages=['playmaker'],
       package_data={
-          'playmaker': ['index.html', 'static/*', 'views/*'],
+          'playmaker': [
+              'index.html',
+              'static/*',
+              'static/css/*',
+              'static/fonts/*',
+              'static/js/*',
+              'views/*'
+          ],
       },
       install_requires=[
             'pyaxmlparser',
