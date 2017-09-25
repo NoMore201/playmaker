@@ -34,10 +34,10 @@ RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose 
 RUN mkdir -p /data/fdroid/repo
 
 WORKDIR /opt
-RUN echo "" && git clone https://github.com/NoMore201/playmaker
+RUN git clone https://github.com/NoMore201/playmaker
 
 WORKDIR /opt/playmaker
-RUN pip3 install -r requirements.txt
+RUN pip3 install .
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
@@ -45,4 +45,4 @@ WORKDIR /data/fdroid
 RUN cp /opt/playmaker/playmaker.conf /data/fdroid
 
 EXPOSE 5000
-ENTRYPOINT python3 -u /opt/playmaker/playmaker.py --fdroid --debug
+ENTRYPOINT python3 -u /usr/local/bin/pm-server --fdroid --debug

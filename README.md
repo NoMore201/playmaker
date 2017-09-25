@@ -20,9 +20,9 @@ with a few fixes, together with WebTornado non-blocking web server. Frontend cod
 
 Features:
 * Download/Update/Delete apks from google play store
-* Automatically setup a fdroid repository with the downloaded apks
-* Update fdroid and downloads work in background, without blocking UI
-* Automatically handle google login tokens using token-dispenser
+* A fdroid repository is setup on first launch. You can update manually, as
+you add apks to your collection
+* Fdroid and apk updates work in background, without blocking UI
 * Responsive UI
 
 <a name="usage"/>
@@ -32,28 +32,22 @@ Features:
 There is a working Dockerfile. You can build and run it, or use a pre-built image on docker hub:
 
 ```
-docker run -d --restart always --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
+docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
 
-**REQUIRED** **You need to insert you google credentials in the configuration file!!**. Copy `playmaker.conf` inside `/srv/fdroid` and modify it. Credentials have this structure:
+**REQUIRED** **You need to insert you google credentials in the configuration file!!**. You can copy the conf file in the working directory (in this case `/srv/fdroid`), otherwise playmaker will take care of creating an empty conf file for you, which you should edit. Credentials have this structure
 
 ```
 # parts inside square brackets are not mandatory
 email = <google_user>[@gmail.com]
-password = <google_passowrd> | <app specific_password>
+password = <google_password> | <app specific_password>
 ```
 
-Otherwise you can run it from the command line, but this is not recommended since you need to setup the android sdk and the fdroidserver tools
+Otherwise you can install it in a virtual env and then launch the `pm-server` script.
 
 ```
-usage: playmaker.py [-h] [-f] [-d]
-
-Apk and fdroid repository manager with a web interface.
-
-optional arguments:
-  -h, --help    show this help message and exit
-  -f, --fdroid  Enable fdroid integration
-  -d, --debug   Enable debug output
+python setup.py install
+pm-server --fdroid --debug
 ```
 
 <a name="todos"/>

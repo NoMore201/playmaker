@@ -35,11 +35,12 @@ class Play(object):
             if len(config_paths) == 0:
                 print('No configuration file found.')
                 print('One will be created for you in the current directory')
+                print('Be sure to edit it with your google credentials!\n')
                 with open('playmaker.conf', 'w') as f:
                     f.write('[Main]\nemail =\npassword =\n'
-                            'authtoken =\nac2dmtoken =\ngsfid =')
+                            'authtoken =\nac2dmtoken =\ngsfid =\n')
                     f.close()
-                    config_paths.append('playmaker.conf')
+                    quit()
         self.configfile = config_paths[0]
         self.configparser.read(config_paths[0])
         self.config = {}
