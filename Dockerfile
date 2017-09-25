@@ -33,7 +33,8 @@ ENV ANDROID_HOME=/opt/android-sdk-linux
 ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platforms;android-26" \
     && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "build-tools;26.0.1" \
-    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platform-tools"
+    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platform-tools" \
+    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "tools"
 
 RUN mkdir -p /data/fdroid/repo
 
