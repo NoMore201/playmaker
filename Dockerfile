@@ -9,6 +9,8 @@ RUN apt-get update && \
     libffi-dev \
     libssl-dev \
     libjpeg-dev \
+    libxml2-dev \
+    libxslt1-dev \
     openjdk-8-jdk \
     virtualenv \
     wget \
