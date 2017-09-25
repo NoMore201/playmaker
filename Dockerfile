@@ -15,13 +15,11 @@ RUN apt-get update && \
     virtualenv \
     wget \
     unzip \
+    fdroidserver \
     zlib1g-dev
 
 # python deps setup
 RUN pip3 install pyaxmlparser pyasn1 tornado pycrypto requests
-
-RUN cd /opt && git clone https://gitlab.com/fdroid/fdroidserver.git && \
-    cd fdroidserver && python3 setup.py install
 
 RUN wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
     && echo "444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0  sdk-tools-linux-3859397.zip" | sha256sum -c \
