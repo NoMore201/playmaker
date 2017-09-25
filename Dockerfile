@@ -17,8 +17,11 @@ RUN apt-get update && \
     unzip \
     zlib1g-dev
 
+# python deps setup
+RUN pip3 install pyaxmlparser pyasn1 tornado pycrypto requests
+
 RUN cd /opt && git clone https://gitlab.com/fdroid/fdroidserver.git && \
-    cd fdroidserver && pip3 install pyasn1 && python3 setup.py install
+    cd fdroidserver && python3 setup.py install
 
 RUN wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
     && echo "444e22ce8ca0f67353bda4b85175ed3731cae3ffa695ca18119cbacef1c1bea0  sdk-tools-linux-3859397.zip" | sha256sum -c \
@@ -35,10 +38,14 @@ RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose 
 RUN mkdir -p /data/fdroid/repo
 
 WORKDIR /opt
-RUN git clone https://github.com/NoMore201/playmaker
+RUN git clone https://github.com/NoMore201/playmaker && \
+    git clone https://github.com/NoMore201/googleplay-api
+
+WORKDIR /opt/googleplay-api
+RUN python3 setup.py install && cd /opt && rm -rf googleplay-api
 
 WORKDIR /opt/playmaker
-RUN pip3 install .
+RUN python3 setup.py install
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
