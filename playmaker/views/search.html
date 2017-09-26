@@ -46,9 +46,9 @@
       </div>
       <div class="modal-body" id="modal-body">
         <strong>Id:</strong> {{app.docId}}<br>
-        <strong>Developer:</strong> {{app.developer}}<br>
-        <strong>Size:</strong> {{app.size}}<br>
-        <strong>Stars:</strong> {{app.stars}}
+        <strong>Developer:</strong> {{app.author}}<br>
+        <strong>Size:</strong> {{app.files[0].size}}<br>
+        <strong>Stars:</strong> {{app.aggregateRating.starRating}}
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" type="button" ng-click="$close()">Close</button>
