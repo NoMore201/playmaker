@@ -32,7 +32,8 @@ ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platforms;android-26" \
     && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "build-tools;26.0.1" \
     && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platform-tools" \
-    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "tools"
+    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "tools" \
+    && rm -rf tools
 
 RUN mkdir -p /data/fdroid/repo
 
@@ -45,7 +46,8 @@ RUN python3 setup.py install && cd /opt && rm -rf googleplay-api
 
 WORKDIR /opt/playmaker
 RUN python3 setup.py install && \
-    cp /opt/playmaker/playmaker.conf /data/fdroid
+    cp /opt/playmaker/playmaker.conf /data/fdroid && \
+    cd /opt && rm -rf playmaker
 
 VOLUME /data/fdroid
 WORKDIR /data/fdroid
