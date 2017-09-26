@@ -3,19 +3,9 @@ from pyaxmlparser import APK
 
 import concurrent.futures
 import configparser
-import urllib.request
 from subprocess import Popen, PIPE
 import os
 import sys
-import itertools
-
-
-def file_size(num):
-    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-        if num < 1024.0:
-            return "%3.1f%s" % (num, x)
-        num /= 1024.0
-
 
 class Play(object):
     def __init__(self, debug=True, fdroid=False):
