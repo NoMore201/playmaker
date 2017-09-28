@@ -5,10 +5,10 @@ var app = angular.module('playmaker', [
 
 app.config(['$locationProvider', '$routeProvider',
   function config($locationProvider, $routeProvider) {
-    $locationProvider.html5Mode({
-      enabled: true,
-      requireBase: false
-    });
+//    $locationProvider.html5Mode({
+//      enabled: true,
+//      requireBase: false
+//    });
 
     $routeProvider.
       when('/', {
@@ -25,6 +25,7 @@ app.config(['$locationProvider', '$routeProvider',
 ]).run(['$rootScope', '$location', 'global', function ($rootScope, $location, global) {
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
 
+      console.log($location.path());
       if (!global.auth.isLoggedIn() &&
           $location.path() !== '/login') {
         event.preventDefault();
@@ -218,6 +219,16 @@ app.component('searchView', {
 app.component('loginView', {
   templateUrl: '/views/login.html',
   controller: function LoginController(api, global) {
+    var ctrl = this;
 
+    ctrl.login = function(user) {
+      if (user.email === '' || user.password === '') {
+        //TODO error
+        return;
+      }
+      var prepared = user.email + '\x00' + user.password;
+      var key = aesjs.utils.utf8.toBytes( sha256(prepared) );
+      console.log(key);
+    }
   }
 });

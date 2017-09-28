@@ -1,11 +1,11 @@
 <form>
   <div class="form-group">
     <label for="emailInput">Email address</label>
-    <input type="email" class="form-control" id="emailInput" placeholder="Email">
+    <input type="text" class="form-control" id="emailInput" placeholder="Email" ng-model="user.email">
   </div>
   <div class="form-group">
     <label for="passwordInput">Password</label>
-    <input type="password" class="form-control" id="passwordInput" placeholder="Password">
+    <input type="password" class="form-control" id="passwordInput" placeholder="Password" ng-model="user.password">
   </div>
-  <button type="submit" class="btn btn-default">Submit</button>
+  <button type="submit" class="btn btn-default" ng-click="$ctrl.login(user)">Submit</button>
 </form>

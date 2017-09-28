@@ -50,7 +50,6 @@ class Play(object):
             self.fdroid_init()
 
         self.service = GooglePlayAPI(self.debug)
-        self.login()
 
     def fdroid_init(self):
         found = False
