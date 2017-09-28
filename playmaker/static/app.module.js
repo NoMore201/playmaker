@@ -5,7 +5,10 @@ var app = angular.module('playmaker', [
 
 app.config(['$locationProvider', '$routeProvider',
   function config($locationProvider, $routeProvider) {
-    $locationProvider.hashPrefix('!');
+    $locationProvider.html5Mode({
+      enabled: true,
+      requireBase: false
+    });
 
     $routeProvider.
       when('/', {
@@ -14,147 +17,27 @@ app.config(['$locationProvider', '$routeProvider',
       when('/search', {
         template: '<search-view></search-view>'
       }).
+      when('/login', {
+        template: '<login-view></login-view>'
+      }).
       otherwise('/');
   }
-]);
+]).run(['$rootScope', '$location', 'global', function ($rootScope, $location, global) {
+    $rootScope.$on('$routeChangeStart', function (event, next, current) {
 
+      if (!global.auth.isLoggedIn() &&
+          $location.path() !== '/login') {
+        event.preventDefault();
+        $location.path('/login');
+      } else if (global.auth.isLoggedIn() &&
+                 $location.path() === '/login') {
+        // redirect home
+        event.preventDefault();
+        $location.path('/');
+      }
 
-/*************
- * CONTROLLERS
- *************/
-
-
-app.controller('notify', [
-  '$scope',
-  'global',
-  function($scope, global) {
-    $scope.alerts = [];
-
-    $scope.closeAlert = function(index) {
-      $scope.alerts.splice(index, 1);
-    };
-
-    global.addAlert = function(type, msg) {
-      newAlert = {
-        type: type,
-        msg: msg
-      };
-      $scope.alerts.push(newAlert);
-    };
-  }]);
-
-app.controller('navbar', [
-  '$location',
-  '$scope',
-  '$rootScope',
-  function($location, $scope, $rootScope) {
-    $rootScope.$on('$routeChangeSuccess', function() {
-      $scope.path = $location.path();
     });
-  }]);
-
-
-/**********
- * SERVICES
- **********/
-
-
-app.service('global', function() {
-  this.addAlert = {};
-
-  this.desktop = false;
-  this.mobile = false;
-
-  var screenWidth = window.innerWidth;
-  if (screenWidth < 700) {
-    this.mobile = true;
-  } else {
-    this.desktop = true;
-  }
-
-});
-
-
-app.service('api', ['$http', function($http) {
-
-  this.getApps = function(callback) {
-    $http({
-      method: 'GET',
-      url: '/api/apps'
-    }).then(function success(response) {
-      callback(response.data.result);
-    }, function error(response) {
-      callback('err');
-    });
-  };
-
-  this.search = function(app, callback) {
-    $http({
-      method: 'GET',
-      url: '/api/search?search=' + app
-    }).then(function success(response) {
-      callback(response.data.result);
-    }, function error(response) {
-      callback('err');
-    });
-  };
-
-  this.check = function(callback) {
-    $http.post('/api/check')
-      .then(function success(response) {
-        callback(response.data.result);
-      }, function error(response) {
-        callback('err');
-      });
-  };
-
-  this.download = function(app, callback) {
-    var requestData = {
-      download: [app]
-    };
-    $http({
-      method: 'POST',
-      url: '/api/download',
-      data: JSON.stringify(requestData)
-    }).then(function success(response) {
-        callback(response.data);
-      }, function error(response) {
-        callback('err');
-      });
-  };
-
-  this.remove = function(app, callback) {
-    var requestData = {
-      delete: app
-    };
-    $http({
-      method: 'DELETE',
-      url: '/api/delete',
-      data: JSON.stringify(requestData)
-    }).then(function success(response) {
-        callback(response.data);
-      }, function error(response) {
-        callback('err');
-      });
-  };
-
-  this.fdroid = function(callback) {
-    $http({
-      method: 'POST',
-      url: '/api/fdroid'
-    }).then(function success(response) {
-      callback(response.data);
-    }, function error(response) {
-      callback('err');
-    });
-  };
-
 }]);
-
-
-/************
- * COMPONENTS
- ************/
 
 
 app.component('appList', {
@@ -329,5 +212,12 @@ app.component('searchView', {
         app.dled = true;
       });
     };
+  }
+});
+
+app.component('loginView', {
+  templateUrl: '/views/login.html',
+  controller: function LoginController(api, global) {
+
   }
 });

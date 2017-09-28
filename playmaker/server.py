@@ -61,6 +61,11 @@ def createServer(service):
             if path == 'apps':
                 apps = yield self.get_apps()
                 self.write(apps)
+            elif path == 'login':
+                # TODO
+                # login() -> a check if the server has credentials
+                # login(key, secret) -> first time login
+                print()
             elif path == 'search':
                 apps = yield self.search()
                 if apps is not None:
