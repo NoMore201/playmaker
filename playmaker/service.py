@@ -4,6 +4,9 @@ from pyaxmlparser import APK
 import concurrent.futures
 import configparser
 from subprocess import Popen, PIPE
+from Crypto.Cipher import AES
+from Crypto import Random
+from pbkdf2 import PBKDF2
 import os
 import sys
 
@@ -106,8 +109,16 @@ class Play(object):
         self.config['gsfid'] = 0
         self.save_config()
 
-    def login(self):
+    def login(self, message, password):
         try:
+            salt = message[0:32]
+            iv = message[32:64]
+            cypher = message[64:]
+            print(salt)
+            print(iv)
+            print(cypher)
+            # TODO: convert char into bytes
+            key = PBKDF2(password, salt.encode()).read(32)
             if self.config['ac2dmtoken'] != '' and self.config['gsfid'] != 0:
                 if self.config['authtoken'] == '':
                     self.service.login(self.config['email'],
@@ -126,19 +137,20 @@ class Play(object):
                                    None, None)
         except LoginError as e:
             print(e)
-            sys.exit(1)
+            return 1
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
             print(e)
             self.invalidate_login()
-            sys.exit(1)
+            return 1
 
         self.config['ac2dmtoken'] = self.service.ac2dmToken
         self.config['gsfid'] = self.service.gsfId
         self.config['authtoken'] = self.service.authSubToken
         self.save_config()
         self.update_state()
+        return 0
 
     def update_state(self):
 

@@ -103,6 +103,21 @@ angular.module('playmaker').service('api', ['$http', function($http) {
     });
   };
 
+  this.login = function(cyphertext, password, callback) {
+    $http({
+      method: 'POST',
+      url: '/api/login',
+      data: JSON.stringify({
+        cyphertext: cyphertext,
+        password: password
+      })
+    }).then(function success(response) {
+      callback(response.data);
+    }, function error(response) {
+      callback('err');
+    });
+  };
+
 }]);
 
 

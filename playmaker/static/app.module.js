@@ -223,12 +223,35 @@ app.component('loginView', {
 
     ctrl.login = function(user) {
       if (user.email === '' || user.password === '') {
-        //TODO error
+        //TODO: error
         return;
       }
-      var prepared = user.email + '\x00' + user.password;
-      var key = aesjs.utils.utf8.toBytes( sha256(prepared) );
+
+      var message = user.email + '\x00' + user.password;
+      var hash = CryptoJS.SHA256(message);
+      var salt = CryptoJS.lib.WordArray.random(128/8);
+      //using sha256(message) as key
+      var key = CryptoJS.PBKDF2(hash.toString(), salt, {
+        keySize: 32,
+        iterations: 100
+      });
       console.log(key);
+      var iv = CryptoJS.lib.WordArray.random(128/8);
+      var encrypted = CryptoJS.AES.encrypt(message, key, { 
+        iv: iv, 
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+      });
+      var cyphertext = salt.toString() + iv.toString() + encrypted.toString();
+      console.log('salt: ' + salt.toString());
+      console.log('iv: ' + iv.toString());
+      console.log('encrypted: ' + encrypted.toString());
+
+      api.login(cyphertext, hash.toString(), function(data) {
+        if (data === 'err') {
+          console.log('error login')
+        }
+      });
     }
   }
 });
