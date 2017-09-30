@@ -1,12 +1,10 @@
 from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
 from pyaxmlparser import APK
-
-import concurrent.futures
-import configparser
 from subprocess import Popen, PIPE
 from Crypto.Cipher import AES
-from Crypto import Random
-from pbkdf2 import PBKDF2
+
+import concurrent.futures
+import base64
 import os
 import sys
 
@@ -15,30 +13,6 @@ class Play(object):
         self.currentSet = []
         self.debug = debug
         self.fdroid = fdroid
-
-        # config parser
-        self.configparser = configparser.ConfigParser()
-        config_paths = [
-            'playmaker.conf',
-            '/etc/playmaker.conf',
-            os.path.expanduser('~') + '/.config/playmaker.conf'
-        ]
-        while not os.path.isfile(config_paths[0]):
-            config_paths.pop(0)
-            if len(config_paths) == 0:
-                print('No configuration file found.')
-                print('One will be created for you in the current directory')
-                print('Be sure to edit it with your google credentials!\n')
-                with open('playmaker.conf', 'w') as f:
-                    f.write('[Main]\nemail =\npassword =\n'
-                            'authtoken =\nac2dmtoken =\ngsfid =\n')
-                    f.close()
-                    quit()
-        self.configfile = config_paths[0]
-        self.configparser.read(config_paths[0])
-        self.config = {}
-        for key, value in self.configparser.items('Main'):
-            self.config[key] = value
 
         # configuring download folder
         if self.fdroid:
@@ -98,59 +72,35 @@ class Play(object):
             'result': sorted(self.currentSet, key=lambda k: k['title'])
         }
 
-    def save_config(self):
-        with open(self.configfile, 'w') as configfile:
-            self.configparser['Main'] = self.config
-            self.configparser.write(configfile)
+    def login(self, encodedMsg, encodedHash):
+        def unpad(s):
+            return s[:-ord(s[len(s)-1:])]
 
-    def invalidate_login(self):
-        self.config['ac2dmtoken'] = ''
-        self.config['authtoken'] = ''
-        self.config['gsfid'] = 0
-        self.save_config()
-
-    def login(self, message, password):
         try:
-            salt = message[0:32]
-            iv = message[32:64]
-            cypher = message[64:]
-            print(salt)
-            print(iv)
-            print(cypher)
-            # TODO: convert char into bytes
-            key = PBKDF2(password, salt.encode()).read(32)
-            if self.config['ac2dmtoken'] != '' and self.config['gsfid'] != 0:
-                if self.config['authtoken'] == '':
-                    self.service.login(self.config['email'],
-                                       self.config['password'],
-                                       self.config['ac2dmtoken'],
-                                       int(self.config['gsfid']))
-                else:
-                    # we have all information we need, update the state of
-                    # self.service and skip login
-                    self.service.authSubToken = self.config['authtoken']
-                    self.service.ac2dmToken = self.config['ac2dmtoken']
-                    self.service.gsfId = int(self.config['gsfid'])
-            else:
-                self.service.login(self.config['email'],
-                                   self.config['password'],
-                                   None, None)
+            cipher = base64.b64decode(encodedMsg)
+            passwd = base64.b64decode(encodedHash)
+            iv = cipher[0:16]
+            cipher = cipher[16:32]
+            aes = AES.new(passwd, AES.MODE_CBC, iv)
+            result = unpad(aes.decrypt(cipher)).split(b'\x00')
+            print(result)
+            quit()
+            email = result[0].decode('utf-8')
+            password = result[1].decode('utf-8')
+            self.service.login(email,
+                               password,
+                               None, None)
+            self.update_state()
+            return 0
         except LoginError as e:
-            print(e)
+            print('Wrong credentials')
             return 1
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
-            print(e)
+            print('Internal error')
             self.invalidate_login()
             return 1
-
-        self.config['ac2dmtoken'] = self.service.ac2dmToken
-        self.config['gsfid'] = self.service.gsfId
-        self.config['authtoken'] = self.service.authSubToken
-        self.save_config()
-        self.update_state()
-        return 0
 
     def update_state(self):
 

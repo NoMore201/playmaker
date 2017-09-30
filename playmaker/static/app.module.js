@@ -5,10 +5,6 @@ var app = angular.module('playmaker', [
 
 app.config(['$locationProvider', '$routeProvider',
   function config($locationProvider, $routeProvider) {
-//    $locationProvider.html5Mode({
-//      enabled: true,
-//      requireBase: false
-//    });
 
     $routeProvider.
       when('/', {
@@ -22,6 +18,7 @@ app.config(['$locationProvider', '$routeProvider',
       }).
       otherwise('/');
   }
+
 ]).run(['$rootScope', '$location', 'global', function ($rootScope, $location, global) {
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
 
@@ -229,25 +226,20 @@ app.component('loginView', {
 
       var message = user.email + '\x00' + user.password;
       var hash = CryptoJS.SHA256(message);
-      var salt = CryptoJS.lib.WordArray.random(128/8);
       //using sha256(message) as key
-      var key = CryptoJS.PBKDF2(hash.toString(), salt, {
-        keySize: 32,
-        iterations: 100
-      });
-      console.log(key);
-      var iv = CryptoJS.lib.WordArray.random(128/8);
-      var encrypted = CryptoJS.AES.encrypt(message, key, { 
-        iv: iv, 
+      var iv = CryptoJS.lib.WordArray.random(16);
+      var encrypted = CryptoJS.AES.encrypt(message, hash, {
+        iv: iv,
         padding: CryptoJS.pad.Pkcs7,
         mode: CryptoJS.mode.CBC
       });
-      var cyphertext = salt.toString() + iv.toString() + encrypted.toString();
-      console.log('salt: ' + salt.toString());
-      console.log('iv: ' + iv.toString());
-      console.log('encrypted: ' + encrypted.toString());
+      iv.concat(encrypted.ciphertext)
+      var ciphertext = CryptoJS.enc.Base64.stringify(iv);
+      hash = CryptoJS.enc.Base64.stringify(hash);
+      console.log(ciphertext);
+      console.log(hash);
 
-      api.login(cyphertext, hash.toString(), function(data) {
+      api.login(ciphertext, hash, function(data) {
         if (data === 'err') {
           console.log('error login')
         }
