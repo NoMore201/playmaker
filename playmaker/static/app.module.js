@@ -19,10 +19,23 @@ app.config(['$locationProvider', '$routeProvider',
       otherwise('/');
   }
 
-]).run(['$rootScope', '$location', 'global', function ($rootScope, $location, global) {
+]).run(['$rootScope', '$location', '$http', 'global',
+  function ($rootScope, $location, $http, global) {
+
+    $http({
+      method: 'POST',
+      url: '/api/login',
+      data: '{}'
+    }).then(function success(response) {
+        if (response.data === 'OK') {
+          global.auth.login();
+          $location.path('/');
+        }
+      }, function error(response) {
+      });
+
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
 
-      console.log($location.path());
       if (!global.auth.isLoggedIn() &&
           $location.path() !== '/login') {
         event.preventDefault();
@@ -215,7 +228,7 @@ app.component('searchView', {
 
 app.component('loginView', {
   templateUrl: '/views/login.html',
-  controller: function LoginController(api, global) {
+  controller: function LoginController($location, api, global) {
     var ctrl = this;
 
     ctrl.login = function(user) {
@@ -224,25 +237,27 @@ app.component('loginView', {
         return;
       }
 
-      var message = user.email + '\x00' + user.password;
-      var hash = CryptoJS.SHA256(message);
+      var plaintext = user.email + '\x00' + user.password;
+      var plaintextHash = CryptoJS.SHA256(plaintext);
       //using sha256(message) as key
       var iv = CryptoJS.lib.WordArray.random(16);
-      var encrypted = CryptoJS.AES.encrypt(message, hash, {
+      var encrypted = CryptoJS.AES.encrypt(plaintext, plaintextHash, {
         iv: iv,
-        padding: CryptoJS.pad.Pkcs7,
         mode: CryptoJS.mode.CBC
       });
       iv.concat(encrypted.ciphertext)
       var ciphertext = CryptoJS.enc.Base64.stringify(iv);
-      hash = CryptoJS.enc.Base64.stringify(hash);
-      console.log(ciphertext);
-      console.log(hash);
+      var hashToB64 = CryptoJS.enc.Base64.stringify(plaintextHash);
+      console.log('Original message: ' + plaintext);
+      console.log('Base64 encoding of [iv, ciphertext]: ' + ciphertext);
+      console.log('Base64 encoding of plaintext hash: ', hashToB64);
 
-      api.login(ciphertext, hash, function(data) {
+      api.login(ciphertext, hashToB64, function(data) {
         if (data === 'err') {
           console.log('error login')
         }
+        global.auth.login();
+        $location.path('/');
       });
     }
   }

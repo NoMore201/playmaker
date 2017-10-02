@@ -8,11 +8,16 @@ import base64
 import os
 import sys
 
+NOT_LOGGED_IN_ERR = 'Not logged in'
+WRONG_CREDENTIALS_ERR = 'Wrong credentials'
+SESSION_EXPIRED_ERR = 'Session tokens expired, re-login needed'
+
 class Play(object):
     def __init__(self, debug=True, fdroid=False):
         self.currentSet = []
         self.debug = debug
         self.fdroid = fdroid
+        self.loggedIn = False
 
         # configuring download folder
         if self.fdroid:
@@ -50,6 +55,10 @@ class Play(object):
                 print('Fdroid repo initialized successfully')
 
     def fdroid_update(self):
+        if not self.loggedIn:
+            return {
+                'error': NOT_LOGGED_IN_ERR
+            }
         if self.fdroid:
             try:
                 p = Popen([self.fdroid_exe, 'update', '-c', '--clean'],
@@ -58,51 +67,62 @@ class Play(object):
                 if p.returncode != 0:
                     sys.stderr.write("error updating fdroid repository " +
                                      stderr.decode('utf-8'))
-                    return False
+                    return {
+                        'error': 'Error while executing fdroidsever'
+                    }
                 else:
                     print('Fdroid repo updated successfully')
-                    return True
+                    return 'OK'
             except:
-                return False
+                return {
+                    'error': 'Error while executing fdroidsever'
+                }
         else:
-            return True
+            return 'OK'
 
     def get_apps(self):
         return {
             'result': sorted(self.currentSet, key=lambda k: k['title'])
         }
 
-    def login(self, encodedMsg, encodedHash):
+    def login(self, ciphertext, hashToB64):
         def unpad(s):
             return s[:-ord(s[len(s)-1:])]
 
         try:
-            cipher = base64.b64decode(encodedMsg)
-            passwd = base64.b64decode(encodedHash)
+            cipher = base64.b64decode(ciphertext)
+            passwd = base64.b64decode(hashToB64)
+            # first 16 bytes corresponds to the init vector
             iv = cipher[0:16]
-            cipher = cipher[16:32]
+            cipher = cipher[16:]
             aes = AES.new(passwd, AES.MODE_CBC, iv)
             result = unpad(aes.decrypt(cipher)).split(b'\x00')
-            print(result)
-            quit()
             email = result[0].decode('utf-8')
             password = result[1].decode('utf-8')
             self.service.login(email,
                                password,
                                None, None)
             self.update_state()
-            return 0
+            self.loggedIn = True
+            return 'OK'
         except LoginError as e:
             print('Wrong credentials')
-            return 1
+            self.loggedIn = False
+            return {
+                'error': 'Wrong credentials'
+            }
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
-            print('Internal error')
-            self.invalidate_login()
-            return 1
+            print('Request error, probably invalid token')
+            self.loggedIn = False
+            return {
+                'error': 'Request error, probably invalid token'
+            }
 
     def update_state(self):
+        if not self.loggedIn:
+            return
 
         def get_details_from_apk(details):
             filepath = os.path.join(self.download_path,
@@ -150,28 +170,44 @@ class Play(object):
             self.currentSet.append(newApp)
 
     def search(self, appName, numItems=15):
-        # numItems will be ignored by googleplay-api
-        # because needs to be implemented
+        if not self.loggedIn:
+            return {
+                'error': NOT_LOGGED_IN_ERR
+            }
+
         try:
             apps = self.service.search(appName, numItems, None)
         except RequestError as e:
-            print(e)
-            self.invalidate_login()
-            sys.exit(1)
+            print(SESSION_EXPIRED_ERR)
+            self.loggedIn = False
+            return {
+                'error': SESSION_EXPIRED_ERR
+            }
         return {
             'result': apps
         }
 
     def get_bulk_details(self, apksList):
+        if not self.loggedIn:
+            return {
+                'error': NOT_LOGGED_IN_ERR
+            }
         try:
             apps = self.service.bulkDetails(apksList)
         except RequestError as e:
-            print(e)
-            self.invalidate_login()
-            sys.exit(1)
+            print(SESSION_EXPIRED_ERR)
+            self.loggedIn = False
+            return {
+                'error': SESSION_EXPIRED_ERR
+            }
         return apps
 
     def download_selection(self, appNames):
+        if not self.loggedIn:
+            return {
+                'error': NOT_LOGGED_IN_ERR
+            }
+
         success = []
         failed = []
         unavail = []
@@ -191,6 +227,12 @@ class Play(object):
             except IndexError as exc:
                 print('Package %s does not exists' % appname)
                 unavail.append(appname)
+            except RequestError as e:
+                print(SESSION_EXPIRED_ERR)
+                self.loggedIn = False
+                return {
+                    'error': SESSION_EXPIRED_ERR
+                }
             except Exception as exc:
                 print('Failed to download %s' % appname)
                 failed.append(appname)
@@ -211,6 +253,11 @@ class Play(object):
         }
 
     def check_local_apks(self):
+        if not self.loggedIn:
+            return {
+                'error': NOT_LOGGED_IN_ERR
+            }
+
         localDetails = self.currentSet
         onlineDetails = self.get_bulk_details([app['docId'] for app in localDetails])
         if len(localDetails) == 0 or len(onlineDetails) == 0:

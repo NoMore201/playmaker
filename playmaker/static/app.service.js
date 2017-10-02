@@ -1,6 +1,7 @@
-angular.module('playmaker').service('global', function() {
+angular.module('playmaker').service('global', ['$http', function($http) {
 
   function AuthManager() {
+
     this.loggedIn = false;
 
     this.isLoggedIn = function () {
@@ -26,7 +27,7 @@ angular.module('playmaker').service('global', function() {
     this.desktop = true;
   }
 
-});
+}]);
 
 
 angular.module('playmaker').service('api', ['$http', function($http) {
