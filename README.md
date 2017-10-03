@@ -35,7 +35,9 @@ Since this app requires a lot of heavy dependencies, like Android SDK and fdroid
 docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
 
-On first launch, playmaker will ask your for your google credentials. They will be used by the server for first time setup, and then discarded, because only the ac2dm and the auth token are needed to process requests. Remember that you can use also app specific password, if you setup 2factor auth:
+On first launch, playmaker will ask your for your google credentials. They will be used by the server for first time setup, and then discarded, because only the ac2dm and the auth token are needed to process requests.
+**If you want to secure access to the server, you need to use HTTP authentication (nginx) !!** Credentials are used by the server to perform login, while the client (your web page) isn't authenticated! If the server is already logged in, client will skip the login step and redirect to the homepage.
+It is also possible to use app specific password, in case the google account is secured with 2factor auth:
 
 ```
 # parts inside square brackets are not mandatory
