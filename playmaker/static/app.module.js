@@ -5,7 +5,6 @@ var app = angular.module('playmaker', [
 
 app.config(['$locationProvider', '$routeProvider',
   function config($locationProvider, $routeProvider) {
-    $locationProvider.hashPrefix('!');
 
     $routeProvider.
       when('/', {
@@ -14,147 +13,45 @@ app.config(['$locationProvider', '$routeProvider',
       when('/search', {
         template: '<search-view></search-view>'
       }).
+      when('/login', {
+        template: '<login-view></login-view>'
+      }).
       otherwise('/');
   }
-]);
 
+]).run(['$rootScope', '$location', '$http', 'global',
+  function ($rootScope, $location, $http, global) {
 
-/*************
- * CONTROLLERS
- *************/
-
-
-app.controller('notify', [
-  '$scope',
-  'global',
-  function($scope, global) {
-    $scope.alerts = [];
-
-    $scope.closeAlert = function(index) {
-      $scope.alerts.splice(index, 1);
-    };
-
-    global.addAlert = function(type, msg) {
-      newAlert = {
-        type: type,
-        msg: msg
-      };
-      $scope.alerts.push(newAlert);
-    };
-  }]);
-
-app.controller('navbar', [
-  '$location',
-  '$scope',
-  '$rootScope',
-  function($location, $scope, $rootScope) {
-    $rootScope.$on('$routeChangeSuccess', function() {
-      $scope.path = $location.path();
-    });
-  }]);
-
-
-/**********
- * SERVICES
- **********/
-
-
-app.service('global', function() {
-  this.addAlert = {};
-
-  this.desktop = false;
-  this.mobile = false;
-
-  var screenWidth = window.innerWidth;
-  if (screenWidth < 700) {
-    this.mobile = true;
-  } else {
-    this.desktop = true;
-  }
-
-});
-
-
-app.service('api', ['$http', function($http) {
-
-  this.getApps = function(callback) {
-    $http({
-      method: 'GET',
-      url: '/api/apps'
-    }).then(function success(response) {
-      callback(response.data.result);
-    }, function error(response) {
-      callback('err');
-    });
-  };
-
-  this.search = function(app, callback) {
-    $http({
-      method: 'GET',
-      url: '/api/search?search=' + app
-    }).then(function success(response) {
-      callback(response.data.result);
-    }, function error(response) {
-      callback('err');
-    });
-  };
-
-  this.check = function(callback) {
-    $http.post('/api/check')
-      .then(function success(response) {
-        callback(response.data.result);
-      }, function error(response) {
-        callback('err');
-      });
-  };
-
-  this.download = function(app, callback) {
-    var requestData = {
-      download: [app]
-    };
     $http({
       method: 'POST',
-      url: '/api/download',
-      data: JSON.stringify(requestData)
+      url: '/api/login',
+      data: '{}'
     }).then(function success(response) {
-        callback(response.data);
+        if (response.data === 'OK') {
+          global.auth.login();
+          $location.path('/');
+        }
+        else {
+          $location.path('/login');
+        }
       }, function error(response) {
-        callback('err');
       });
-  };
 
-  this.remove = function(app, callback) {
-    var requestData = {
-      delete: app
-    };
-    $http({
-      method: 'DELETE',
-      url: '/api/delete',
-      data: JSON.stringify(requestData)
-    }).then(function success(response) {
-        callback(response.data);
-      }, function error(response) {
-        callback('err');
-      });
-  };
+    $rootScope.$on('$routeChangeStart', function (event, next, current) {
 
-  this.fdroid = function(callback) {
-    $http({
-      method: 'POST',
-      url: '/api/fdroid'
-    }).then(function success(response) {
-      callback(response.data);
-    }, function error(response) {
-      callback('err');
+      if (!global.auth.isLoggedIn() &&
+          $location.path() !== '/login') {
+        event.preventDefault();
+        $location.path('/login');
+      } else if (global.auth.isLoggedIn() &&
+                 $location.path() === '/login') {
+        // redirect home
+        event.preventDefault();
+        $location.path('/');
+      }
+
     });
-  };
-
 }]);
-
-
-/************
- * COMPONENTS
- ************/
 
 
 app.component('appList', {
@@ -329,5 +226,49 @@ app.component('searchView', {
         app.dled = true;
       });
     };
+  }
+});
+
+app.component('loginView', {
+  templateUrl: '/views/login.html',
+  controller: function LoginController($location, api, global) {
+    var ctrl = this;
+
+    ctrl.loggingIn = false;
+
+    ctrl.login = function(user) {
+      if (user.email === '' || user.password === '') {
+        //TODO: error
+        return;
+      }
+
+      ctrl.loggingIn = true;
+
+      var plaintext = user.email + '\x00' + user.password;
+      var plaintextHash = CryptoJS.SHA256(plaintext);
+      //using sha256(message) as key
+      var iv = CryptoJS.lib.WordArray.random(16);
+      var encrypted = CryptoJS.AES.encrypt(plaintext, plaintextHash, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC
+      });
+      iv.concat(encrypted.ciphertext)
+      var ciphertext = CryptoJS.enc.Base64.stringify(iv);
+      var hashToB64 = CryptoJS.enc.Base64.stringify(plaintextHash);
+      console.log('Original message: ' + plaintext);
+      console.log('Base64 encoding of [iv, ciphertext]: ' + ciphertext);
+      console.log('Base64 encoding of plaintext hash: ', hashToB64);
+
+      api.login(ciphertext, hashToB64, function(data) {
+        if (data === 'err') {
+          global.addAlert('danger', 'Wrong login credentials, try again');
+          ctrl.loggingIn = false;
+          return;
+        }
+        global.auth.login();
+        $location.path('/');
+        ctrl.loggingIn = false;
+      });
+    }
   }
 });

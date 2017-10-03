@@ -36,6 +36,14 @@ def createServer(service):
             return service.search(keyword)
 
         @run_on_executor
+        def login(self):
+            data = tornado.escape.json_decode(self.request.body)
+            if len(data) == 0:
+                return 'OK' if service.loggedIn else { 'error' : 'Not logged in' }
+            res = service.login(data['cyphertext'], data['password'])
+            return res
+
+        @run_on_executor
         def download(self):
             data = tornado.escape.json_decode(self.request.body)
             if data.get('download') is None:
@@ -84,6 +92,13 @@ def createServer(service):
             elif path == 'check':
                 result = yield self.check()
                 self.write(result)
+            elif path == 'login':
+                result = yield self.login()
+                print(result)
+                if not isinstance(result, str):
+                    self.clear()
+                    self.set_status(400)
+                self.write(result)
             elif path == 'fdroid':
                 global fdroid_instance
                 if fdroid_instance != {}:
@@ -91,13 +106,11 @@ def createServer(service):
                 else:
                     fdroid_instance = self
                     result = yield self.update_fdroid()
-                    if result:
-                        self.write('OK')
-                        fdroid_instance = {}
-                    else:
+                    if not isinstance(result, str):
                         self.clear()
                         self.set_status(500)
-                        fdroid_instance = {}
+                    self.write(result)
+                    fdroid_instance = {}
             else:
                 self.set_status(404)
             self.finish()
