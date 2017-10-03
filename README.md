@@ -68,7 +68,7 @@ optional arguments:
 
 - [ ] Auto-update apks
 - [ ] System settings (fdroid, auto-update, etc.)
-- [x] Switch to an async webserver ( [tornado](http://www.tornadoweb.org/en/stable/) )
+- [x] Switch to an async webserver
 - [x] fdroid integration
 
 <a name="todos-frontend"/>
