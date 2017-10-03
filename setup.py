@@ -20,6 +20,7 @@ setup(name='playmaker',
       },
       install_requires=[
             'pyaxmlparser',
+            'pycrypto',
             'tornado',
             'googleplay-api',
       ],

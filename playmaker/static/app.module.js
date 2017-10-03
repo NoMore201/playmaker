@@ -31,6 +31,9 @@ app.config(['$locationProvider', '$routeProvider',
           global.auth.login();
           $location.path('/');
         }
+        else {
+          $location.path('/login');
+        }
       }, function error(response) {
       });
 
@@ -231,11 +234,15 @@ app.component('loginView', {
   controller: function LoginController($location, api, global) {
     var ctrl = this;
 
+    ctrl.loggingIn = false;
+
     ctrl.login = function(user) {
       if (user.email === '' || user.password === '') {
         //TODO: error
         return;
       }
+
+      ctrl.loggingIn = true;
 
       var plaintext = user.email + '\x00' + user.password;
       var plaintextHash = CryptoJS.SHA256(plaintext);
@@ -254,10 +261,13 @@ app.component('loginView', {
 
       api.login(ciphertext, hashToB64, function(data) {
         if (data === 'err') {
-          console.log('error login')
+          global.addAlert('danger', 'Wrong login credentials, try again');
+          ctrl.loggingIn = false;
+          return;
         }
         global.auth.login();
         $location.path('/');
+        ctrl.loggingIn = false;
       });
     }
   }
