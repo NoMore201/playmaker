@@ -29,13 +29,13 @@ you add apks to your collection
 
 ## Usage
 
-There is a working Dockerfile. You can build and run it, or use a pre-built image on docker hub:
+Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image. You can build the Dockerfile in this repo and run it, or use a pre-built image on docker hub:
 
 ```
 docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
 
-**REQUIRED** **You need to insert you google credentials in the configuration file!!**. You can copy the conf file in the working directory (in this case `/srv/fdroid`), otherwise playmaker will take care of creating an empty conf file for you, which you should edit. Credentials have this structure
+On first launch, playmaker will ask your for your google credentials. They will be used by the server for first time setup, and then discarded, because only the ac2dm and the auth token are needed to process requests. Remember that you can use also app specific password, if you setup 2factor auth:
 
 ```
 # parts inside square brackets are not mandatory
@@ -43,11 +43,19 @@ email = <google_user>[@gmail.com]
 password = <google_password> | <app specific_password>
 ```
 
-Otherwise you can install it in a virtual env and then launch the `pm-server` script.
+Credentials are encrypted using AES256 and securely transferred to the server.
+
+If you want to run it in a virtualenv rather than using docker, remember that you need to build googleplay-api, fdroidserver and setup the android SDK (see the Dockerfile as a reference).
 
 ```
-python setup.py install
-pm-server --fdroid --debug
+usage: pm-server [-h] [-f] [-d]
+
+Apk and fdroid repository manager with a web interface.
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -f, --fdroid  Enable fdroid integration
+  -d, --debug   Enable debug output
 ```
 
 <a name="todos"/>
