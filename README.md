@@ -75,6 +75,8 @@ optional arguments:
 
 ### Frontend
 
+- [ ] Add more information for apps
+- [ ] Better error handling
 - [ ] Fdroid repo configuration page
 - [ ] Add placeholder when there aren't local apps
 - [x] Switch to angular (less code, one page app)
