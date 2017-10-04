@@ -32,6 +32,7 @@ class Play(object):
             self.fdroid_init()
 
         self.service = GooglePlayAPI(self.debug)
+        self.update_state()
 
     def fdroid_init(self):
         found = False
@@ -103,7 +104,6 @@ class Play(object):
                                password,
                                None, None)
             self.loggedIn = True
-            self.update_state()
             return 'OK'
         except LoginError as e:
             print('Wrong credentials')
@@ -121,9 +121,6 @@ class Play(object):
             }
 
     def update_state(self):
-        if not self.loggedIn:
-            return
-
         def get_details_from_apk(details):
             filepath = os.path.join(self.download_path,
                                     details['docId'] + '.apk')
