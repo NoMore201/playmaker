@@ -39,11 +39,11 @@ RUN git clone https://github.com/NoMore201/playmaker && \
     git clone https://github.com/NoMore201/googleplay-api
 
 WORKDIR /opt/googleplay-api
-RUN git checkout v0.1.1 && pip3 install . && \
+RUN git checkout v0.1.2 && pip3 install . && \
     cd /opt && rm -rf googleplay-api
 
 WORKDIR /opt/playmaker
-RUN git checkout v0.3.2 && pip3 install . && \
+RUN git checkout v0.4.1 && pip3 install . && \
     cp /opt/playmaker/playmaker.conf /data/fdroid && \
     cd /opt && rm -rf playmaker
 
