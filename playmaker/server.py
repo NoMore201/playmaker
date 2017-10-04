@@ -39,7 +39,7 @@ def createServer(service):
         def login(self):
             data = tornado.escape.json_decode(self.request.body)
             if len(data) == 0:
-                return 'OK' if service.loggedIn else { 'error' : 'Not logged in' }
+                return 'YES' if service.loggedIn else { 'error' : 'Not logged in' }
             res = service.login(data['cyphertext'], data['password'])
             return res
 
@@ -55,6 +55,10 @@ def createServer(service):
         def check(self):
             apps = service.check_local_apks()
             return apps
+
+        @run_on_executor
+        def update_state(self):
+            service.update_state()
 
         @run_on_executor
         def remove_app(self, app):
@@ -94,11 +98,12 @@ def createServer(service):
                 self.write(result)
             elif path == 'login':
                 result = yield self.login()
-                print(result)
                 if not isinstance(result, str):
                     self.clear()
                     self.set_status(400)
                 self.write(result)
+                if result == 'OK':
+                    self.update_state()
             elif path == 'fdroid':
                 global fdroid_instance
                 if fdroid_instance != {}:

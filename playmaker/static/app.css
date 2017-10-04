@@ -22,6 +22,13 @@
   color: #333333;
 }
 
+#app-message {
+  min-width: 250px;
+  margin: 0 auto;
+  color: #777777;
+  font-size: 30px;
+}
+
 .dl-button:hover {
   color: #333333;
 }

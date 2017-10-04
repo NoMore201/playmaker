@@ -18,6 +18,7 @@ class Play(object):
         self.debug = debug
         self.fdroid = fdroid
         self.loggedIn = False
+        self.firstRun = True
 
         # configuring download folder
         if self.fdroid:
@@ -32,7 +33,6 @@ class Play(object):
             self.fdroid_init()
 
         self.service = GooglePlayAPI(self.debug)
-        self.update_state()
 
     def fdroid_init(self):
         found = False
@@ -82,6 +82,8 @@ class Play(object):
             return 'OK'
 
     def get_apps(self):
+        if self.firstRun:
+            return 'PENDING'
         return {
             'result': sorted(self.currentSet, key=lambda k: k['title'])
         }
@@ -149,6 +151,7 @@ class Play(object):
 
         print('Updating cache')
         self.currentSet = fetch_details_for_local_apps()
+        self.firstRun = False
 
     def insert_app_into_state(self, newApp):
         found = False

@@ -37,7 +37,7 @@ angular.module('playmaker').service('api', ['$http', function($http) {
       method: 'GET',
       url: '/api/apps'
     }).then(function success(response) {
-      callback(response.data.result);
+      callback(response.data);
     }, function error(response) {
       callback('err');
     });

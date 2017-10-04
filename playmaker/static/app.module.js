@@ -27,7 +27,7 @@ app.config(['$locationProvider', '$routeProvider',
       url: '/api/login',
       data: '{}'
     }).then(function success(response) {
-        if (response.data === 'OK') {
+        if (response.data === 'YES') {
           global.auth.login();
           $location.path('/');
         }
@@ -58,6 +58,9 @@ app.component('appList', {
   templateUrl: '/views/app.html',
   controller: function AppController(api, global) {
     var ctrl = this;
+
+    ctrl.apps = [];
+    ctrl.updatingState = true;
 
     ctrl.check = function() {
       global.addAlert('info', 'Checking for updates');
@@ -140,7 +143,12 @@ app.component('appList', {
     };
 
     api.getApps(function(data) {
-      var apps = data;
+      console.log(data);
+      if (data === 'PENDING') {
+        return;
+      }
+      var apps = data.result;
+      ctrl.updatingState = false;
       apps.forEach(function(a) {
         a.updating = false;
         a.needsUpdate = false;
@@ -255,11 +263,9 @@ app.component('loginView', {
       iv.concat(encrypted.ciphertext)
       var ciphertext = CryptoJS.enc.Base64.stringify(iv);
       var hashToB64 = CryptoJS.enc.Base64.stringify(plaintextHash);
-      console.log('Original message: ' + plaintext);
-      console.log('Base64 encoding of [iv, ciphertext]: ' + ciphertext);
-      console.log('Base64 encoding of plaintext hash: ', hashToB64);
 
       api.login(ciphertext, hashToB64, function(data) {
+        console.log(data);
         if (data === 'err') {
           global.addAlert('danger', 'Wrong login credentials, try again');
           ctrl.loggingIn = false;
