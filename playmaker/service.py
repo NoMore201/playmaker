@@ -102,8 +102,8 @@ class Play(object):
             self.service.login(email,
                                password,
                                None, None)
-            self.update_state()
             self.loggedIn = True
+            self.update_state()
             return 'OK'
         except LoginError as e:
             print('Wrong credentials')
