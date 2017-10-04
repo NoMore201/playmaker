@@ -15,15 +15,16 @@
 
 ## Description & Features
 
-Playmaker is a python3 apk manager with a web interface. The backend uses the python3 branch of googleplay-api, taken from [gplaycli](https://github.com/matlink/gplaycli)
-with a few fixes, together with WebTornado non-blocking web server. Frontend code uses BackboneJS as the JS framework, bootstrap and font-awesome.
+Playmaker is a python3 apk manager with a web interface. The backend uses an up-to-date version of [googleplay-api](https://github.com/NoMore201/googleplay-api)
+ including a lot of improvements, WebTornado for its non-blocking behaviour, while the frontend is built with angularjs and the bootstrap CSS framework.
 
 Features:
-* Download/Update/Delete apks from google play store
-* A fdroid repository is setup on first launch. You can update manually, as
-you add apks to your collection
-* Fdroid and apk updates work in background, without blocking UI
-* Responsive UI
+* Download apks from google play store to your collection. Update them or delete if they are not needed anymore.
+* A fdroid repository is setup on first launch. You can update it manually, as you add/remove apks to your collection.
+* Credentials you provide for first-time setup are encrypted using AES-256-CBC and sent to the server.
+* Thanks to the non-blocking UI, you can browse the collection or search for an app while the server is updating the fdroid
+repository.
+* Responsive UI.
 
 <a name="usage"/>
 
@@ -35,7 +36,7 @@ Since this app requires a lot of heavy dependencies, like Android SDK and fdroid
 docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
 
-On first launch, playmaker will ask your for your google credentials. They will be used by the server for first time setup, and then discarded, because only the ac2dm and the auth token are needed to process requests.
+On first launch, playmaker will ask your for your google credentials. They will be used by the server for first time setup, and then discarded, because auth token is needed to process requests.
 **If you want to secure access to the server, you need to use HTTP authentication (nginx) !!** Credentials are used by the server to perform login, while the client (your web page) isn't authenticated! If the server is already logged in, client will skip the login step and redirect to the homepage.
 It is also possible to use app specific password, in case the google account is secured with 2factor auth:
 
