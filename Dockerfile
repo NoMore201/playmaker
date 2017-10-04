@@ -43,7 +43,7 @@ RUN git checkout v0.1.2 && pip3 install . && \
     cd /opt && rm -rf googleplay-api
 
 WORKDIR /opt/playmaker
-RUN git checkout v0.4.2 && pip3 install . && \
+RUN git checkout v0.4.3 && pip3 install . && \
     cp /opt/playmaker/playmaker.conf /data/fdroid && \
     cd /opt && rm -rf playmaker
 
