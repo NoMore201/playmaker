@@ -143,7 +143,6 @@ app.component('appList', {
     };
 
     api.getApps(function(data) {
-      console.log(data);
       if (data === 'PENDING') {
         return;
       }
@@ -265,7 +264,6 @@ app.component('loginView', {
       var hashToB64 = CryptoJS.enc.Base64.stringify(plaintextHash);
 
       api.login(ciphertext, hashToB64, function(data) {
-        console.log(data);
         if (data === 'err') {
           global.addAlert('danger', 'Wrong login credentials, try again');
           ctrl.loggingIn = false;
