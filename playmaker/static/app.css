@@ -4,6 +4,11 @@
   padding:0;
 }
 
+#login-body {
+  max-width: 500px;
+  margin:0 auto;
+}
+
 #notification-panel {
   position: fixed;
   right: 30px;

@@ -243,10 +243,20 @@ app.component('loginView', {
     var ctrl = this;
 
     ctrl.loggingIn = false;
+    ctrl.badUsername = false;
+    ctrl.badPassword = false;
 
     ctrl.login = function(user) {
-      if (user.email === '' || user.password === '') {
-        //TODO: error
+      ctrl.badUsername = false;
+      ctrl.badPassword = false;
+
+      if (user.email === '') {
+        ctrl.badUsername = true;
+        return;
+      }
+
+      if (user.password === '') {
+        ctrl.badPassword = true;
         return;
       }
 
