@@ -26,13 +26,15 @@
           <span><strong>Size: </strong>{{app.formattedSize}} MB</span><br>
           <span><strong>PackageId: </strong>{{app.docId}}</span><br>
         </div>
-        <div ng-hide="!app.updating" class="progress">
-          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-            <span class="sr-only">Updating</span>
-          </div><!-- progress-bar -->
-        </div><!-- progress -->
 
       </div><!-- panel-body -->
+
+      <div ng-hide="!app.updating" class="progress" id="apk-progess">
+        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+          <span class="sr-only">Updating</span>
+        </div><!-- progress-bar -->
+      </div><!-- progress -->
+
       <div class="apk-buttons">
         <a ng-hide="app.updating" ng-disabled="!app.needsUpdate" ng-click="$ctrl.updateApp(app)" ng-class="{'btn btn-raised btn-primary': app.needsUpdate, 'btn btn-default': !app.needsUpdate}" type="button"><i class="fa fa-download" aria-hidden="true"></i> update</a>
 
