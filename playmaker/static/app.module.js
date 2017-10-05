@@ -61,6 +61,8 @@ app.component('appList', {
 
     ctrl.apps = [];
     ctrl.updatingState = false;
+    ctrl.desktop = global.desktop;
+    ctrl.mobile = global.mobile;
 
     ctrl.check = function() {
       global.addAlert('info', 'Checking for updates');
@@ -149,7 +151,20 @@ app.component('appList', {
       }
       ctrl.updatingState = false;
       var apps = data.result;
+      console.log(apps);
       apps.forEach(function(a) {
+        stars = Math.round(a.aggregateRating.starRating);
+        var starList = [];
+        for (i = 0; i < 5; i++) {
+          if (i+1 <= stars){
+            starList.push({index: i, full: true});
+          } else {
+            starList.push({index: i, full: false});
+          }
+        }
+        a.starList = starList;
+        a.formattedSize = a.installationSize / (1024*1024);
+        a.formattedSize = a.formattedSize.toFixed(2);
         a.updating = false;
         a.needsUpdate = false;
       });
