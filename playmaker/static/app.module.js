@@ -60,7 +60,7 @@ app.component('appList', {
     var ctrl = this;
 
     ctrl.apps = [];
-    ctrl.updatingState = true;
+    ctrl.updatingState = false;
 
     ctrl.check = function() {
       global.addAlert('info', 'Checking for updates');
@@ -144,10 +144,11 @@ app.component('appList', {
 
     api.getApps(function(data) {
       if (data === 'PENDING') {
+        ctrl.updatingState = true;
         return;
       }
-      var apps = data.result;
       ctrl.updatingState = false;
+      var apps = data.result;
       apps.forEach(function(a) {
         a.updating = false;
         a.needsUpdate = false;
