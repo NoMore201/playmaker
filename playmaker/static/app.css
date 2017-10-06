@@ -1,3 +1,44 @@
+/*
+ * index.html
+ */
+
+#notification-panel {
+  position: fixed;
+  right: 30px;
+  top: 75px;
+  width: 300px;
+  z-index: 10;
+}
+
+/*
+ * Login view
+ */
+
+#login-body {
+  max-width: 500px;
+  margin:0 auto;
+}
+
+
+/*
+ * Apps view
+ */
+
+#app-message {
+  min-width: 250px;
+  margin: 0 auto;
+  color: #888888;
+  font-size: 30px;
+}
+
+#function-bar {
+  margin-top:30px;
+}
+
+#app-container {
+  margin-top: 30px;
+}
+
 .panel-body {
   display: flex;
   flex-direction: row;
@@ -12,64 +53,35 @@
   display: block;
   white-space: nowrap;
   margin-top:10px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 22px;
 }
 
 .apk-info {
-  margin-left: 40px;
+  margin-left: 20px;
 }
 
 .apk-buttons {
-  display:flex;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-  margin:0 20px 20px 20px;
-}
-
-#apk-progress {
-  margin:0 20px 13px 20px;
+  width:100%;
+  text-align:right;
+  padding:15px;
 }
 
 .apk-buttons > a {
   margin-left: 30px;
 }
 
-#login-body {
-  max-width: 500px;
-  margin:0 auto;
+.apk-progress {
+  margin:24px 15px 18px 15px;
 }
 
-#notification-panel {
-  position: fixed;
-  right: 30px;
-  top: 75px;
-  width: 300px;
-  z-index: 10;
-}
-
-#function-bar {
-  margin-top:30px;
-}
-
-#function-bar > a {
- margin-bottom:20px;
-}
-
-#app-container {
-  margin-top: 30px;
-}
+/*
+ * Search view
+ */
 
 .dl-button {
   cursor: pointer;
   color: #333333;
-}
-
-#app-message {
-  min-width: 250px;
-  margin: 0 auto;
-  color: #888888;
-  font-size: 30px;
 }
 
 .dl-button:hover {
@@ -97,23 +109,10 @@
   width:100%
 }
 
-.progress {
-  margin-bottom:14px;
-}
-
 #search-progress {
   margin-top:40px;
   margin-left:30px;
   margin-right:30px;
-}
-
-#fdroid-progress {
-  margin-left:30px;
-  margin-right:30px;
-}
-
-#update-all {
-  cursor: pointer;
 }
 
 #search-area {

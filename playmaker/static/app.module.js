@@ -151,9 +151,13 @@ app.component('appList', {
       }
       ctrl.updatingState = false;
       var apps = data.result;
-      console.log(apps);
       apps.forEach(function(a) {
+        if (ctrl.mobile && a.title.length > 21) {
+          a.title = a.title.substring(0, 22);
+          a.title += '...';
+        }
         stars = Math.round(a.aggregateRating.starRating);
+        a.formattedStars = a.aggregateRating.starRating.toFixed(1);
         var starList = [];
         for (i = 0; i < 5; i++) {
           if (i+1 <= stars){
@@ -167,6 +171,9 @@ app.component('appList', {
         a.formattedSize = a.formattedSize.toFixed(2);
         a.updating = false;
         a.needsUpdate = false;
+        if (a.docId === 'org.mozilla.focus') {
+          a.updating = true;
+        }
       });
       ctrl.apps = apps;
     });
@@ -265,12 +272,12 @@ app.component('loginView', {
       ctrl.badUsername = false;
       ctrl.badPassword = false;
 
-      if (user.email === '') {
+      if (user.email === '' || user.email === undefined) {
         ctrl.badUsername = true;
         return;
       }
 
-      if (user.password === '') {
+      if (user.password === '' || user.password === undefined) {
         ctrl.badPassword = true;
         return;
       }

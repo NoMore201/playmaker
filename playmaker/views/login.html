@@ -5,13 +5,13 @@
     they are discarded by the server, since it will retrieve android ID and token needed to perform requests.</p>
     <div class="form-group">
       <label for="emailInput">Email address</label>
-      <input type="text" class="form-control" id="emailInput" placeholder="Email" ng-model="user.email" uib-tooltip="Enter a valid username (with or without '@gmail.com'" tooltip-enable="$ctrl.badUsername" tooltip-placement="top" tooltip-is-open="$ctrl.badUsername" ng-disabled="$ctrl.loggingIn">
+      <input type="text" class="form-control" id="emailInput" placeholder="Email" ng-model="user.email" uib-tooltip="Enter a valid username (with or without '@gmail.com')" tooltip-enable="$ctrl.badUsername" tooltip-placement="top" tooltip-is-open="$ctrl.badUsername" ng-disabled="$ctrl.loggingIn">
     </div>
     <div class="form-group">
       <label for="passwordInput">Password</label>
       <input type="password" class="form-control" id="passwordInput" placeholder="Password" ng-model="user.password" uib-tooltip="Enter a valid password" tooltip-enable="$ctrl.badPassword" tooltip-placement="bottom" tooltip-is-open="$ctrl.badPassword" ng-disabled="$ctrl.loggingIn">
     </div>
     <button type="submit" class="btn btn-default" ng-click="$ctrl.login(user)" ng-disabled="$ctrl.loggingIn">Submit</button>
-    <i id="loading-icon" class="fa fa-cog fa-spin fa-3x fa-fw" ng-hide="!$ctrl.logginIn" ></i>
+    <i id="loading-icon" class="fa fa-cog fa-spin fa-2x fa-fw" ng-hide="!$ctrl.loggingIn" ></i>
   </div>
 </form>
