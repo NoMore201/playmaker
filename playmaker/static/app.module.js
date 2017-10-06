@@ -171,9 +171,6 @@ app.component('appList', {
         a.formattedSize = a.formattedSize.toFixed(2);
         a.updating = false;
         a.needsUpdate = false;
-        if (a.docId === 'org.mozilla.focus') {
-          a.updating = true;
-        }
       });
       ctrl.apps = apps;
     });
