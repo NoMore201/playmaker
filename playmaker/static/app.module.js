@@ -27,7 +27,7 @@ app.config(['$locationProvider', '$routeProvider',
       url: '/api/login',
       data: '{}'
     }).then(function success(response) {
-        if (response.data === 'YES') {
+        if (response.data.message === 'YES') {
           global.auth.login();
           $location.path('/');
         }
@@ -71,10 +71,10 @@ app.component('appList', {
           global.addAlert('danger', 'Cannot check for updates');
           return;
         }
-        if (data.length === 0) {
+        if (data.status === 'SUCCESS' && data.message.length === 0) {
           global.addAlert('success', 'All apps are up-to-date!');
         }
-        if (data.length > 0) {
+        if (data.status === 'SUCCESS' && data.message.length > 0) {
           global.addAlert('info', data.length.toString() + ' apps must be updated');
 
           data.forEach(function(newApp) {
@@ -90,8 +90,8 @@ app.component('appList', {
 
     ctrl.downloadApp = function(app) {
       api.download(app.docId, function(data) {
-        if (data.success.length === 0) return;
-        newApp = data.success[0];
+        //TODO: error handling
+        if (data.message.success.length === 0) return;
       });
     };
 
@@ -99,24 +99,24 @@ app.component('appList', {
       app.needsUpdate = false;
       app.updating = true;
       api.download(app.docId, function(data) {
-        if (data === 'err') {
+        if (data === 'err' || data.status === 'ERROR') {
           global.addAlert('danger', 'Unable to update ' + app.docId);
           app.updating = false;
           return;
         }
-        if (data.success !== undefined && data.success.length === 0) {
+        if (data.message.success.length === 0) {
           global.addAlert('danger', 'Unable to update ' + app.docId);
           app.updating = false;
           return;
         }
-        app.version = data.success[0].versionCode;
+        app.version = data.message.success[0].versionCode;
         app.updating = false;
       });
     };
 
     ctrl.delete = function(app) {
       api.remove(app.docId, function(data) {
-        if (data === 'OK') {
+        if (data.status === 'SUCCESS') {
           var i = ctrl.apps.findIndex(function(elem) {
             return elem.docId === app.docId;
           });
@@ -134,33 +134,32 @@ app.component('appList', {
           global.addAlert('danger', 'Error updating repository');
           return;
         }
-        if (data === 'PENDING') {
+        if (data.status === 'PENDING') {
           global.addAlert('warning', 'Update process still running');
           return;
         }
-        if (data === 'OK') {
+        if (data.status === 'SUCCESS') {
           global.addAlert('success', 'Fdroid repository updated succesfully');
         }
       });
     };
 
     api.getApps(function(data) {
-      if (data === 'PENDING') {
+      if (data.status === 'PENDING') {
         ctrl.updatingState = true;
         return;
       }
       ctrl.updatingState = false;
-      var apps = data.result;
+      var apps = data.message;
       apps.forEach(function(a) {
         if (ctrl.mobile && a.title.length > 21) {
-          a.title = a.title.substring(0, 22);
-          a.title += '...';
+          a.title = a.title.substring(0, 22) + '...';
         }
-        stars = Math.round(a.aggregateRating.starRating);
+        roundedStars = Math.round(a.aggregateRating.starRating);
         a.formattedStars = a.aggregateRating.starRating.toFixed(1);
         var starList = [];
         for (i = 0; i < 5; i++) {
-          if (i+1 <= stars){
+          if (i+1 <= roundedStars){
             starList.push({index: i, full: true});
           } else {
             starList.push({index: i, full: false});
@@ -214,7 +213,7 @@ app.component('searchView', {
 
     ctrl.search = function(app) {
       // no input by the user
-      if (app === undefined) return;
+      if (app === undefined || app === '') return;
       ctrl.results = [];
       ctrl.searching = true;
       api.search(app, function(data) {
@@ -223,16 +222,16 @@ app.component('searchView', {
           ctrl.searching = false;
           return;
         }
-        if (data !== undefined && data.length === 0) {
-          global.addAlert('danger', 'No result for "' + app + '"');
+        if (data.status === 'SUCCESS' && data.message.length === 0) {
+          global.addAlert('warning', 'No result for "' + app + '"');
           ctrl.searching = false;
           return;
         }
-        data.forEach(function(d) {
+        data.message.forEach(function(d) {
           d.dling = false;
           d.dled = false;
         });
-        ctrl.results = data;
+        ctrl.results = data.message;
         ctrl.searching = false;
       });
     };
@@ -241,12 +240,13 @@ app.component('searchView', {
       app.dling = true;
       api.download(app.docId, function(data) {
         if (data === 'err') {
-          global.addAlert('danger', 'Error downloading app');
           app.dling = false;
+          global.addAlert('danger', 'Error downloading app');
           return;
         }
-        if (data !== undefined && data.success.length === 0) {
+        if (data.status === 'SUCCESS' && data.message.success.length === 0) {
           app.dling = false;
+          global.addAlert('warning', 'Cannot download ' + app.docId);
           return;
         }
         app.dling = false;
@@ -294,8 +294,8 @@ app.component('loginView', {
       var hashToB64 = CryptoJS.enc.Base64.stringify(plaintextHash);
 
       api.login(ciphertext, hashToB64, function(data) {
-        if (data === 'err') {
-          global.addAlert('danger', 'Wrong login credentials, try again');
+        if (data.status === 'ERROR') {
+          global.addAlert('danger', data.message);
           ctrl.loggingIn = false;
           return;
         }

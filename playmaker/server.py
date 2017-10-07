@@ -39,22 +39,22 @@ def createServer(service):
         def login(self):
             data = tornado.escape.json_decode(self.request.body)
             if len(data) == 0:
-                return 'YES' if service.loggedIn else { 'error' : 'Not logged in' }
-            res = service.login(data['cyphertext'], data['password'])
-            return res
+                if service.loggedIn:
+                    return { 'status': 'SUCCESS', 'message': 'YES' }
+                else:
+                    return { 'status': 'ERROR', 'message': 'Not logged in' }
+            return service.login(data['cyphertext'], data['password'])
 
         @run_on_executor
         def download(self):
             data = tornado.escape.json_decode(self.request.body)
             if data.get('download') is None:
                 return None
-            apps = service.download_selection(data['download'])
-            return apps
+            return service.download_selection(data['download'])
 
         @run_on_executor
         def check(self):
-            apps = service.check_local_apks()
-            return apps
+            return service.check_local_apks()
 
         @run_on_executor
         def update_state(self):
@@ -79,7 +79,7 @@ def createServer(service):
                     self.write(apps)
                 else:
                     self.clear()
-                    self.set_status(400)
+                    self.set_status(400, 'You should supply a valid search query');
             else:
                 self.set_status(404)
             self.finish()
@@ -98,22 +98,16 @@ def createServer(service):
                 self.write(result)
             elif path == 'login':
                 result = yield self.login()
-                if not isinstance(result, str):
-                    self.clear()
-                    self.set_status(400)
                 self.write(result)
-                if result == 'OK':
+                if result['status'] == 'SUCCESS' and result['message'] == 'OK':
                     self.update_state()
             elif path == 'fdroid':
                 global fdroid_instance
                 if fdroid_instance != {}:
-                    self.write('PENDING')
+                    self.write({ 'status': 'PENDING' })
                 else:
                     fdroid_instance = self
                     result = yield self.update_fdroid()
-                    if not isinstance(result, str):
-                        self.clear()
-                        self.set_status(500)
                     self.write(result)
                     fdroid_instance = {}
             else:
@@ -129,10 +123,7 @@ def createServer(service):
                     self.set_status(400)
                 else:
                     result = yield self.remove_app(data['delete'])
-                    if result:
-                        self.write('OK')
-                    else:
-                        self.set_status(500)
+                    self.write(result)
             else:
                 self.set_status(404)
             self.finish()

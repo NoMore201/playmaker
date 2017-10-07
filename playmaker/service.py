@@ -11,6 +11,11 @@ import sys
 NOT_LOGGED_IN_ERR = 'Not logged in'
 WRONG_CREDENTIALS_ERR = 'Wrong credentials'
 SESSION_EXPIRED_ERR = 'Session tokens expired, re-login needed'
+FDROID_ERR = 'Error while executing fdroidserver tool'
+
+def makeError(message):
+    return { 'status': 'ERROR',
+             'message': message }
 
 class Play(object):
     def __init__(self, debug=True, fdroid=False):
@@ -57,9 +62,7 @@ class Play(object):
 
     def fdroid_update(self):
         if not self.loggedIn:
-            return {
-                'error': NOT_LOGGED_IN_ERR
-            }
+            return makeError(NOT_LOGGED_IN_ERR)
         if self.fdroid:
             try:
                 p = Popen([self.fdroid_exe, 'update', '-c', '--clean'],
@@ -68,25 +71,20 @@ class Play(object):
                 if p.returncode != 0:
                     sys.stderr.write("error updating fdroid repository " +
                                      stderr.decode('utf-8'))
-                    return {
-                        'error': 'Error while executing fdroidsever'
-                    }
+                    return makeError(FDROID_ERR)
                 else:
                     print('Fdroid repo updated successfully')
-                    return 'OK'
+                    return { 'status': 'SUCCESS' }
             except:
-                return {
-                    'error': 'Error while executing fdroidsever'
-                }
+                return makeError(FDROID_ERR)
         else:
-            return 'OK'
+            return { 'status': 'SUCCESS' }
 
     def get_apps(self):
         if self.firstRun:
-            return 'PENDING'
-        return {
-            'result': sorted(self.currentSet, key=lambda k: k['title'])
-        }
+            return { 'status': 'PENDING' }
+        return { 'status': 'SUCCESS',
+                 'message': sorted(self.currentSet, key=lambda k: k['title']) }
 
     def login(self, ciphertext, hashToB64):
         def unpad(s):
@@ -106,21 +104,19 @@ class Play(object):
                                password,
                                None, None)
             self.loggedIn = True
-            return 'OK'
+            return { 'status': 'SUCCESS', 'message': 'OK' }
         except LoginError as e:
             print('Wrong credentials')
             self.loggedIn = False
-            return {
-                'error': 'Wrong credentials'
-            }
+            return { 'status': 'ERROR',
+                     'message': 'Wrong credentials' }
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
             print('Request error, probably invalid token')
             self.loggedIn = False
-            return {
-                'error': 'Request error, probably invalid token'
-            }
+            return { 'status': 'ERROR',
+                     'message': 'Request error, probably invalid token' }
 
     def update_state(self):
         def get_details_from_apk(details):
@@ -171,42 +167,37 @@ class Play(object):
 
     def search(self, appName, numItems=15):
         if not self.loggedIn:
-            return {
-                'error': NOT_LOGGED_IN_ERR
-            }
+            return { 'status': 'ERROR',
+                     'message': NOT_LOGGED_IN_ERR }
 
         try:
             apps = self.service.search(appName, numItems, None)
         except RequestError as e:
             print(SESSION_EXPIRED_ERR)
             self.loggedIn = False
-            return {
-                'error': SESSION_EXPIRED_ERR
-            }
-        return {
-            'result': apps
-        }
+            return { 'status': 'ERROR',
+                     'message': SESSION_EXPIRED_ERR }
+
+        return { 'status': 'SUCCESS',
+                 'message': apps }
 
     def get_bulk_details(self, apksList):
         if not self.loggedIn:
-            return {
-                'error': NOT_LOGGED_IN_ERR
-            }
+            return { 'status': 'ERROR',
+                     'message': NOT_LOGGED_IN_ERR }
         try:
             apps = self.service.bulkDetails(apksList)
         except RequestError as e:
             print(SESSION_EXPIRED_ERR)
             self.loggedIn = False
-            return {
-                'error': SESSION_EXPIRED_ERR
-            }
+            return { 'status': 'ERROR',
+                     'message': SESSION_EXPIRED_ERR }
         return apps
 
     def download_selection(self, appNames):
         if not self.loggedIn:
-            return {
-                'error': NOT_LOGGED_IN_ERR
-            }
+            return { 'status': 'ERROR',
+                     'error': NOT_LOGGED_IN_ERR }
 
         success = []
         failed = []
@@ -227,12 +218,6 @@ class Play(object):
             except IndexError as exc:
                 print('Package %s does not exists' % appname)
                 unavail.append(appname)
-            except RequestError as e:
-                print(SESSION_EXPIRED_ERR)
-                self.loggedIn = False
-                return {
-                    'error': SESSION_EXPIRED_ERR
-                }
             except Exception as exc:
                 print('Failed to download %s' % appname)
                 failed.append(appname)
@@ -246,36 +231,32 @@ class Play(object):
                     failed.append(appname)
         for x in success:
             self.insert_app_into_state(x)
-        return {
-            'success': success,
-            'failed': failed,
-            'unavail': unavail
-        }
+        return { 'status': 'SUCCESS',
+                 'message': { 'success': success,
+                              'failed': failed,
+                              'unavail': unavail } }
 
     def check_local_apks(self):
         if not self.loggedIn:
-            return {
-                'error': NOT_LOGGED_IN_ERR
-            }
+            return { 'status': 'ERROR',
+                     'error': NOT_LOGGED_IN_ERR }
 
         localDetails = self.currentSet
         onlineDetails = self.get_bulk_details([app['docId'] for app in localDetails])
         if len(localDetails) == 0 or len(onlineDetails) == 0:
             print('There is no package locally')
-            return {
-                'result': []
-            }
+            return { 'status': 'SUCCESS',
+                     'message': [] }
         else:
-            toUpdate = list()
+            toUpdate = []
             for local, online in zip(localDetails, onlineDetails):
                 if self.debug:
                     print('Checking %s' % local['docId'])
                     print('%d == %d ?' % (local['versionCode'], online['versionCode']))
                 if local['versionCode'] != online['versionCode']:
                     toUpdate.append(online['docId'])
-            return {
-                'result': toUpdate
-            }
+        return { 'status': 'SUCCESS',
+                 'message': toUpdate }
 
     def remove_local_app(self, appName):
         apkName = appName + '.apk'
@@ -285,5 +266,5 @@ class Play(object):
             for pos, app in enumerate(self.currentSet):
                 if app['docId'] == appName:
                     del self.currentSet[pos]
-            return True
-        return False
+            return { 'status': 'SUCCESS' }
+        return { 'status': 'ERROR' }

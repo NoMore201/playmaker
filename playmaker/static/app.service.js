@@ -30,7 +30,19 @@ angular.module('playmaker').service('global', ['$http', function($http) {
 }]);
 
 
-angular.module('playmaker').service('api', ['$http', function($http) {
+angular.module('playmaker').service('api', ['$http', '$location', 'global', function($http, $location, global) {
+
+  function loginHandler(result) {
+    if (result.data.status === 'ERROR') {
+      if (result.data.message !== undefined) {
+        global.addAlert('danger', result.data.message);
+      } else {
+        global.addAlert('danger', 'Application error');
+      }
+      global.auth.loggedIn = false;
+      $location.path('/login');
+    }
+  }
 
   this.getApps = function(callback) {
     $http({
@@ -48,7 +60,8 @@ angular.module('playmaker').service('api', ['$http', function($http) {
       method: 'GET',
       url: '/api/search?search=' + app
     }).then(function success(response) {
-      callback(response.data.result);
+      loginHandler(response);
+      callback(response.data);
     }, function error(response) {
       callback('err');
     });
@@ -57,7 +70,8 @@ angular.module('playmaker').service('api', ['$http', function($http) {
   this.check = function(callback) {
     $http.post('/api/check')
       .then(function success(response) {
-        callback(response.data.result);
+        loginHandler(response);
+        callback(response.data);
       }, function error(response) {
         callback('err');
       });
@@ -87,6 +101,7 @@ angular.module('playmaker').service('api', ['$http', function($http) {
       url: '/api/delete',
       data: JSON.stringify(requestData)
     }).then(function success(response) {
+        loginHandler(response);
         callback(response.data);
       }, function error(response) {
         callback('err');
@@ -98,6 +113,7 @@ angular.module('playmaker').service('api', ['$http', function($http) {
       method: 'POST',
       url: '/api/fdroid'
     }).then(function success(response) {
+      loginHandler(response);
       callback(response.data);
     }, function error(response) {
       callback('err');
@@ -120,5 +136,4 @@ angular.module('playmaker').service('api', ['$http', function($http) {
   };
 
 }]);
-
 
