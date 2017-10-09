@@ -48,7 +48,7 @@ class Play(object):
         if not found:
             print('Please install fdroid')
             sys.exit(1)
-        elif os.path.isdir('./repo'):
+        elif os.path.isfile('./config.py'):
             print('Repo already initalized, skipping')
         else:
             p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)
@@ -57,8 +57,14 @@ class Play(object):
                 sys.stderr.write("error initializing fdroid repository " +
                                  stderr.decode('utf-8'))
                 sys.exit(1)
-            else:
-                print('Fdroid repo initialized successfully')
+        # ensure all folder and files are setup
+        p = Popen([self.fdroid_exe, 'update', '--create-key'], stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate()
+        if p.returncode != 0:
+            sys.stderr.write("error initializing fdroid repository " +
+                             stderr.decode('utf-8'))
+        else:
+            print('Fdroid repo initialized successfully')
 
     def fdroid_update(self):
         if not self.loggedIn:
