@@ -35,15 +35,10 @@ RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose 
 RUN mkdir -p /data/fdroid/repo
 
 WORKDIR /opt
-RUN git clone https://github.com/NoMore201/playmaker && \
-    git clone https://github.com/NoMore201/googleplay-api
-
-WORKDIR /opt/googleplay-api
-RUN git checkout v0.1.2 && pip3 install . && \
-    cd /opt && rm -rf googleplay-api
+RUN git clone https://github.com/NoMore201/playmaker
 
 WORKDIR /opt/playmaker
-RUN pip3 install . && \
+RUN pi3 install gpapi && pip3 install . && \
     cp /opt/playmaker/playmaker.conf /data/fdroid && \
     cd /opt && rm -rf playmaker
 
