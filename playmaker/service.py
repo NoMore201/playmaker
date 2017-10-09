@@ -212,13 +212,18 @@ class Play(object):
                 continue
             print('Downloading %s' % appname)
             try:
-                data = self.service.download(appname, appdetails['versionCode'])
+                if appdetails['offer'][0]['formattedAmount'] == 'Free':
+                    data = self.service.download(appname, appdetails['versionCode'])
+                else:
+                    data = self.service.delivery(appname, appdetails['versionCode'])
                 success.append(appdetails)
                 print('Done!')
             except IndexError as exc:
+                print(exc)
                 print('Package %s does not exists' % appname)
                 unavail.append(appname)
             except Exception as exc:
+                print(exc)
                 print('Failed to download %s' % appname)
                 failed.append(appname)
             else:
