@@ -77,7 +77,7 @@ app.component('appList', {
         if (data.status === 'SUCCESS' && data.message.length > 0) {
           global.addAlert('info', data.message.length.toString() + ' apps must be updated');
 
-          data.forEach(function(newApp) {
+          data.message.forEach(function(newApp) {
             var oldAppIndex = ctrl.apps.findIndex(function(elem) {
               return elem.docId === newApp;
             });
