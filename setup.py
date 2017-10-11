@@ -22,8 +22,7 @@ setup(name='playmaker',
             'pyaxmlparser',
             'pycrypto',
             'tornado',
-            'googleplay-api',
+            'gpapi',
       ],
-      dependency_links=['https://github.com/NoMore201/googleplay-api/tarball/master#egg=googleplay-api'],
       scripts=['pm-server']
 )
