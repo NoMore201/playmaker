@@ -38,7 +38,7 @@ WORKDIR /opt
 RUN git clone https://github.com/NoMore201/playmaker
 
 WORKDIR /opt/playmaker
-RUN pip3 install gpapi && pip3 install . && \
+RUN pip3 install . && \
     cp /opt/playmaker/playmaker.conf /data/fdroid && \
     cd /opt && rm -rf playmaker
 
