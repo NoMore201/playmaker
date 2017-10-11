@@ -109,7 +109,7 @@ app.component('appList', {
           app.updating = false;
           return;
         }
-        app.version = data.message.success[0].versionCode;
+        app.versionCode = data.message.success[0].versionCode;
         app.updating = false;
       });
     };
