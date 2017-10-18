@@ -183,6 +183,11 @@ class Play(object):
             self.loggedIn = False
             return { 'status': 'ERROR',
                      'message': SESSION_EXPIRED_ERR }
+        except IndexError as e:
+            print(SESSION_EXPIRED_ERR)
+            self.loggedIn = False
+            return { 'status': 'ERROR',
+                     'message': SESSION_EXPIRED_ERR }
 
         return { 'status': 'SUCCESS',
                  'message': apps }
