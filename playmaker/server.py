@@ -7,10 +7,11 @@ from tornado.web import MissingArgumentError
 from concurrent.futures import ThreadPoolExecutor
 
 
-MAX_WORKERS=4
+MAX_WORKERS = 4
 app_dir = os.path.dirname(os.path.realpath(__file__))
 static_dir = os.path.join(app_dir, 'static')
 fdroid_instance = {}
+
 
 def createServer(service):
 
@@ -18,7 +19,6 @@ def createServer(service):
         def get(self):
             with open(app_dir + '/index.html', 'r') as f:
                 self.write(f.read())
-
 
     class ApiHandler(web.RequestHandler):
         executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
@@ -40,9 +40,9 @@ def createServer(service):
             data = tornado.escape.json_decode(self.request.body)
             if len(data) == 0:
                 if service.loggedIn:
-                    return { 'status': 'SUCCESS', 'message': 'YES' }
+                    return {'status': 'SUCCESS', 'message': 'YES'}
                 else:
-                    return { 'status': 'ERROR', 'message': 'Not logged in' }
+                    return {'status': 'ERROR', 'message': 'Not logged in'}
             return service.login(data['cyphertext'], data['password'])
 
         @run_on_executor
@@ -79,7 +79,7 @@ def createServer(service):
                     self.write(apps)
                 else:
                     self.clear()
-                    self.set_status(400, 'You should supply a valid search query');
+                    self.set_status(400, 'You should supply a valid search query')
             else:
                 self.set_status(404)
             self.finish()
@@ -104,7 +104,7 @@ def createServer(service):
             elif path == 'fdroid':
                 global fdroid_instance
                 if fdroid_instance != {}:
-                    self.write({ 'status': 'PENDING' })
+                    self.write({'status': 'PENDING'})
                 else:
                     fdroid_instance = self
                     result = yield self.update_fdroid()
