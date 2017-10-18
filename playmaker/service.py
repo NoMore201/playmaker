@@ -227,7 +227,6 @@ class Play(object):
                     data = self.service.download(appname, appdetails['versionCode'])
                 else:
                     data = self.service.delivery(appname, appdetails['versionCode'])
-                success.append(appdetails)
                 print('Done!')
             except IndexError as exc:
                 print(exc)
@@ -245,6 +244,7 @@ class Play(object):
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
                     failed.append(appname)
+                success.append(appdetails)
         for x in success:
             self.insert_app_into_state(x)
         return { 'status': 'SUCCESS',
