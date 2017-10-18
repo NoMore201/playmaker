@@ -1,3 +1,0 @@
-pyaxmlparser
-tornado
-git+git://github.com/NoMore201/googleplay-api
