@@ -240,7 +240,7 @@ class Play(object):
                 filename = appname + '.apk'
                 filepath = os.path.join(self.download_path, filename)
                 try:
-                    open(filepath, 'wb').write(data)
+                    open(filepath, 'wb').write(data['data'])
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
                     failed.append(appname)
