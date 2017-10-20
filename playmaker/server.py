@@ -38,11 +38,6 @@ def createServer(service):
         @run_on_executor
         def login(self):
             data = tornado.escape.json_decode(self.request.body)
-            if len(data) == 0:
-                if service.loggedIn:
-                    return {'status': 'SUCCESS', 'message': 'YES'}
-                else:
-                    return {'status': 'ERROR', 'message': 'Not logged in'}
             return service.login(data['cyphertext'], data['password'])
 
         @run_on_executor

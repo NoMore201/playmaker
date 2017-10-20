@@ -23,16 +23,15 @@ app.config(['$locationProvider', '$routeProvider',
   function ($rootScope, $location, $http, global) {
 
     $http({
-      method: 'POST',
-      url: '/api/login',
-      data: '{}'
+      method: 'GET',
+      url: '/api/apps'
     }).then(function success(response) {
-        if (response.data.message === 'YES') {
-          global.auth.login();
-          $location.path('/');
+        if (response.data.message.status === 'UNAUTHORIZED') {
+          $location.path('/login');
         }
         else {
-          $location.path('/login');
+          global.auth.login();
+          $location.path('/');
         }
       }, function error(response) {
       });

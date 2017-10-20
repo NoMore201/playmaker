@@ -23,8 +23,10 @@ class Play(object):
         self.currentSet = []
         self.debug = debug
         self.fdroid = fdroid
-        self.loggedIn = False
         self.firstRun = True
+        self.loggedIn = False
+        self._email = None
+        self._passwd = None
 
         # configuring download folder
         if self.fdroid:
@@ -69,7 +71,7 @@ class Play(object):
 
     def fdroid_update(self):
         if not self.loggedIn:
-            return makeError(NOT_LOGGED_IN_ERR)
+            return {'status': 'UNAUTHORIZED'}
         if self.fdroid:
             try:
                 p = Popen([self.fdroid_exe, 'update', '-c', '--clean'],
@@ -88,40 +90,48 @@ class Play(object):
             return {'status': 'SUCCESS'}
 
     def get_apps(self):
+        if not self.loggedIn:
+            return {'status': 'UNAUTHORIZED'}
         if self.firstRun:
             return {'status': 'PENDING'}
         return {'status': 'SUCCESS',
                 'message': sorted(self.currentSet, key=lambda k: k['title'])}
 
-    def login(self, ciphertext, hashToB64):
+    def login(self, ciphertext=None, hashToB64=None):
         def unpad(s):
             return s[:-ord(s[len(s)-1:])]
 
         try:
-            cipher = base64.b64decode(ciphertext)
-            passwd = base64.b64decode(hashToB64)
-            # first 16 bytes corresponds to the init vector
-            iv = cipher[0:16]
-            cipher = cipher[16:]
-            aes = AES.new(passwd, AES.MODE_CBC, iv)
-            result = unpad(aes.decrypt(cipher)).split(b'\x00')
-            email = result[0].decode('utf-8')
-            password = result[1].decode('utf-8')
-            self.service.login(email,
-                               password,
-                               None, None)
-            self.loggedIn = True
+            if ciphertext is not None and hashToB64 is not None:
+                cipher = base64.b64decode(ciphertext)
+                passwd = base64.b64decode(hashToB64)
+                # first 16 bytes corresponds to the init vector
+                iv = cipher[0:16]
+                cipher = cipher[16:]
+                aes = AES.new(passwd, AES.MODE_CBC, iv)
+                result = unpad(aes.decrypt(cipher)).split(b'\x00')
+                self._email = result[0].decode('utf-8')
+                self._passwd = result[1].decode('utf-8')
+                self.service.login(self._email,
+                                   self._passwd,
+                                   None, None)
+                self.loggedIn = True
+            else:
+                # otherwise we need only to refresh auth token
+                encrypted = self.service.encrypt_password(self._email,
+                                                          self._passwd).decode('utf-8')
+                self.service.getAuthSubToken(self._email,
+                                             encrypted)
+                self.loggedIn = True
             return {'status': 'SUCCESS', 'message': 'OK'}
         except LoginError as e:
             print('Wrong credentials')
-            self.loggedIn = False
             return {'status': 'ERROR',
                     'message': 'Wrong credentials'}
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
-            print('Request error, probably invalid token')
-            self.loggedIn = False
+            print(e)
             return {'status': 'ERROR',
                     'message': 'Request error, probably invalid token'}
 
@@ -170,43 +180,39 @@ class Play(object):
 
     def search(self, appName, numItems=15):
         if not self.loggedIn:
-            return {'status': 'ERROR',
-                    'message': NOT_LOGGED_IN_ERR}
-
+            return {'status': 'UNAUTHORIZED'}
         try:
             apps = self.service.search(appName, numItems, None)
         except RequestError as e:
-            print(SESSION_EXPIRED_ERR)
-            self.loggedIn = False
+            print(e)
+            self.login()
             return {'status': 'ERROR',
                     'message': SESSION_EXPIRED_ERR}
         except IndexError as e:
             print(SESSION_EXPIRED_ERR)
-            self.loggedIn = False
-            return {'status': 'ERROR',
-                    'message': SESSION_EXPIRED_ERR}
+            self.login()
+            return self.search(appName, numItems)
 
         return {'status': 'SUCCESS',
                 'message': apps}
 
     def get_bulk_details(self, apksList):
         if not self.loggedIn:
-            return {'status': 'ERROR',
-                    'message': NOT_LOGGED_IN_ERR}
+            return {'status': 'UNAUTHORIZED'}
         try:
             apps = self.service.bulkDetails(apksList)
+            if any([a['versionCode'] == 0 for a in apps]):
+                self.login()
+                apps = self.service.bulkDetails(apksList)
         except RequestError as e:
-            print(SESSION_EXPIRED_ERR)
-            self.loggedIn = False
+            print(e)
             return {'status': 'ERROR',
                     'message': SESSION_EXPIRED_ERR}
         return apps
 
     def download_selection(self, appNames):
         if not self.loggedIn:
-            return {'status': 'ERROR',
-                    'error': NOT_LOGGED_IN_ERR}
-
+            return {'status': 'UNAUTHORIZED'}
         success = []
         failed = []
         unavail = []
@@ -251,9 +257,7 @@ class Play(object):
 
     def check_local_apks(self):
         if not self.loggedIn:
-            return {'status': 'ERROR',
-                    'error': NOT_LOGGED_IN_ERR}
-
+            return {'status': 'UNAUTHORIZED'}
         localDetails = self.currentSet
         onlineDetails = self.get_bulk_details([app['docId'] for app in localDetails])
         if len(localDetails) == 0 or len(onlineDetails) == 0:
@@ -272,6 +276,8 @@ class Play(object):
                 'message': toUpdate}
 
     def remove_local_app(self, appName):
+        if not self.loggedIn:
+            return {'status': 'UNAUTHORIZED'}
         apkName = appName + '.apk'
         apkPath = os.path.join(self.download_path, apkName)
         if os.path.isfile(apkPath):
