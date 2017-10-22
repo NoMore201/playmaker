@@ -280,19 +280,11 @@ app.component('loginView', {
 
       ctrl.loggingIn = true;
 
-      var plaintext = user.email + '\x00' + user.password;
-      var plaintextHash = CryptoJS.SHA256(plaintext);
-      //using sha256(message) as key
-      var iv = CryptoJS.lib.WordArray.random(16);
-      var encrypted = CryptoJS.AES.encrypt(plaintext, plaintextHash, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC
-      });
-      iv.concat(encrypted.ciphertext)
-      var ciphertext = CryptoJS.enc.Base64.stringify(iv);
-      var hashToB64 = CryptoJS.enc.Base64.stringify(plaintextHash);
-
-      api.login(ciphertext, hashToB64, function(data) {
+      var email = CryptoJS.enc.Utf8.parse(user.email);
+      var passwd = CryptoJS.enc.Utf8.parse(user.password);
+      var emailB64 = CryptoJS.enc.Base64.stringify(email);
+      var passwdB64 = CryptoJS.enc.Base64.stringify(passwd);
+      api.login(emailB64, passwdB64, function(data) {
         if (data.status === 'ERROR') {
           global.addAlert('danger', data.message);
           ctrl.loggingIn = false;
