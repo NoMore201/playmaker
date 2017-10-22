@@ -22,7 +22,7 @@ setup(name='playmaker',
             'pyaxmlparser',
             'pycryptodome',
             'tornado',
-            'gpapi',
+            'gpapi>=0.2.5',
       ],
       scripts=['pm-server']
 )
