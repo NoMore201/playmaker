@@ -185,9 +185,13 @@ class Play(object):
             apps = self.service.search(appName, numItems, None)
         except RequestError as e:
             print(e)
-            self.login()
+            self.loggedIn = False
             return {'status': 'ERROR',
                     'message': SESSION_EXPIRED_ERR}
+        except LoginError as e:
+            print(SESSION_EXPIRED_ERR)
+            self.login()
+            return self.search(appName, numItems)
         except IndexError as e:
             print(SESSION_EXPIRED_ERR)
             self.login()
