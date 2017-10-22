@@ -42,7 +42,7 @@ def createServer(service):
         @run_on_executor
         def login(self):
             data = tornado.escape.json_decode(self.request.body)
-            return service.login(data['cyphertext'], data['password'])
+            return service.login(data['email'], data['password'])
 
         @run_on_executor
         def download(self):

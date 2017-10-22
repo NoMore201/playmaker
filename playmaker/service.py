@@ -1,7 +1,6 @@
 from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
 from pyaxmlparser import APK
 from subprocess import Popen, PIPE
-from Crypto.Cipher import AES
 
 import base64
 import os
@@ -105,21 +104,14 @@ class Play(object):
         return {'status': 'SUCCESS',
                 'message': sorted(self.currentSet, key=lambda k: k['title'])}
 
-    def login(self, ciphertext=None, hashToB64=None):
+    def login(self, email=None, password=None):
         def unpad(s):
             return s[:-ord(s[len(s)-1:])]
 
         try:
-            if ciphertext is not None and hashToB64 is not None:
-                cipher = base64.b64decode(ciphertext)
-                passwd = base64.b64decode(hashToB64)
-                # first 16 bytes corresponds to the init vector
-                iv = cipher[0:16]
-                cipher = cipher[16:]
-                aes = AES.new(passwd, AES.MODE_CBC, iv)
-                result = unpad(aes.decrypt(cipher)).split(b'\x00')
-                self._email = result[0].decode('utf-8')
-                self._passwd = result[1].decode('utf-8')
+            if email is not None and password is not None:
+                self._email = base64.b64decode(email).decode('utf-8')
+                self._passwd = base64.b64decode(password).decode('utf-8')
                 self.service.login(self._email,
                                    self._passwd,
                                    None, None)

@@ -131,12 +131,12 @@ angular.module('playmaker').service('api', ['$http', '$location', 'global', func
     });
   };
 
-  this.login = function(cyphertext, password, callback) {
+  this.login = function(email, password, callback) {
     $http({
       method: 'POST',
       url: '/api/login',
       data: JSON.stringify({
-        cyphertext: cyphertext,
+        email: email,
         password: password
       })
     }).then(function success(response) {
