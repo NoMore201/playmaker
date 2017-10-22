@@ -125,7 +125,7 @@ class Play(object):
                 self.loggedIn = True
             return {'status': 'SUCCESS', 'message': 'OK'}
         except LoginError as e:
-            print('Wrong credentials')
+            print('Wrong credentials: {0}'.format(e))
             return {'status': 'ERROR',
                     'message': 'Wrong credentials'}
         except RequestError as e:
