@@ -2,6 +2,7 @@
 **/__pycache__/
 *.swp
 *.apk
+.tern-project
 
 dist/
 build/
