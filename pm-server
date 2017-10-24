@@ -21,6 +21,9 @@ if __name__ == '__main__':
     args = ap.parse_args()
     service = Play(debug=args.debug, fdroid=args.fdroid)
     app = createServer(service)
-    server = httpserver.HTTPServer(app)
+    server = httpserver.HTTPServer(app, ssl_options={
+        "certfile": "./certs/playmaker.crt",
+        "keyfile": "./certs/playmaker.key",
+        })
     server.listen(5000, address='0.0.0.0')
     io.IOLoop.instance().start()
