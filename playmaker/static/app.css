@@ -24,8 +24,6 @@
  * Apps view
  */
 
-
-
 #app-message {
   min-width: 250px;
   margin: 0 auto;
@@ -54,8 +52,7 @@
 }
 
 .app-container {
-  max-width: 800px;
-  margin-top:30px;
+  margin-top: 30px;
 }
 
 .panel-body {
@@ -168,6 +165,8 @@
     top: 52px;
     left: 300px;
     max-width: 1200px;
+    height:90%;
+    overflow: auto;
     margin-left: 30px;
   }
 }
