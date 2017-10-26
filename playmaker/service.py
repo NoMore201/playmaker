@@ -57,14 +57,14 @@ class Play(object):
         elif os.path.isfile('./config.py'):
             print('Repo already initalized, skipping')
         else:
-            p = Popen([self.fdroid_exe, 'init'], stdout=PIPE, stderr=PIPE)
+            p = Popen([self.fdroid_exe, 'init', '-v'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
                 sys.stderr.write("error initializing fdroid repository " +
                                  stderr.decode('utf-8'))
                 sys.exit(1)
         # ensure all folder and files are setup
-        p = Popen([self.fdroid_exe, 'update', '--create-key'], stdout=PIPE, stderr=PIPE)
+        p = Popen([self.fdroid_exe, 'update', '--create-key', 'v'], stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if p.returncode != 0:
             sys.stderr.write("error initializing fdroid repository " +
