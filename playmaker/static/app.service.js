@@ -110,6 +110,17 @@ angular.module('playmaker').service('api', ['$http', '$location', 'global', func
 
   this.fdroid = function(callback) {
     $http({
+      method: 'GET',
+      url: '/api/fdroid'
+    }).then(function success(response) {
+      callback(response.data);
+    }, function error(response) {
+      callback('err');
+    });
+  };
+
+  this.fdroidUpdate = function(callback) {
+    $http({
       method: 'POST',
       url: '/api/fdroid'
     }).then(function success(response) {

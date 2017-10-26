@@ -26,7 +26,7 @@ app.config(['$locationProvider', '$routeProvider',
       method: 'GET',
       url: '/api/apps'
     }).then(function success(response) {
-        if (response.data.message.status === 'UNAUTHORIZED') {
+        if (response.data.status === 'UNAUTHORIZED') {
           $location.path('/login');
         }
         else {
@@ -60,6 +60,7 @@ app.component('appList', {
 
     ctrl.apps = [];
     ctrl.updatingState = false;
+    ctrl.lastFdroidUpdate = 'None';
     ctrl.desktop = global.desktop;
     ctrl.mobile = global.mobile;
 
@@ -127,18 +128,24 @@ app.component('appList', {
     };
 
     ctrl.fdroid = function() {
-      global.addAlert('info', 'Updating fdroid repository');
-      api.fdroid(function (data) {
+      var oldUpdate = ctrl.lastFdroidUpdate;
+      ctrl.lastFdroidUpdate = 'Pending';
+      api.fdroidUpdate(function (data) {
         if (data === 'err') {
           global.addAlert('danger', 'Error updating repository');
+          ctrl.lastFdroidUpdate = oldUpdate;
           return;
         }
         if (data.status === 'PENDING') {
-          global.addAlert('warning', 'Update process still running');
           return;
         }
         if (data.status === 'SUCCESS') {
-          global.addAlert('success', 'Fdroid repository updated succesfully');
+          api.fdroid(function(data) {
+            if (data.status !== 'SUCCESS') {
+              return;
+            }
+            ctrl.lastFdroidUpdate = data.message;
+          });
         }
       });
     };
@@ -146,6 +153,9 @@ app.component('appList', {
     api.getApps(function(data) {
       if (data.status === 'PENDING') {
         ctrl.updatingState = true;
+        return;
+      }
+      if (data.status === 'UNAUTHORIZED') {
         return;
       }
       ctrl.updatingState = false;
@@ -171,6 +181,13 @@ app.component('appList', {
         a.needsUpdate = false;
       });
       ctrl.apps = apps;
+    });
+
+    api.fdroid(function(data) {
+      if (data.status !== 'SUCCESS') {
+        return;
+      }
+      ctrl.lastFdroidUpdate = data.message;
     });
   }
 });

@@ -28,6 +28,10 @@ def createServer(service):
             return service.get_apps()
 
         @run_on_executor
+        def get_last_fdroid_update(self):
+            return service.get_last_fdroid_update()
+
+        @run_on_executor
         def search(self):
             try:
                 keyword = self.get_argument('search')
@@ -75,6 +79,9 @@ def createServer(service):
                 else:
                     self.clear()
                     self.set_status(400, 'You should supply a valid search query')
+            elif path == 'fdroid':
+                result = yield self.get_last_fdroid_update()
+                self.write(result)
             else:
                 self.set_status(404)
             self.finish()

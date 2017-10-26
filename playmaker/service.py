@@ -6,6 +6,7 @@ from Crypto.Cipher import AES
 import base64
 import os
 import sys
+from datetime import datetime as dt
 
 NOT_LOGGED_IN_ERR = 'Not logged in'
 WRONG_CREDENTIALS_ERR = 'Wrong credentials'
@@ -27,6 +28,7 @@ class Play(object):
         self.loggedIn = False
         self._email = None
         self._passwd = None
+        self._last_fdroid_update = None
 
         # configuring download folder
         if self.fdroid:
@@ -44,10 +46,11 @@ class Play(object):
 
     def fdroid_init(self):
         found = False
-        for path in ['/usr/bin', '/usr/local/bin']:
+        for path in os.environ['PATH'].split(':'):
             exe = os.path.join(path, self.fdroid_exe)
             if os.path.isfile(exe):
                 found = True
+                break
         if not found:
             print('Please install fdroid')
             sys.exit(1)
@@ -69,6 +72,10 @@ class Play(object):
         else:
             print('Fdroid repo initialized successfully')
 
+    def get_last_fdroid_update(self):
+        return {'status': 'SUCCESS',
+                'message': str(self._last_fdroid_update)}
+
     def fdroid_update(self):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
@@ -83,8 +90,9 @@ class Play(object):
                     return makeError(FDROID_ERR)
                 else:
                     print('Fdroid repo updated successfully')
+                    self._last_fdroid_update = dt.today().replace(microsecond=0)
                     return {'status': 'SUCCESS'}
-            except:
+            except Exception as e:
                 return makeError(FDROID_ERR)
         else:
             return {'status': 'SUCCESS'}
