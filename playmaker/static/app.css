@@ -24,6 +24,8 @@
  * Apps view
  */
 
+
+
 #app-message {
   min-width: 250px;
   margin: 0 auto;
@@ -31,12 +33,29 @@
   font-size: 30px;
 }
 
-#function-bar {
-  margin-top:30px;
+.sidebar {
+  margin: 0 auto;
+  padding-top: 30px;
+  width: 300px;
 }
 
-#app-container {
-  margin-top: 30px;
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-list-el {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding:15px;
+  height:50px;
+}
+
+.app-container {
+  max-width: 800px;
+  margin-top:30px;
 }
 
 .panel-body {
@@ -131,4 +150,24 @@
 
 #table-body > tr > td {
   vertical-align: middle;
+}
+
+
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 52px;
+    left:0;
+    height:100%;
+    width: 300px;
+    background-color:#f7f7f7;
+  }
+
+  .app-container {
+    position: fixed;
+    top: 52px;
+    left: 300px;
+    max-width: 1200px;
+    margin-left: 30px;
+  }
 }
