@@ -38,9 +38,9 @@ app.config(['$locationProvider', '$routeProvider',
 
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
 
-      if (location.protocol != 'https:') {
-        location.href = 'https:' + window.location.href.substring(
-                                     window.location.protocol.length);
+      if ($location.protocol != 'https:') {
+        $location.href = 'https:' + $location.href.substring(
+                                     $location.protocol.length);
       }
 
       if (!global.auth.isLoggedIn() &&
@@ -280,9 +280,9 @@ app.component('searchView', {
 app.component('loginView', {
   templateUrl: '/views/login.html',
   controller: function LoginController($location, api, global) {
-    if (location.protocol != 'https:') {
-      location.href = 'https:' + window.location.href.substring(
-                                   window.location.protocol.length);
+    if ($location.protocol != 'https:') {
+      $location.href = 'https:' + $location.href.substring(
+                                   $location.protocol.length);
     }
     var ctrl = this;
 
