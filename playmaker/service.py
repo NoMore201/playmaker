@@ -64,7 +64,7 @@ class Play(object):
                                  stderr.decode('utf-8'))
                 sys.exit(1)
         # ensure all folder and files are setup
-        p = Popen([self.fdroid_exe, 'update', '--create-key', 'v'], stdout=PIPE, stderr=PIPE)
+        p = Popen([self.fdroid_exe, 'update', '--create-key', '-v'], stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if p.returncode != 0:
             sys.stderr.write("error initializing fdroid repository " +
