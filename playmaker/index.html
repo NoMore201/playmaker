@@ -11,7 +11,7 @@
     <link href="/static/app.css" rel="stylesheet">
   </head>
   <body>
-    <div ng-controller="navbar" class="navbar navbar-default">
+    <div ng-controller="navbar" class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div id="notification-panel" ng-controller="notify">
+    <div class="notification-panel" ng-controller="notify">
       <script type="text/ng-template" id="alert.html">
         <div ng-transclude></div>
       </script>

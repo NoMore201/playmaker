@@ -2,7 +2,15 @@
  * index.html
  */
 
-#notification-panel {
+.container {
+  margin-top: 51px;
+}
+
+.navbar-fixed-top {
+  top:0;
+}
+
+.notification-panel {
   position: fixed;
   right: 30px;
   top: 75px;
@@ -15,8 +23,8 @@
  */
 
 #login-body {
-  max-width: 500px;
   margin:0 auto;
+  max-width: 500px;
 }
 
 
@@ -24,16 +32,16 @@
  * Apps view
  */
 
-#app-message {
-  min-width: 250px;
-  margin: 0 auto;
+.app-message {
   color: #888888;
   font-size: 30px;
+  margin: 0 auto;
+  min-width: 250px;
 }
 
 .sidebar {
   margin: 0 auto;
-  padding-top: 30px;
+  margin-top: 71px;
   width: 300px;
 }
 
@@ -43,12 +51,13 @@
 }
 
 .sidebar-list-el {
+  align-items: center;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding:15px;
   height:50px;
+  justify-content: space-between;
+  padding-left:15px;
+  padding-right:15px;
 }
 
 .app-container {
@@ -56,21 +65,20 @@
 }
 
 .panel-body {
+  align-items: center;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: left;
-  align-items: center;
   overflow: hidden;
   white-space: nowrap;
 }
 
 .apk-item-title {
   display: block;
-  white-space: nowrap;
-  margin-top:10px;
-  margin-bottom: 12px;
   font-size: 22px;
+  margin-bottom: 12px;
+  margin-top:10px;
+  white-space: nowrap;
 }
 
 .apk-info {
@@ -78,9 +86,9 @@
 }
 
 .apk-buttons {
-  width:100%;
-  text-align:right;
+  display: block;
   padding:15px;
+  text-align:right;
 }
 
 .apk-buttons > a {
@@ -152,21 +160,20 @@
 
 @media (min-width: 768px) {
   .sidebar {
-    position: fixed;
-    top: 52px;
-    left:0;
-    height:100%;
-    width: 300px;
     background-color:#f7f7f7;
+    bottom:0;
+    left:0;
+    margin:0;
+    padding-top:30px;
+    position: fixed;
+    top: 51px;
+    width: 300px;
   }
 
   .app-container {
-    position: fixed;
-    top: 52px;
-    left: 300px;
+    margin-left:300px;
+    margin-top: 81px;
     max-width: 1200px;
-    height:90%;
     overflow: auto;
-    margin-left: 30px;
   }
 }
