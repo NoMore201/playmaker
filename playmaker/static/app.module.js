@@ -16,47 +16,59 @@ app.config(['$locationProvider', '$routeProvider',
       when('/login', {
         template: '<login-view></login-view>'
       }).
+      when('/enforce', {
+        template: '<enforce-view></enforce-view>'
+      }).
       otherwise('/');
   }
 
 ]).run(['$rootScope', '$location', '$http', 'global',
   function ($rootScope, $location, $http, global) {
-
-    $http({
-      method: 'GET',
-      url: '/api/apps'
-    }).then(function success(response) {
-        if (response.data.status === 'UNAUTHORIZED') {
-          $location.path('/login');
-        }
-        else {
-          global.auth.login();
-          $location.path('/');
-        }
-      }, function error(response) {
+    if ($location.protocol() !== 'https') {
+      $rootScope.$apply(function () {
+        $location.path('/enforce');
       });
+    } else {
+      $http({
+        method: 'GET',
+        url: '/api/apps'
+      }).then(function success(response) {
+          if (response.data.message.status === 'UNAUTHORIZED') {
+            $location.path('/login');
+          }
+          else {
+            global.auth.login();
+            $location.path('/');
+          }
+        }, function error(response) {
+        });
+    }
 
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
-
-      if ($location.protocol != 'https:') {
-        $location.href = 'https:' + $location.href.substring(
-                                     $location.protocol.length);
-      }
-
-      if (!global.auth.isLoggedIn() &&
-          $location.path() !== '/login') {
+      if ($location.protocol() !== 'https') {
         event.preventDefault();
-        $location.path('/login');
-      } else if (global.auth.isLoggedIn() &&
-                 $location.path() === '/login') {
-        // redirect home
-        event.preventDefault();
-        $location.path('/');
+        $location.path('/enforce');
+      } else {
+        if (!global.auth.isLoggedIn() &&
+            $location.path() !== '/login') {
+          event.preventDefault();
+          $location.path('/login');
+        } else if (global.auth.isLoggedIn() &&
+                   $location.path() === '/login') {
+          // redirect home
+          event.preventDefault();
+          $location.path('/');
+        }
       }
-
     });
-}]);
+  }
+]);
 
+app.component('enforceView', {
+  templateUrl: '/views/error.html',
+  controller: function EnforceController() {
+  }
+});
 
 app.component('appList', {
   templateUrl: '/views/app.html',
@@ -280,10 +292,6 @@ app.component('searchView', {
 app.component('loginView', {
   templateUrl: '/views/login.html',
   controller: function LoginController($location, api, global) {
-    if ($location.protocol != 'https:') {
-      $location.href = 'https:' + $location.href.substring(
-                                   $location.protocol.length);
-    }
     var ctrl = this;
 
     ctrl.loggingIn = false;
@@ -320,6 +328,6 @@ app.component('loginView', {
         $location.path('/');
         ctrl.loggingIn = false;
       });
-    }
+    };
   }
 });
