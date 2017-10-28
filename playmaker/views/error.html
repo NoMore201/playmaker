@@ -1,3 +1,17 @@
 <div class="container">
-  <h2>You need to setup https</h2>
+  <h2>Https needed</h2>
+  <p>In order to secure communications between client and server, playmaker will not work without it.
+  You have two options:
+  </p>
+  <ul>
+    <li>Use your own certificate (or generate self-signed certiciate using openssl)</li><br>
+    <pre>
+# mkdir certs
+# openssl req \
+    -newkey rsa:2048 -nodes -keyout certs/playmaker.key \
+    -x509 -days 365 -out certs/playmaker.crt
+# pm-server --debug --fdroid</pre>
+    <li>Setup playmaker behind an https proxy like nginx, and run it without https support</li><br>
+    <pre># playmaker --debug --fdroid --no-https</pre>
+  </ul>
 </div>
