@@ -42,7 +42,7 @@ repository.
 or run it behind an https proxy like nginx, and run it without https support
 
 ```
-# playmaker --debug --fdroid --no-https
+# pm-server --debug --fdroid --no-https
 ```
 
 Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image. You can build the Dockerfile in this repo and run it, or use a pre-built image on docker hub:
