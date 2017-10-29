@@ -1,17 +1,29 @@
 <div class="container">
-  <h2>Https needed</h2>
-  <p>In order to secure communications between client and server, playmaker will not work without it.
-  You have two options:
-  </p>
-  <ul>
-    <li>Use your own certificate (or generate self-signed certiciate using openssl)</li><br>
-    <pre>
-# mkdir certs
+  <h1>Https needed</h1>
+  <p> Playmaker needs https to avoid MITM attacks while sending google credentials to the server. While it may sound strange,
+  remember that the login process to google services is done server-side, so the client <strong>must</strong> send unencrypted
+  credentials to the server. The only way to protect this communication is through HTTPS.</p>
+  <h2>Getting certificates</h2>
+  <p>If you are deploying playmaker for personal use, consider getting a certificate through <a href="https://letsencrypt.org/">Letsencrypt</a>.</p>
+  <p>If you're testing in your local environment, you can also generate a self-signed one using openssl</p><br>
+  <pre>
 # openssl req \
     -newkey rsa:2048 -nodes -keyout certs/playmaker.key \
-    -x509 -days 365 -out certs/playmaker.crt
+    -x509 -days 365 -out certs/playmaker.crt</pre>
+  <h2>Setting up https</h2>
+  <p>Once you have certificates, there are two ways to setup playmaker with https support.
+  The <strong>recommended</strong> way is to setup a nginx proxy with your certificate, and run playmaker behind that proxy with the <code>--no-https</code> flag.
+  <p>You can follow <a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04">this guide</a> to setup nginx</p>
+  <p>Otherwise you can add your certificates in a folder named <code>certs</code> and run playmaker normally</p>
+  <pre>
+# cd /srv/playmaker
+# mkdir certs
+# cp [cert_dir]/my.crt ./certs/playmaker.crt
+# cp [cert_dir]/my.key ./certs/playmaker.key
 # pm-server --debug --fdroid</pre>
-    <li>Setup playmaker behind an https proxy like nginx, and run it without https support</li><br>
-    <pre># pm-server --debug --fdroid --no-https</pre>
-  </ul>
+  <br>
+  <form>
+    <input type="checkbox" ng-model="cb.value"> <strong>I understand the risk, please let me use HTTP</strong>
+    <button type="button" class="btn btn-primary" ng-click="$ctrl.acceptEula(cb)">Submit</button>
+  </form>
 </div>

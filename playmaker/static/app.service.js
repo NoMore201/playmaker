@@ -6,17 +6,19 @@ angular.module('playmaker').service('global', ['$http', function($http) {
 
     this.isLoggedIn = function () {
       return this.loggedIn;
-    }
+    };
 
     this.login = function () {
       this.loggedIn = !this.loggedIn;
-    }
+    };
   }
 
   this.addAlert = {};
 
   this.desktop = false;
   this.mobile = false;
+
+  this.forceHttp = false;
 
   this.auth = new AuthManager();
 

@@ -24,7 +24,8 @@ app.config(['$locationProvider', '$routeProvider',
 
 ]).run(['$rootScope', '$location', '$http', 'global',
   function ($rootScope, $location, $http, global) {
-    if ($location.protocol() !== 'https') {
+    if ($location.protocol() !== 'https' &&
+        !global.forceHttp) {
       $rootScope.$apply(function () {
         $location.path('/enforce');
       });
@@ -45,7 +46,8 @@ app.config(['$locationProvider', '$routeProvider',
     }
 
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
-      if ($location.protocol() !== 'https') {
+      if ($location.protocol() !== 'https' &&
+          !global.forceHttp) {
         event.preventDefault();
         $location.path('/enforce');
       } else {
@@ -66,7 +68,16 @@ app.config(['$locationProvider', '$routeProvider',
 
 app.component('enforceView', {
   templateUrl: '/views/error.html',
-  controller: function EnforceController() {
+  controller: function EnforceController($location, global) {
+    var ctrl = this;
+
+    ctrl.acceptEula = function(checkbox) {
+      if (checkbox === undefined || !checkbox.value) {
+        return;
+      }
+      global.forceHttp = true;
+      $location.path('/login');
+    };
   }
 });
 
