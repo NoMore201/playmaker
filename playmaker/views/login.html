@@ -2,8 +2,9 @@
   <form>
     <div id="login-body">
       <h2>First time initialization</h2>
-      <p>In order to initalize the server, you need to enter your google credentials. They are encrypted using AES256, and after the initalization
-      they are discarded by the server, since it will retrieve android ID and token needed to perform requests.</p>
+      <p>In order to initalize the server, you need to enter your google credentials. They are sent to the server, which will
+      perform the login procedure and fetch an authorization token, and then they are discarded. To secure communucation between client and server you
+      should configure playmaker with https, like explained <a href="https://github.com/NoMore201/playmaker#usage">here</a></p>
       <div class="form-group">
         <label for="emailInput">Email address</label>
         <input type="text" class="form-control" id="emailInput" placeholder="Email" ng-model="user.email" uib-tooltip="Enter a valid username (with or without '@gmail.com')" tooltip-enable="$ctrl.badUsername" tooltip-placement="top" tooltip-is-open="$ctrl.badUsername" ng-disabled="$ctrl.loggingIn">
