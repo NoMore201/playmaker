@@ -287,6 +287,9 @@ app.component('searchView', {
     };
 
     ctrl.download = function(app) {
+      if (app.dled) {
+        return;
+      }
       app.dling = true;
       api.download(app.docId, function(data) {
         if (data === 'err') {
