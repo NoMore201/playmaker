@@ -24,45 +24,51 @@ app.config(['$locationProvider', '$routeProvider',
 
 ]).run(['$rootScope', '$location', '$http', 'global',
   function ($rootScope, $location, $http, global) {
-    if ($location.protocol() !== 'https' &&
-        !global.forceHttp) {
-      $rootScope.$apply(function () {
-        $location.path('/enforce');
-      });
-    } else {
-      $http({
+
+    $http({
         method: 'GET',
         url: '/api/apps'
-      }).then(function success(response) {
-          if (response.data.message.status === 'UNAUTHORIZED') {
-            $location.path('/login');
-          }
-          else {
-            global.auth.login();
-            $location.path('/');
-          }
-        }, function error(response) {
-        });
-    }
+      })
+      .then(function success(response) {
+        if (response.data.status === 'SUCCESS') {
+          global.auth.login();
+          return 'ok';
+        }
+        return 'err';
+      }, function error(response) {
+        return 'err';
+      })
+      .then(function(val) {
 
-    $rootScope.$on('$routeChangeStart', function (event, next, current) {
-      if ($location.protocol() !== 'https' &&
-          !global.forceHttp) {
-        event.preventDefault();
-        $location.path('/enforce');
-      } else {
-        if (!global.auth.isLoggedIn() &&
-            $location.path() !== '/login') {
-          event.preventDefault();
+        if ($location.protocol() !== 'https' &&
+            !global.forceHttp) {
+          $location.path('/enforce');
+        } else if (val === 'err') {
           $location.path('/login');
-        } else if (global.auth.isLoggedIn() &&
-                   $location.path() === '/login') {
+        } else if (val === 'ok') {
           // redirect home
-          event.preventDefault();
           $location.path('/');
         }
-      }
-    });
+
+
+        $rootScope.$on('$routeChangeStart', function (event, next, current) {
+            if ($location.protocol() !== 'https' &&
+              !global.forceHttp) {
+            $location.path('/enforce');
+          } else if (!global.auth.isLoggedIn() &&
+                     $location.path() !== '/login') {
+            event.preventDefault();
+            $location.path('/login');
+          } else if (global.auth.isLoggedIn() &&
+                     $location.path() === '/login') {
+            // redirect home
+            event.preventDefault();
+            $location.path('/');
+          }
+        });
+
+      });
+
   }
 ]);
 
