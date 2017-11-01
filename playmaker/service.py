@@ -205,13 +205,14 @@ class Play(object):
             return {'status': 'UNAUTHORIZED'}
         try:
             apps = self.service.bulkDetails(apksList)
-            if any([a['versionCode'] == 0 for a in apps]):
-                self.login()
-                apps = self.service.bulkDetails(apksList)
         except RequestError as e:
             print(e)
             return {'status': 'ERROR',
                     'message': SESSION_EXPIRED_ERR}
+        except LoginError as e:
+            print(e)
+            self.login()
+            apps = self.service.bulkDetails(apksList)
         return apps
 
     def download_selection(self, appNames):
