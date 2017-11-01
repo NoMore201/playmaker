@@ -22,53 +22,40 @@ app.config(['$locationProvider', '$routeProvider',
       otherwise('/');
   }
 
-]).run(['$rootScope', '$location', '$http', 'global',
-  function ($rootScope, $location, $http, global) {
+]).run(['$rootScope', '$location', 'api', 'global',
+  function ($rootScope, $location, api, global) {
 
-    $http({
-        method: 'GET',
-        url: '/api/apps'
-      })
-      .then(function success(response) {
-        if (response.data.status === 'SUCCESS') {
-          global.auth.login();
-          return 'ok';
-        }
-        return 'err';
-      }, function error(response) {
-        return 'err';
-      })
-      .then(function(val) {
+    api.getApps(function(response) {
+      if (response.status === 'SUCCESS') {
+        global.auth.login();
+      }
 
-        if ($location.protocol() !== 'https' &&
+      if ($location.protocol() !== 'https' &&
             !global.forceHttp) {
           $location.path('/enforce');
-        } else if (val === 'err') {
+      } else if (response === 'err') {
           $location.path('/login');
-        } else if (val === 'ok') {
+      } else {
+        // redirect home
+        $location.path('/');
+      }
+
+      $rootScope.$on('$routeChangeStart', function (event, next, current) {
+          if ($location.protocol() !== 'https' &&
+            !global.forceHttp) {
+          $location.path('/enforce');
+        } else if (!global.auth.isLoggedIn() &&
+                   $location.path() !== '/login') {
+          event.preventDefault();
+          $location.path('/login');
+        } else if (global.auth.isLoggedIn() &&
+                   $location.path() === '/login') {
           // redirect home
+          event.preventDefault();
           $location.path('/');
         }
-
-
-        $rootScope.$on('$routeChangeStart', function (event, next, current) {
-            if ($location.protocol() !== 'https' &&
-              !global.forceHttp) {
-            $location.path('/enforce');
-          } else if (!global.auth.isLoggedIn() &&
-                     $location.path() !== '/login') {
-            event.preventDefault();
-            $location.path('/login');
-          } else if (global.auth.isLoggedIn() &&
-                     $location.path() === '/login') {
-            // redirect home
-            event.preventDefault();
-            $location.path('/');
-          }
-        });
-
       });
-
+    });
   }
 ]);
 
@@ -119,13 +106,6 @@ app.component('appList', {
             ctrl.apps[oldAppIndex].needsUpdate = true;
           });
         }
-      });
-    };
-
-    ctrl.downloadApp = function(app) {
-      api.download(app.docId, function(data) {
-        //TODO: error handling
-        if (data.message.success.length === 0) return;
       });
     };
 
@@ -193,28 +173,23 @@ app.component('appList', {
         return;
       }
       ctrl.updatingState = false;
-      var apps = data.message;
-      apps.forEach(function(a) {
-        if (ctrl.mobile && a.title.length > 21) {
-          a.title = a.title.substring(0, 22) + '...';
-        }
-        roundedStars = Math.round(a.aggregateRating.starRating);
+      ctrl.apps = data.message.map(function(a) {
+        roundedStars = Math.floor(a.aggregateRating.starRating);
         a.formattedStars = a.aggregateRating.starRating.toFixed(1);
-        var starList = [];
+        a.starList = [];
         for (i = 0; i < 5; i++) {
           if (i+1 <= roundedStars){
-            starList.push({index: i, full: true});
+            a.starList.push({index: i, full: true});
           } else {
-            starList.push({index: i, full: false});
+            a.starList.push({index: i, full: false});
           }
         }
-        a.starList = starList;
         a.formattedSize = a.installationSize / (1024*1024);
         a.formattedSize = a.formattedSize.toFixed(2);
         a.updating = false;
         a.needsUpdate = false;
+        return a;
       });
-      ctrl.apps = apps;
     });
 
     api.fdroid(function(data) {
@@ -278,8 +253,8 @@ app.component('searchView', {
           return;
         }
         data.message.forEach(function(d) {
-          d.dling = false;
-          d.dled = false;
+          d.downloading = false;
+          d.disabled = false;
         });
         ctrl.results = data.message;
         ctrl.searching = false;
@@ -287,23 +262,25 @@ app.component('searchView', {
     };
 
     ctrl.download = function(app) {
-      if (app.dled) {
+      if (app.disabled) {
         return;
       }
-      app.dling = true;
+      app.downloading = true;
       api.download(app.docId, function(data) {
         if (data === 'err') {
-          app.dling = false;
+          app.downloading = false;
           global.addAlert('danger', 'Error downloading app');
           return;
         }
-        if (data.status === 'SUCCESS' && data.message.success.length === 0) {
-          app.dling = false;
-          global.addAlert('warning', 'Cannot download ' + app.docId);
-          return;
+        if (data.status === 'SUCCESS') {
+          if (data.message.success.length === 0) {
+            app.downloading = false;
+            global.addAlert(app.docId + ' can\'t be downloaded');
+            return;
+          }
         }
-        app.dling = false;
-        app.dled = true;
+        app.downloading = false;
+        app.disabled = true;
       });
     };
   }
