@@ -33,7 +33,7 @@ app.config(['$locationProvider', '$routeProvider',
       if ($location.protocol() !== 'https' &&
             !global.forceHttp) {
           $location.path('/enforce');
-      } else if (response === 'err') {
+      } else if (response === 'err' || !global.auth.isLoggedIn()) {
           $location.path('/login');
       } else {
         // redirect home
