@@ -25,9 +25,9 @@
       <tbody id="table-body">
         <tr ng-repeat="app in $ctrl.results">
           <td id="dl-button-td">
-            <a ng-class="{'dl-button-disabled': app.dled, 'dl-button': !app.dled}">
-              <i ng-click="$ctrl.download(app)" ng-hide="app.dling" class="fa fa-download fa-2x" aria-hidden="true"></i>
-              <i ng-hide="!app.dling" class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
+            <a ng-class="{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
+              <i ng-click="$ctrl.download(app)" ng-hide="app.downloading" class="fa fa-download fa-2x" aria-hidden="true"></i>
+              <i ng-hide="!app.downloading" class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
             </a>
           </td>
           <td>{{app.title}}</td>
@@ -67,9 +67,9 @@
         <tr ng-repeat="app in $ctrl.results">
 
           <td id="dl-button-td">
-            <a ng-class="{'dl-button-disabled': app.dled, 'dl-button': !app.dled}">
-              <i ng-click="$ctrl.download(app)" ng-hide="app.dling" class="fa fa-download fa-2x" aria-hidden="true"></i>
-              <i ng-hide="!app.dling" class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
+            <a ng-class="{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
+              <i ng-click="$ctrl.download(app)" ng-hide="app.downloading" class="fa fa-download fa-2x" aria-hidden="true"></i>
+              <i ng-hide="!app.downloading" class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
             </a>
           </td>
           <td>{{app.title}}</td>
