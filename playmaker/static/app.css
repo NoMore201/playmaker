@@ -27,6 +27,16 @@
   max-width: 500px;
 }
 
+.loading-login {
+  max-width: 500px;
+  margin: 0 auto;
+  margin-top: 50px;
+}
+
+.loading-login-text {
+  font-size: 24px;
+  margin: 10px auto;
+}
 
 /*
  * Apps view

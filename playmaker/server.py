@@ -7,7 +7,6 @@ from tornado.web import MissingArgumentError
 from concurrent.futures import ThreadPoolExecutor
 
 
-MAX_WORKERS = 4
 app_dir = os.path.dirname(os.path.realpath(__file__))
 static_dir = os.path.join(app_dir, 'static')
 fdroid_instance = {}
@@ -21,7 +20,7 @@ def createServer(service):
                 self.write(f.read())
 
     class ApiHandler(web.RequestHandler):
-        executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+        executor = ThreadPoolExecutor()
 
         @run_on_executor
         def get_apps(self):
@@ -55,9 +54,8 @@ def createServer(service):
         def check(self):
             return service.check_local_apks()
 
-        @run_on_executor
         def update_state(self):
-            service.update_state()
+            service.update_state(self.executor)
 
         @run_on_executor
         def remove_app(self, app):

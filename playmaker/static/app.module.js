@@ -80,7 +80,6 @@ app.component('appList', {
     var ctrl = this;
 
     ctrl.apps = [];
-    ctrl.updatingState = false;
     ctrl.lastFdroidUpdate = 'None';
     ctrl.desktop = global.desktop;
     ctrl.mobile = global.mobile;
@@ -165,14 +164,9 @@ app.component('appList', {
     };
 
     api.getApps(function(data) {
-      if (data.status === 'PENDING') {
-        ctrl.updatingState = true;
-        return;
-      }
       if (data.status === 'UNAUTHORIZED') {
         return;
       }
-      ctrl.updatingState = false;
       ctrl.apps = data.message.map(function(a) {
         roundedStars = Math.floor(a.aggregateRating.starRating);
         a.formattedStars = a.aggregateRating.starRating.toFixed(1);

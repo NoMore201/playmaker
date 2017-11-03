@@ -5,6 +5,7 @@ from subprocess import Popen, PIPE
 import base64
 import os
 import sys
+import concurrent.futures
 from datetime import datetime as dt
 
 NOT_LOGGED_IN_ERR = 'Not logged in'
@@ -115,14 +116,13 @@ class Play(object):
                 self.service.login(self._email,
                                    self._passwd,
                                    None, None)
-                self.loggedIn = True
             else:
                 # otherwise we need only to refresh auth token
                 encrypted = self.service.encrypt_password(self._email,
                                                           self._passwd).decode('utf-8')
                 self.service.getAuthSubToken(self._email,
                                              encrypted)
-                self.loggedIn = True
+            self.loggedIn = True
             return {'status': 'SUCCESS', 'message': 'OK'}
         except LoginError as e:
             print('Wrong credentials: {0}'.format(e))
@@ -135,31 +135,32 @@ class Play(object):
             return {'status': 'ERROR',
                     'message': 'Request error, probably invalid token'}
 
-    def _get_details_from_apk(self, details):
-        filepath = os.path.join(self.download_path,
-                                details['docId'] + '.apk')
-        a = APK(filepath)
-        details['versionCode'] = int(a.version_code)
-        return details
 
-    def _fetch_details_for_local_apps(self):
+    def update_state(self, executor):
+        def get_details_from_apk(appDetails):
+            filepath = os.path.join(self.download_path,
+                                    appDetails['docId'] + '.apk')
+            a = APK(filepath)
+            appDetails['versionCode'] = int(a.version_code)
+            if self.debug:
+                print('Added %s to cache' % appDetails['docId'])
+            return appDetails
+
+        print('Updating cache')
         # get application ids from apk files
         appList = [os.path.splitext(apk)[0]
                    for apk in os.listdir(self.download_path)
                    if os.path.splitext(apk)[1] == '.apk']
-        toReturn = []
-        if len(appList) > 0:
-            details = self.get_bulk_details(appList)
-            for app in details:
-                local_app = self._get_details_from_apk(app)
-                toReturn.append(local_app)
-                if self.debug:
-                    print('Added %s to cache' % app['docId'])
-        return toReturn
-
-    def update_state(self):
-        print('Updating cache')
-        self.currentSet = self._fetch_details_for_local_apps()
+        detailsList = self.service.bulkDetails(appList)
+        future_to_app = {executor.submit(get_details_from_apk, d): d for d in detailsList}
+        for future in concurrent.futures.as_completed(future_to_app):
+            try:
+                data = future.result()
+                print(data)
+            except Exception as e:
+                print(e)
+                data = None
+            self.currentSet.append(data)
         self.firstRun = False
 
     def insert_app_into_state(self, newApp):
