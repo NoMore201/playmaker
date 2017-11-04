@@ -156,7 +156,6 @@ class Play(object):
         for future in concurrent.futures.as_completed(future_to_app):
             try:
                 data = future.result()
-                print(data)
             except Exception as e:
                 print(e)
                 data = None
