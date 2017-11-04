@@ -18,6 +18,13 @@ def makeError(message):
     return {'status': 'ERROR',
             'message': message}
 
+def get_details_from_apk(appDetails, downloadPath):
+    filepath = os.path.join(downloadPath,
+                            appDetails['docId'] + '.apk')
+    a = APK(filepath)
+    appDetails['versionCode'] = int(a.version_code)
+    print('Added %s to cache' % appDetails['docId'])
+    return appDetails
 
 class Play(object):
     def __init__(self, debug=True, fdroid=False):
@@ -136,30 +143,21 @@ class Play(object):
                     'message': 'Request error, probably invalid token'}
 
 
-    def update_state(self, executor):
-        def get_details_from_apk(appDetails):
-            filepath = os.path.join(self.download_path,
-                                    appDetails['docId'] + '.apk')
-            a = APK(filepath)
-            appDetails['versionCode'] = int(a.version_code)
-            if self.debug:
-                print('Added %s to cache' % appDetails['docId'])
-            return appDetails
-
+    def update_state(self):
         print('Updating cache')
-        # get application ids from apk files
-        appList = [os.path.splitext(apk)[0]
-                   for apk in os.listdir(self.download_path)
-                   if os.path.splitext(apk)[1] == '.apk']
-        detailsList = self.service.bulkDetails(appList)
-        future_to_app = {executor.submit(get_details_from_apk, d): d for d in detailsList}
-        for future in concurrent.futures.as_completed(future_to_app):
-            try:
-                data = future.result()
-            except Exception as e:
-                print(e)
-                data = None
-            self.currentSet.append(data)
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            # get application ids from apk files
+            appList = [os.path.splitext(apk)[0]
+                       for apk in os.listdir(self.download_path)
+                       if os.path.splitext(apk)[1] == '.apk']
+            detailsList = self.service.bulkDetails(appList)
+            future_to_app = [executor.submit(get_details_from_apk,
+                                             d,
+                                             self.download_path)
+                             for d in detailsList]
+            for future in concurrent.futures.as_completed(future_to_app):
+                app = future.result()
+                self.currentSet.append(app)
         self.firstRun = False
 
     def insert_app_into_state(self, newApp):
@@ -190,12 +188,10 @@ class Play(object):
                     'message': SESSION_EXPIRED_ERR}
         except LoginError as e:
             print(SESSION_EXPIRED_ERR)
-            self.login()
-            return self.search(appName, numItems)
+            self.loggedIn = False
         except IndexError as e:
             print(SESSION_EXPIRED_ERR)
-            self.login()
-            return self.search(appName, numItems)
+            self.loggedIn = False
 
         return {'status': 'SUCCESS',
                 'message': apps}
@@ -211,8 +207,7 @@ class Play(object):
                     'message': SESSION_EXPIRED_ERR}
         except LoginError as e:
             print(e)
-            self.login()
-            apps = self.service.bulkDetails(apksList)
+            self.loggedIn = False
         return apps
 
     def download_selection(self, appNames):

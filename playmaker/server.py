@@ -55,7 +55,7 @@ def createServer(service):
             return service.check_local_apks()
 
         def update_state(self):
-            service.update_state(self.executor)
+            service.update_state()
 
         @run_on_executor
         def remove_app(self, app):
