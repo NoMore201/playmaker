@@ -19,11 +19,12 @@ def makeError(message):
             'message': message}
 
 def get_details_from_apk(appDetails, downloadPath):
-    filepath = os.path.join(downloadPath,
-                            appDetails['docId'] + '.apk')
-    a = APK(filepath)
-    appDetails['versionCode'] = int(a.version_code)
-    print('Added %s to cache' % appDetails['docId'])
+    if appDetails is not None:
+        filepath = os.path.join(downloadPath,
+                                appDetails['docId'] + '.apk')
+        a = APK(filepath)
+        appDetails['versionCode'] = int(a.version_code)
+        print('Added %s to cache' % appDetails['docId'])
     return appDetails
 
 class Play(object):
@@ -157,7 +158,8 @@ class Play(object):
                              for d in detailsList]
             for future in concurrent.futures.as_completed(future_to_app):
                 app = future.result()
-                self.currentSet.append(app)
+                if app is not None:
+                    self.currentSet.append(app)
         print('Cache correctly initialized')
         self.firstRun = False
 
