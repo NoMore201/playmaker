@@ -54,6 +54,7 @@ def createServer(service):
         def check(self):
             return service.check_local_apks()
 
+        @run_on_executor
         def update_state(self):
             service.update_state()
 

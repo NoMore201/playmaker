@@ -289,6 +289,25 @@ app.component('loginView', {
     ctrl.badUsername = false;
     ctrl.badPassword = false;
 
+    setInterval(function() {
+      api.getApps(function(response) {
+        if (response === 'err') {
+          ctrl.loggingIn = false;
+          console.log('unable to contact server');
+        }
+        if (response.status === 'PENDING' ||
+            response.status === 'UNAUTHORIZED') {
+          return;
+        }
+        if (response.status === 'SUCCESS') {
+          global.auth.login();
+          $location.path('/');
+          ctrl.loggingIn = false;
+        }
+      });
+    }, 5000);
+
+
     ctrl.login = function(user) {
       ctrl.badUsername = false;
       ctrl.badPassword = false;
@@ -304,7 +323,6 @@ app.component('loginView', {
       }
 
       ctrl.loggingIn = true;
-
       var email = CryptoJS.enc.Utf8.parse(user.email);
       var passwd = CryptoJS.enc.Utf8.parse(user.password);
       var emailB64 = CryptoJS.enc.Base64.stringify(email);
@@ -315,9 +333,6 @@ app.component('loginView', {
           ctrl.loggingIn = false;
           return;
         }
-        global.auth.login();
-        $location.path('/');
-        ctrl.loggingIn = false;
       });
     };
   }
