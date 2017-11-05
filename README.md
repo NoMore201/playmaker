@@ -6,10 +6,6 @@
 
 * [Description & Features](#desc)
 * [Usage](#usage)
-* [TODOs](#todos)
-  * [Backend](#todos-backend)
-  * [Frontend](#todos-frontend)
-  * [Dockerfile](#todos-docker)
 
 <a name="desc"/>
 
@@ -76,38 +72,3 @@ optional arguments:
   -d, --debug   Enable debug output
   -n, --no-https  Disable HTTPS server
 ```
-
-<a name="todos"/>
-
-## TODOs
-
-<a name="todos-backend"/>
-
-### Backend
-
-- [ ] Auto-update apks
-- [ ] System settings (fdroid, auto-update, etc.)
-- [x] Switch to an async webserver
-- [x] fdroid integration
-
-<a name="todos-frontend"/>
-
-### Frontend
-
-- [ ] Add more information for apps
-- [ ] Better error handling
-- [ ] Fdroid repo configuration page
-- [ ] Add placeholder when there aren't local apps
-- [x] Switch to angular (less code, one page app)
-- [x] Integrate both Apps and Search views in a single page
-- [x] *Check* and *Fdroid update* buttons need some visual feedback while executing
-- [x] Add some kind of notification
-- [x] Make notifications disappear after some seconds
-- [x] gplay.js: populate collection manually (no fetch)
-
-<a name="todos-docker"/>
-
-### Dockerfile
-
-- [ ] Try to make image a bit smaller
-- [x] Update Android SDK to Android 6.0+
