@@ -284,20 +284,17 @@ app.component('loginView', {
   templateUrl: '/views/login.html',
   controller: function LoginController($location, api, global) {
     var ctrl = this;
-
-    ctrl.loggingIn = false;
-    ctrl.badUsername = false;
-    ctrl.badPassword = false;
-
-    setInterval(function() {
+    var polling = function() {
       api.getApps(function(response) {
         if (response === 'err') {
           ctrl.loggingIn = false;
           console.log('unable to contact server');
         }
-        if (response.status === 'PENDING' ||
-            response.status === 'UNAUTHORIZED') {
+        if (response.status === 'UNAUTHORIZED') {
           return;
+        }
+        if (response.status === 'PENDING') {
+          ctrl.loggingIn = true;
         }
         if (response.status === 'SUCCESS') {
           global.auth.login();
@@ -305,7 +302,13 @@ app.component('loginView', {
           ctrl.loggingIn = false;
         }
       });
-    }, 5000);
+    };
+    ctrl.loggingIn = false;
+    ctrl.badUsername = false;
+    ctrl.badPassword = false;
+
+    polling();
+    setInterval(polling, 5000);
 
 
     ctrl.login = function(user) {
