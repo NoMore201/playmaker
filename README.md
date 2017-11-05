@@ -29,38 +29,41 @@ repository.
 
 ## Usage
 
-**REQUIRED** Playmaker needs HTTPS to run, since it needs to send base64 encoded google credentials to the server, to avoid mitm attacks. You can either provide your own certs
+###Requirements
+
+Playmaker needs HTTPS to run, since it needs to send base64 encoded google credentials to the server,
+to avoid mitm attacks. You can either use you own certs, placing them in a `certs` subfolder
 
 ```
+# cd /srv/playmaker
 # mkdir certs
-# openssl req \
-    -newkey rsa:2048 -nodes -keyout certs/playmaker.key \
-    -x509 -days 365 -out certs/playmaker.crt
+# cp [cert_dir]/my.crt ./certs/playmaker.crt
+# cp [cert_dir]/my.key ./certs/playmaker.key
 # pm-server --debug --fdroid
 ```
 
-or run it behind an https proxy like nginx, and run it without https support
+or run it behind an https proxy like nginx, disabling playmaker's https support
 
 ```
 # pm-server --debug --fdroid --no-https
 ```
 
-Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image. You can build the Dockerfile in this repo and run it, or use a pre-built image on docker hub:
+On first launch, playmaker will ask your for your google credentials. To avoid problems, or captcha requests
+it's recommended to setup app specific password, and securing your account with 2-factor auth.
+
+### Docker image
+
+Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image. You can use a pre-built image on docker hub:
 
 ```
 docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
 
-On first launch, playmaker will ask your for your google credentials. They will be used by the server for first time setup, and then discarded, because auth token is needed to process requests.
-It is also possible to use app specific password, in case the google account is secured with 2factor auth:
+or use the available `Dockerfile` if you want to build it by yourself.
 
-```
-# parts inside square brackets are not mandatory
-email = <google_user>[@gmail.com]
-password = <google_password> | <app specific_password>
-```
+### Virtualenv
 
-If you want to run it in a virtualenv rather than using docker, remember that you need to build googleplay-api, fdroidserver and setup the android SDK (see the Dockerfile as a reference).
+If you want to run it in a virtualenv rather than using docker, remember that you need to build fdroidserver and setup the android SDK (see the Dockerfile as a reference).
 
 ```
 usage: pm-server [-h] [-f] [-d]
