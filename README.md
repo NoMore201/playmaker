@@ -29,7 +29,7 @@ repository.
 
 ## Usage
 
-###Requirements
+### Requirements
 
 Playmaker needs HTTPS to run, since it needs to send base64 encoded google credentials to the server,
 to avoid mitm attacks. You can either use you own certs, placing them in a `certs` subfolder
