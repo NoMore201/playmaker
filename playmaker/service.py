@@ -22,7 +22,11 @@ def get_details_from_apk(appDetails, downloadPath):
     if appDetails is not None:
         filepath = os.path.join(downloadPath,
                                 appDetails['docId'] + '.apk')
-        a = APK(filepath)
+        try:
+            a = APK(filepath)
+        except Exception as e:
+            print(e)
+            return None
         appDetails['versionCode'] = int(a.version_code)
         print('Added %s to cache' % appDetails['docId'])
     return appDetails
