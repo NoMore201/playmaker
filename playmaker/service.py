@@ -158,6 +158,7 @@ class Play(object):
             for future in concurrent.futures.as_completed(future_to_app):
                 app = future.result()
                 self.currentSet.append(app)
+        print('Cache correctly initialized')
         self.firstRun = False
 
     def insert_app_into_state(self, newApp):

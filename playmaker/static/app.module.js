@@ -300,6 +300,7 @@ app.component('loginView', {
           global.auth.login();
           $location.path('/');
           ctrl.loggingIn = false;
+          clearInterval(interval);
         }
       });
     };
@@ -308,7 +309,7 @@ app.component('loginView', {
     ctrl.badPassword = false;
 
     polling();
-    setInterval(polling, 5000);
+    var interval = setInterval(polling, 5000);
 
 
     ctrl.login = function(user) {
@@ -332,8 +333,6 @@ app.component('loginView', {
       var passwdB64 = CryptoJS.enc.Base64.stringify(passwd);
       api.login(emailB64, passwdB64, function(data) {
         if (data.status === 'ERROR') {
-          global.addAlert('danger', data.message);
-          ctrl.loggingIn = false;
           return;
         }
       });
