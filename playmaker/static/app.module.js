@@ -76,13 +76,14 @@ app.component('enforceView', {
 
 app.component('appList', {
   templateUrl: '/views/app.html',
-  controller: function AppController(api, global) {
+  controller: function AppController(api, global, $location) {
     var ctrl = this;
 
     ctrl.apps = [];
     ctrl.lastFdroidUpdate = 'None';
     ctrl.desktop = global.desktop;
     ctrl.mobile = global.mobile;
+    ctrl.baseUrl = $location.protocol() + '://' + $location.host();
 
     ctrl.check = function() {
       global.addAlert('info', 'Checking for updates');
@@ -286,6 +287,7 @@ app.component('loginView', {
     var ctrl = this;
     ctrl.current = 0;
     ctrl.max = -1;
+    ctrl.formattedPercent = 0;
     var polling = function() {
       api.getApps(function(response) {
         if (response === 'err') {
@@ -300,6 +302,8 @@ app.component('loginView', {
           if (response.total !== 0) {
             ctrl.max = response.total;
             ctrl.current = response.current;
+            ctrl.formattedPercent = (ctrl.current / ctrl.max)*100;
+            ctrl.formattedPercent = ctrl.formattedPercent.toFixed(1);
           }
         }
         if (response.status === 'SUCCESS') {

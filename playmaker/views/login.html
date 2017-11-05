@@ -18,6 +18,6 @@
   </form>
   <div ng-hide="!$ctrl.loggingIn" class="row loading-login">
     <div class="loading-login-text">Loading apps into cache, please wait</div>
-    <uib-progressbar class="progress-striped active" max="$ctrl.max" value="$ctrl.current"><span style="color:white; white-space:nowrap;">{{($ctrl.current/$ctrl.max)*100}}%</span></uib-progressbar>
+    <uib-progressbar class="progress-striped active" max="$ctrl.max" value="$ctrl.current"><span style="color:white; white-space:nowrap;">{{$ctrl.formattedPercent}}%</span></uib-progressbar>
   </div>
 </div>
