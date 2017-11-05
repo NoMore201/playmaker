@@ -34,6 +34,7 @@ def get_details_from_apk(appDetails, downloadPath):
 class Play(object):
     def __init__(self, debug=True, fdroid=False):
         self.currentSet = []
+        self.totalNumOfApps = 0
         self.debug = debug
         self.fdroid = fdroid
         self.firstRun = True
@@ -113,7 +114,9 @@ class Play(object):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
         if self.firstRun:
-            return {'status': 'PENDING'}
+            return {'status': 'PENDING',
+                    'total': self.totalNumOfApps,
+                    'current': len(self.currentSet)}
         return {'status': 'SUCCESS',
                 'message': sorted(self.currentSet, key=lambda k: k['title'])}
 
@@ -155,6 +158,7 @@ class Play(object):
             appList = [os.path.splitext(apk)[0]
                        for apk in os.listdir(self.download_path)
                        if os.path.splitext(apk)[1] == '.apk']
+            self.totalNumOfApps = len(appList)
             detailsList = self.service.bulkDetails(appList)
             future_to_app = [executor.submit(get_details_from_apk,
                                              d,

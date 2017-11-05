@@ -284,6 +284,8 @@ app.component('loginView', {
   templateUrl: '/views/login.html',
   controller: function LoginController($location, api, global) {
     var ctrl = this;
+    ctrl.current = 0;
+    ctrl.max = -1;
     var polling = function() {
       api.getApps(function(response) {
         if (response === 'err') {
@@ -295,6 +297,10 @@ app.component('loginView', {
         }
         if (response.status === 'PENDING') {
           ctrl.loggingIn = true;
+          if (response.total !== 0) {
+            ctrl.max = response.total;
+            ctrl.current = response.current;
+          }
         }
         if (response.status === 'SUCCESS') {
           global.auth.login();
@@ -309,7 +315,7 @@ app.component('loginView', {
     ctrl.badPassword = false;
 
     polling();
-    var interval = setInterval(polling, 5000);
+    var interval = setInterval(polling, 3000);
 
 
     ctrl.login = function(user) {
