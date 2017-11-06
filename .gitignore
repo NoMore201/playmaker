@@ -3,6 +3,7 @@
 *.swp
 *.apk
 .tern-project
+.ycm_extra_conf.py
 
 dist/
 build/

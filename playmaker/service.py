@@ -18,6 +18,7 @@ def makeError(message):
     return {'status': 'ERROR',
             'message': message}
 
+
 def get_details_from_apk(appDetails, downloadPath):
     if appDetails is not None:
         filepath = os.path.join(downloadPath,
@@ -30,6 +31,7 @@ def get_details_from_apk(appDetails, downloadPath):
         appDetails['versionCode'] = int(a.version_code)
         print('Added %s to cache' % appDetails['docId'])
     return appDetails
+
 
 class Play(object):
     def __init__(self, debug=True, fdroid=False):
@@ -149,7 +151,6 @@ class Play(object):
             print(e)
             return {'status': 'ERROR',
                     'message': 'Request error, probably invalid token'}
-
 
     def update_state(self):
         print('Updating cache')
