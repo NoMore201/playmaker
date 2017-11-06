@@ -6,20 +6,21 @@
 
 * [Description & Features](#desc)
 * [Usage](#usage)
+* [Alternatives](#diff)
 
 <a name="desc"/>
 
 ## Description & Features
 
-Playmaker is a python3 apk manager with a web interface. The backend uses an up-to-date version of [googleplay-api](https://github.com/NoMore201/googleplay-api)
- including a lot of improvements, WebTornado for its non-blocking behaviour, while the frontend is built with angularjs and the bootstrap CSS framework.
+Playmaker is a fdroid repository manager, which lets you download/update apps from the play store using your google account
+and configure repository with app you download. After you setup the server, repository will be available at the address `http[s]://<playmaker_host>/fdroid`, and you can start downloading apps from play store.
 
 Features:
 * Download apks from google play store to your collection. Update them or delete if they are not needed anymore.
-* A fdroid repository is setup on first launch. You can update it manually, as you add/remove apks to your collection.
-* Thanks to the non-blocking UI, you can browse the collection or search for an app while the server is updating the fdroid
+* Manage the fdroid repository. You can update it manually, as you add/remove apks to your collection.
+* Non-blocking UI, you can browse the collection or search for an app while the server is updating the fdroid
 repository.
-* Responsive UI.
+* Responsive UI, usable also from a mobile device
 
 <a name="usage"/>
 
@@ -72,3 +73,16 @@ optional arguments:
   -d, --debug   Enable debug output
   -n, --no-https  Disable HTTPS server
 ```
+
+<a name="diff"/>
+
+## Alternatives
+
+### YalpStore
+
+[YalpStore](https://github.com/yeriomin/YalpStore) is an open source alternative to the play store. It works very well and it requires you to install only the app, but it requires one of the following thing to be able to install/update apks:
+
+- enable **Unknown Sources**
+- have **root** privileges
+
+While if you use playmaker and the fdroid [privileged extension](https://gitlab.com/fdroid/privileged-extension), fdroid will be able to install/update app without root privileges or enabling unknown sources.
