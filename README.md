@@ -31,24 +31,22 @@ repository.
 
 ### Requirements
 
-Playmaker needs HTTPS to run, since it needs to send base64 encoded google credentials to the server,
-to avoid mitm attacks. You can either use you own certs, placing them in a `certs` subfolder
+Playmaker requires HTTPS to avoid mitm attacks, since it needs to send base64 encoded google credentials to the server. You can use you own certs, placing them in a `certs` subfolder in the current working directory (or in the mounted volume if you are using docker image)
 
 ```
 # cd /srv/playmaker
 # mkdir certs
 # cp [cert_dir]/my.crt ./certs/playmaker.crt
 # cp [cert_dir]/my.key ./certs/playmaker.key
-# pm-server --debug --fdroid
 ```
 
-or run it behind an https proxy like nginx, disabling playmaker's https support
+If you are running playmaker behind an already configured HTTPS proxy like nginx, or if you want to locally start it without HTTPS, you need to disable built-in https support (docker image has disabled HTTPS support by default)
 
 ```
 # pm-server --debug --fdroid --no-https
 ```
 
-On first launch, playmaker will ask your for your google credentials. To avoid problems, or captcha requests
+On first launch, playmaker will ask your for your google credentials. To avoid authentication problems, like captcha requests,
 it's recommended to setup app specific password, and securing your account with 2-factor auth.
 
 ### Docker image
@@ -59,23 +57,13 @@ Since this app requires a lot of heavy dependencies, like Android SDK and fdroid
 docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
 ```
 
-or use the available `Dockerfile` if you want to build it by yourself.
+or use the available `Dockerfile` if you want to build it by yourself. Notice that the docker image is built by default with HTTPS support disabled, so if you need it change `Dockerfile` accordingly and place your certificate in the mounted volume like described above
 
 ### Virtualenv
 
-If you want to run it in a virtualenv rather than using docker, remember that you need to build fdroidserver and setup the android SDK (see the Dockerfile as a reference).
-
-```
-usage: pm-server [-h] [-f] [-d]
-
-Apk and fdroid repository manager with a web interface.
-
-optional arguments:
-  -h, --help    show this help message and exit
-  -f, --fdroid  Enable fdroid integration
-  -d, --debug   Enable debug output
-  -n, --no-https  Disable HTTPS server
-```
+If you want to run it in a virtualenv rather than using docker, remember that you need to install fdroidserver,
+android SDK and define the ANDROID_HOME env variable (see the Dockerfile as a reference).
+Instruction on how to install fdroidserver [here](https://f-droid.org/docs/Installing_the_Server_and_Repo_Tools/)
 
 <a name="diff"/>
 
