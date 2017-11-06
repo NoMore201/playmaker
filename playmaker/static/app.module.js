@@ -343,6 +343,7 @@ app.component('loginView', {
       var passwdB64 = CryptoJS.enc.Base64.stringify(passwd);
       api.login(emailB64, passwdB64, function(data) {
         if (data.status === 'ERROR') {
+          global.addAlert('danger', data.message);
           ctrl.loggingIn = false;
           return;
         }
