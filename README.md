@@ -1,6 +1,6 @@
 # Playmaker
 
-![screenshot](https://github.com/NoMore201/playmaker/raw/master/example1.png)
+![screenshot](https://github.com/NoMore201/playmaker/raw/master/example.png)
 
 ## Table of Content
 
