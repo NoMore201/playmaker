@@ -13,7 +13,10 @@
 ## Description & Features
 
 Playmaker is a fdroid repository manager, which lets you download/update apps from the play store using your google account
-and configure repository with app you download. After you setup the server, repository will be available at the address `http[s]://<playmaker_host>/fdroid`, and you can start downloading apps from play store.
+and configure repository with app you download. After you setup the server, repository will be available at the address 
+`http[s]://<playmaker_host>/fdroid`, and you can start downloading apps from play store.
+
+Server uses [googleplay-api](https://github.com/NoMore201/googleplay-api) library, which is the python equivalent of the Java [play-store-api](https://github.com/yeriomin/play-store-api) library used by YalpStore.
 
 Features:
 * Download apks from google play store to your collection. Update them or delete if they are not needed anymore.
