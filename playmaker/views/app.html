@@ -51,11 +51,8 @@
           </div><!-- progress -->
         </div><!-- apk-progress -->
         <div ng-hide="app.updating" class="apk-buttons">
-          <a ng-disabled="!app.needsUpdate" ng-click="$ctrl.updateApp(app)"
-          ng-class=
-          "{'btn btn-raised btn-primary': app.needsUpdate, 'btn btn-default': !app.needsUpdate}"
-          type="button">update</a> <a ng-click="$ctrl.delete(app)" class=
-          "btn btn-raised btn-danger pull-right"> delete</a>
+          <a ng-click="$ctrl.delete(app)" class=
+          "btn btn-raised btn-danger"> delete</a>
         </div>
       </div><!-- panel -->
     </div><!-- main -->

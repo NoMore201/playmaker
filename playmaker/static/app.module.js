@@ -85,32 +85,7 @@ app.component('appList', {
     ctrl.mobile = global.mobile;
     ctrl.baseUrl = $location.protocol() + '://' + $location.host();
 
-    ctrl.check = function() {
-      global.addAlert('info', 'Checking for updates');
-      api.check(function(data) {
-        if (data === 'err') {
-          global.addAlert('danger', 'Cannot check for updates');
-          return;
-        }
-        if (data.status === 'SUCCESS' && data.message.length === 0) {
-          global.addAlert('success', 'All apps are up-to-date!');
-        }
-        if (data.status === 'SUCCESS' && data.message.length > 0) {
-          global.addAlert('info', data.message.length.toString() + ' apps must be updated');
-
-          data.message.forEach(function(newApp) {
-            var oldAppIndex = ctrl.apps.findIndex(function(elem) {
-              return elem.docId === newApp;
-            });
-            if (oldAppIndex === -1) return;
-            ctrl.apps[oldAppIndex].needsUpdate = true;
-          });
-        }
-      });
-    };
-
-    ctrl.updateApp = function(app) {
-      app.needsUpdate = false;
+    var updateApp = function(app) {
       app.updating = true;
       api.download(app.docId, function(data) {
         if (data === 'err' || data.status === 'ERROR') {
@@ -127,6 +102,31 @@ app.component('appList', {
         app.updating = false;
       });
     };
+
+    ctrl.check = function() {
+      global.addAlert('info', 'Checking for updates');
+      api.check(function(data) {
+        if (data === 'err') {
+          global.addAlert('danger', 'Cannot check for updates');
+          return;
+        }
+        if (data.status === 'SUCCESS' && data.message.length === 0) {
+          global.addAlert('success', 'All apps are up-to-date!');
+        }
+        if (data.status === 'SUCCESS' && data.message.length > 0) {
+          global.addAlert('Updating ', data.message.length.toString() + ' apps');
+
+          data.message.forEach(function(newApp) {
+            var oldAppIndex = ctrl.apps.findIndex(function(elem) {
+              return elem.docId === newApp;
+            });
+            if (oldAppIndex === -1) return;
+            updateApp(ctrl.apps[oldAppIndex]);
+          });
+        }
+      });
+    };
+
 
     ctrl.delete = function(app) {
       api.remove(app.docId, function(data) {
@@ -182,7 +182,6 @@ app.component('appList', {
         a.formattedSize = a.installationSize / (1024*1024);
         a.formattedSize = a.formattedSize.toFixed(2);
         a.updating = false;
-        a.needsUpdate = false;
         return a;
       });
     });
