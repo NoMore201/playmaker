@@ -1,47 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.4.0">
-  <title></title>
-</head>
-<body>
-  <div class="container">
-    <form>
-      <div id="login-body">
-        <h2>First time initialization</h2>
-        <p>In order to initalize the server, you need to enter your google
-        credentials. They are sent to the server, which will perform the login
-        procedure and fetch an authorization token, and then they are
-        discarded. To secure communucation between client and server you should
-        configure playmaker with https, like explained <a href=
-        "https://github.com/NoMore201/playmaker#usage">here</a></p>
-        <div class="form-group">
-          <label for="emailInput">Email address</label> <input type="text"
-          class="form-control" id="emailInput" placeholder="Email" ng-model=
-          "user.email" uib-tooltip=
-          "Enter a valid username (with or without '@gmail.com')"
-          tooltip-enable="$ctrl.badUsername" tooltip-placement="top"
-          tooltip-is-open="$ctrl.badUsername" ng-disabled="$ctrl.loggingIn">
-        </div>
-        <div class="form-group">
-          <label for="passwordInput">Password</label> <input type="password"
-          class="form-control" id="passwordInput" placeholder="Password"
-          ng-model="user.password" uib-tooltip="Enter a valid password"
-          tooltip-enable="$ctrl.badPassword" tooltip-placement="bottom"
-          tooltip-is-open="$ctrl.badPassword" ng-disabled="$ctrl.loggingIn">
-        </div><button type="submit" class="btn btn-default" ng-click=
-        "$ctrl.login(user)" ng-disabled="$ctrl.loggingIn">Submit</button>
+<div class="container">
+  <form>
+    <div id="login-body">
+      <h2>First time initialization</h2>
+      <p>In order to initalize the server, you need to enter your google
+      credentials. They are sent to the server, which will perform the login
+      procedure and fetch an authorization token, and then they are
+      discarded. To secure communucation between client and server you should
+      configure playmaker with https, like explained <a href=
+      "https://github.com/NoMore201/playmaker#usage">here</a></p>
+      <div class="form-group">
+        <label for="emailInput">Email address</label> <input type="text"
+        class="form-control" id="emailInput" placeholder="Email" ng-model=
+        "user.email" uib-tooltip=
+        "Enter a valid username (with or without '@gmail.com')"
+        tooltip-enable="$ctrl.badUsername" tooltip-placement="top"
+        tooltip-is-open="$ctrl.badUsername" ng-disabled="$ctrl.loggingIn">
       </div>
-    </form>
-    <div ng-hide="!$ctrl.loggingIn" class="row loading-login">
-      <div class="loading-login-text">
-        Loading apps into cache, please wait
-      </div>
-      <uib-progressbar class="progress-striped active" max="$ctrl.max" value=
-      "$ctrl.current"><span style=
-        "color:white; white-space:nowrap;">{{$ctrl.formattedPercent}}%</span>
-      </uib-progressbar>
+      <div class="form-group">
+        <label for="passwordInput">Password</label> <input type="password"
+        class="form-control" id="passwordInput" placeholder="Password"
+        ng-model="user.password" uib-tooltip="Enter a valid password"
+        tooltip-enable="$ctrl.badPassword" tooltip-placement="bottom"
+        tooltip-is-open="$ctrl.badPassword" ng-disabled="$ctrl.loggingIn">
+      </div><button type="submit" class="btn btn-default" ng-click=
+      "$ctrl.login(user)" ng-disabled="$ctrl.loggingIn">Submit</button>
     </div>
+  </form>
+  <div ng-hide="!$ctrl.loggingIn" class="row loading-login">
+    <div class="loading-login-text">
+      Loading apps into cache, please wait
+    </div>
+    <uib-progressbar class="progress-striped active" max="$ctrl.max" value=
+    "$ctrl.current"><span style=
+      "color:white; white-space:nowrap;">{{$ctrl.formattedPercent}}%</span>
+    </uib-progressbar>
   </div>
-</body>
-</html>
+</div>

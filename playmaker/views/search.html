@@ -1,104 +1,95 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.4.0">
-  <title></title>
-</head>
-<body>
-  <div class="container">
-    <div id="search-area" class="input-group input-group-lg">
-      <span class="input-group-addon" id="search-input-label">
-        <i class="fa fa-search" aria-hidden="true"></i>
-      </span>
-      <input ng-model="searchString" on-enter="$ctrl.search(searchString)"
-      type="text" class="form-control" id="search-input" placeholder="Search"
-      aria-describedby="search-input-label">
-    </div>
-    <div ng-hide="!$ctrl.searching" id="search-progress" class="progress">
-      <div class="progress-bar progress-bar-striped active" role="progressbar"
-      aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style=
-      "width:100%">
-        <span class="sr-only">Loading results</span>
-      </div>
-    </div><!-- progress -->
-    <div ng-if="$ctrl.desktop" class="row" id="table-box">
-      <table class="table" ng-hide="$ctrl.results.length === 0">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Title</th>
-            <th>Developer</th>
-            <th>Id</th>
-            <th>Version</th>
-            <th>Size</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          <tr ng-repeat="app in $ctrl.results">
-            <td id="dl-button-td">
-              <a ng-class=
-              "{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
-                <i ng-click="$ctrl.download(app)" ng-hide="app.downloading"
-                  class="fa fa-download fa-2x" aria-hidden="true"></i>
-                <i ng-hide="!app.downloading" class=
-                  "fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
-              </a>
-            </td>
-            <td>{{app.title}}</td>
-            <td>{{app.author}}</td>
-            <td>{{app.docId}}</td>
-            <td>{{app.versionCode}}</td>
-            <td>{{app.files[0].size}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div ng-if="$ctrl.mobile" class="row" id="table-box">
-      <script type="text/ng-template" id="myModalContent.html">
-        <div class="modal-header">
-          <h3 class="modal-title" id="modal-title">{{app.title}}</h3>
-        </div>
-        <div class="modal-body" id="modal-body">
-          <strong>Id:</strong> {{app.docId}}<br>
-          <strong>Developer:</strong> {{app.author}}<br>
-          <strong>Size:</strong> {{app.files[0].size}}<br>
-          <strong>Stars:</strong> {{app.aggregateRating.starRating}}
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-default" type="button" ng-click="$close()">Close</button>
-        </div>
-      </script>
-      <table class="table" ng-hide="$ctrl.results.length === 0">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Title</th>
-            <th>Info</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          <tr ng-repeat="app in $ctrl.results">
-            <td id="dl-button-td">
-              <a ng-class=
-              "{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
-                <i ng-click="$ctrl.download(app)" ng-hide="app.downloading"
-                  class="fa fa-download fa-2x" aria-hidden="true"></i>
-                <i ng-hide="!app.downloading"
-                  class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
-              </a>
-            </td>
-            <td>{{app.title}}</td>
-            <td>
-              <a ng-click="$ctrl.modalOpen(app)" class="dl-button">
-                <i class="fa fa-info-circle fa-2x" data-toggle="popover"
-                  data-html="true" title="" data-placement="left"
-                  data-content="" aria-hidden="true"></i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="container">
+  <div id="search-area" class="input-group input-group-lg">
+    <span class="input-group-addon" id="search-input-label">
+      <i class="fa fa-search" aria-hidden="true"></i>
+    </span>
+    <input ng-model="searchString" on-enter="$ctrl.search(searchString)"
+    type="text" class="form-control" id="search-input" placeholder="Search"
+    aria-describedby="search-input-label">
   </div>
-</body>
-</html>
+  <div ng-hide="!$ctrl.searching" id="search-progress" class="progress">
+    <div class="progress-bar progress-bar-striped active" role="progressbar"
+    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style=
+    "width:100%">
+      <span class="sr-only">Loading results</span>
+    </div>
+  </div><!-- progress -->
+  <div ng-if="$ctrl.desktop" class="row" id="table-box">
+    <table class="table" ng-hide="$ctrl.results.length === 0">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Title</th>
+          <th>Developer</th>
+          <th>Id</th>
+          <th>Version</th>
+          <th>Size</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr ng-repeat="app in $ctrl.results">
+          <td id="dl-button-td">
+            <a ng-class=
+            "{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
+              <i ng-click="$ctrl.download(app)" ng-hide="app.downloading"
+                class="fa fa-download fa-2x" aria-hidden="true"></i>
+              <i ng-hide="!app.downloading" class=
+                "fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
+            </a>
+          </td>
+          <td>{{app.title}}</td>
+          <td>{{app.author}}</td>
+          <td>{{app.docId}}</td>
+          <td>{{app.versionCode}}</td>
+          <td>{{app.files[0].size}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div ng-if="$ctrl.mobile" class="row" id="table-box">
+    <script type="text/ng-template" id="myModalContent.html">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">{{app.title}}</h3>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <strong>Id:</strong> {{app.docId}}<br>
+        <strong>Developer:</strong> {{app.author}}<br>
+        <strong>Size:</strong> {{app.files[0].size}}<br>
+        <strong>Stars:</strong> {{app.aggregateRating.starRating}}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" type="button" ng-click="$close()">Close</button>
+      </div>
+    </script>
+    <table class="table" ng-hide="$ctrl.results.length === 0">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Title</th>
+          <th>Info</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr ng-repeat="app in $ctrl.results">
+          <td id="dl-button-td">
+            <a ng-class=
+            "{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
+              <i ng-click="$ctrl.download(app)" ng-hide="app.downloading"
+                class="fa fa-download fa-2x" aria-hidden="true"></i>
+              <i ng-hide="!app.downloading"
+                class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
+            </a>
+          </td>
+          <td>{{app.title}}</td>
+          <td>
+            <a ng-click="$ctrl.modalOpen(app)" class="dl-button">
+              <i class="fa fa-info-circle fa-2x" data-toggle="popover"
+                data-html="true" title="" data-placement="left"
+                data-content="" aria-hidden="true"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div><!-- row -->
+</div><!-- container -->
