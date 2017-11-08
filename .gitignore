@@ -8,6 +8,7 @@
 dist/
 build/
 node_modules/
+.ropeproject/
 eggs/
 .eggs/
 *.egg-info/
