@@ -129,13 +129,21 @@ def createServer(service):
                 self.set_status(404)
             self.finish()
 
-    app = web.Application([
-        (r'/', HomeHandler),
-        (r'/api/(.*?)/?', ApiHandler),
-        (r'/fdroid/(.*)', web.StaticFileHandler, {'path': service.download_path}),
-        (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
-        (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
-    ], debug=service.debug)
+    if service.fdroid:
+        app = web.Application([
+            (r'/', HomeHandler),
+            (r'/api/(.*?)/?', ApiHandler),
+            (r'/fdroid/(.*)', web.StaticFileHandler, {'path': service.download_path}),
+            (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
+            (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
+        ], debug=service.debug)
+    else:
+        app = web.Application([
+            (r'/', HomeHandler),
+            (r'/api/(.*?)/?', ApiHandler),
+            (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
+            (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
+        ], debug=service.debug)
 
     # overwrite settings
     app.settings['static_path'] = ''
