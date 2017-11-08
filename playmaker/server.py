@@ -143,7 +143,7 @@ def createServer(service):
             (r'/api/(.*?)/?', ApiHandler),
             (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
             (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
-        ], debug=service.debug)
+        ], debug=False)
 
     # overwrite settings
     app.settings['static_path'] = ''
