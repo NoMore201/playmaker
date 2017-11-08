@@ -2,10 +2,6 @@
  * index.html
  */
 
-.container {
-  margin-top: 81px;
-}
-
 .navbar-fixed-top {
   top:0;
 }
@@ -22,7 +18,7 @@
  * Login view
  */
 
-#login-body {
+.login-body {
   margin:0 auto;
   max-width: 500px;
 }
@@ -41,13 +37,6 @@
 /*
  * Apps view
  */
-
-.app-message {
-  color: #888888;
-  font-size: 30px;
-  margin-left: 30px;
-  min-width: 250px;
-}
 
 .sidebar {
   margin: 0 auto;
@@ -113,6 +102,12 @@
  * Search view
  */
 
+.view-container {
+  max-width: 1000px;
+  margin:0 auto;
+  margin-top: 81px;
+}
+
 .dl-button {
   cursor: pointer;
   color: #333333;
@@ -136,13 +131,6 @@
   width:80px;
 }
 
-.message {
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%
-}
-
 #search-progress {
   margin-top:40px;
   margin-left:30px;
@@ -150,8 +138,7 @@
 }
 
 #search-area {
-  padding-left:10px;
-  padding-right:10px;
+  padding:0 10px;
 }
 
 .table {
