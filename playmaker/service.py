@@ -20,18 +20,18 @@ def makeError(message):
             'message': message}
 
 
-def get_details_from_apk(appDetails, downloadPath):
-    if appDetails is not None:
-        filepath = os.path.join(downloadPath,
-                                appDetails['docId'] + '.apk')
+def get_details_from_apk(apk, downloadPath, service):
+    if apk is not None:
+        filepath = os.path.join(downloadPath, apk)
         try:
             a = APK(filepath)
         except Exception as e:
             print(e)
             return None
-        appDetails['versionCode'] = int(a.version_code)
-        print('Added %s to cache' % appDetails['docId'])
-    return appDetails
+        print('Fetching details for %s' % a.package)
+        details = service.details(a.package)
+        print('Added %s to cache' % details['docId'])
+    return details
 
 
 class Play(object):
@@ -179,19 +179,19 @@ class Play(object):
         print('Updating cache')
         with concurrent.futures.ProcessPoolExecutor() as executor:
             # get application ids from apk files
-            appList = [os.path.splitext(apk)[0]
-                       for apk in os.listdir(self.download_path)
-                       if os.path.splitext(apk)[1] == '.apk']
-            self.totalNumOfApps = len(appList)
-            detailsList = self.service.bulkDetails(appList)
-            future_to_app = [executor.submit(get_details_from_apk,
-                                             d,
-                                             self.download_path)
-                             for d in detailsList]
-            for future in concurrent.futures.as_completed(future_to_app):
-                app = future.result()
-                if app is not None:
-                    self.currentSet.append(app)
+            apkFiles = [apk for apk in os.listdir(self.download_path)
+                        if os.path.splitext(apk)[1] == '.apk']
+            self.totalNumOfApps = len(apkFiles)
+            if self.totalNumOfApps != 0:
+                future_to_app = [executor.submit(get_details_from_apk,
+                                                 a,
+                                                 self.download_path,
+                                                 self.service)
+                                 for a in apkFiles]
+                for future in concurrent.futures.as_completed(future_to_app):
+                    app = future.result()
+                    if app is not None:
+                        self.currentSet.append(app)
         print('Cache correctly initialized')
         self.firstRun = False
 
