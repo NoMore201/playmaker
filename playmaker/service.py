@@ -99,6 +99,7 @@ class Play(object):
                 f.write('\n# playmaker\nrepo_name = "playmaker"\n'
                         'repo_description = "repository managed with '
                         'playmaker https://github.com/NoMore201/playmaker"\n')
+        os.chmod('./config.py', 0o600)
 
         # ensure all folder and files are setup
         p = Popen([self.fdroid_exe, 'update', '--create-key', '-v'], stdout=PIPE, stderr=PIPE)
