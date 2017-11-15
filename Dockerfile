@@ -32,14 +32,14 @@ RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose 
     && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "tools" \
     && rm -rf tools
 
-RUN mkdir -p /data/fdroid/repo
+RUN mkdir -p /data/fdroid/repo && \
+    mkdir -p /opt/playmaker
 
-WORKDIR /opt
-RUN git clone https://github.com/NoMore201/playmaker
+COPY README.md setup.py pm-server /opt/playmaker/
+ADD playmaker /opt/playmaker/playmaker
 
 WORKDIR /opt/playmaker
 RUN pip3 install . && \
-    cp /opt/playmaker/playmaker.conf /data/fdroid && \
     cd /opt && rm -rf playmaker
 
 VOLUME /data/fdroid
