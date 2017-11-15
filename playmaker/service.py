@@ -7,6 +7,7 @@ import os
 import sys
 import concurrent.futures
 from datetime import datetime as dt
+from shutil import move
 
 NOT_LOGGED_IN_ERR = 'Not logged in'
 WRONG_CREDENTIALS_ERR = 'Wrong credentials'
@@ -78,6 +79,27 @@ class Play(object):
                 sys.stderr.write("error initializing fdroid repository " +
                                  stderr.decode('utf-8'))
                 sys.exit(1)
+        # backup config.py
+        if self.debug:
+            print('Backing up config.py')
+        move('./config.py', './config-backup.py')
+        with open('./config-backup.py') as f1:
+            content = f1.readlines()
+        # copy all content of backup in the main config.py
+        # if the file was not modified with custom values, do it
+        with open('./config.py', 'w') as f:
+            modified = False
+            for line in content:
+                if '# playmaker' in line:
+                    modified = True
+                f.write(line)
+            if not modified:
+                if self.debug:
+                    print('Appending playmaker data to config.py')
+                f.write('\n# playmaker\nrepo_name = "playmaker"\n'
+                        'repo_description = "repository managed with '
+                        'playmaker https://github.com/NoMore201/playmaker"\n')
+
         # ensure all folder and files are setup
         p = Popen([self.fdroid_exe, 'update', '--create-key', '-v'], stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
