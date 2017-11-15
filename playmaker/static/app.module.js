@@ -169,18 +169,22 @@ app.component('appList', {
         return;
       }
       ctrl.apps = data.message.map(function(a) {
-        roundedStars = Math.floor(a.aggregateRating.starRating);
-        a.formattedStars = a.aggregateRating.starRating.toFixed(1);
-        a.starList = [];
-        for (i = 0; i < 5; i++) {
-          if (i+1 <= roundedStars){
-            a.starList.push({index: i, full: true});
-          } else {
-            a.starList.push({index: i, full: false});
+        if (a.aggregateRating !== undefined) {
+          roundedStars = Math.floor(a.aggregateRating.starRating);
+          a.formattedStars = a.aggregateRating.starRating.toFixed(1);
+          a.starList = [];
+          for (i = 0; i < 5; i++) {
+            if (i+1 <= roundedStars){
+              a.starList.push({index: i, full: true});
+            } else {
+              a.starList.push({index: i, full: false});
+            }
           }
         }
-        a.formattedSize = a.installationSize / (1024*1024);
-        a.formattedSize = a.formattedSize.toFixed(2);
+        if (a.installationSize !== undefined) {
+          a.formattedSize = a.installationSize / (1024*1024);
+          a.formattedSize = a.formattedSize.toFixed(2);
+        }
         a.updating = false;
         return a;
       });

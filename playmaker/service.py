@@ -29,7 +29,14 @@ def get_details_from_apk(apk, downloadPath, service):
             print(e)
             return None
         print('Fetching details for %s' % a.package)
-        details = service.details(a.package)
+        try:
+            details = service.details(a.package)
+        except RequestError as e:
+            print('Cannot fetch information for %s' % a.package)
+            print('Extracting basic information from package...')
+            return {'docId': a.package,
+                    'versionCode': a.version_code,
+                    'title': a.application}
         print('Added %s to cache' % details['docId'])
     return details
 
