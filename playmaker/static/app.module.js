@@ -114,7 +114,7 @@ app.component('appList', {
           global.addAlert('success', 'All apps are up-to-date!');
         }
         if (data.status === 'SUCCESS' && data.message.length > 0) {
-          global.addAlert('Updating ', data.message.length.toString() + ' apps');
+          global.addAlert('success', 'Updating ' + data.message.length.toString() + ' apps');
 
           data.message.forEach(function(newApp) {
             var oldAppIndex = ctrl.apps.findIndex(function(elem) {
