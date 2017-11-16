@@ -23,6 +23,7 @@ def makeError(message):
 def get_details_from_apk(apk, downloadPath, service):
     if apk is not None:
         filepath = os.path.join(downloadPath, apk)
+        filename = os.path.splitext(apk)[0]
         try:
             a = APK(filepath)
         except Exception as e:
@@ -31,10 +32,12 @@ def get_details_from_apk(apk, downloadPath, service):
         print('Fetching details for %s' % a.package)
         try:
             details = service.details(a.package)
+            details['filename'] = filename
         except RequestError as e:
             print('Cannot fetch information for %s' % a.package)
             print('Extracting basic information from package...')
             return {'docId': a.package,
+                    'filename': filename,
                     'versionCode': a.version_code,
                     'title': a.application}
         print('Added %s to cache' % details['docId'])
@@ -309,6 +312,9 @@ class Play(object):
         else:
             toUpdate = []
             for local, online in zip(localDetails, onlineDetails):
+                if online is None:
+                    print('%s not available in Play Store' % local['docId'])
+                    continue
                 if self.debug:
                     print('Checking %s' % local['docId'])
                     print('%d == %d ?' % (local['versionCode'], online['versionCode']))
@@ -326,6 +332,9 @@ class Play(object):
             os.remove(apkPath)
             for pos, app in enumerate(self.currentSet):
                 if app['docId'] == appName:
+                    del self.currentSet[pos]
+                filename = app.get('filename')
+                if filename is not None and filename == appName:
                     del self.currentSet[pos]
             return {'status': 'SUCCESS'}
         return {'status': 'ERROR'}
