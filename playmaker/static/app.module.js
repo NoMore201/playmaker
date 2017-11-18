@@ -181,6 +181,11 @@ app.component('appList', {
             }
           }
         }
+        if (a.images !== undefined) {
+          a.previewImage = a.images.filter(function(img) {
+            return img.imageType === 4;
+          });
+        }
         if (a.installationSize !== undefined) {
           a.formattedSize = a.installationSize / (1024*1024);
           a.formattedSize = a.formattedSize.toFixed(2);
