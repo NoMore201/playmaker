@@ -23,7 +23,6 @@ def makeError(message):
 def get_details_from_apk(apk, downloadPath, service):
     if apk is not None:
         filepath = os.path.join(downloadPath, apk)
-        filename = os.path.splitext(apk)[0]
         try:
             a = APK(filepath)
         except Exception as e:
@@ -32,13 +31,13 @@ def get_details_from_apk(apk, downloadPath, service):
         print('Fetching details for %s' % a.package)
         try:
             details = service.details(a.package)
-            details['filename'] = filename
+            details['filename'] = apk
         except RequestError as e:
             print('Cannot fetch information for %s' % a.package)
             print('Extracting basic information from package...')
             return {'docId': a.package,
-                    'filename': filename,
-                    'versionCode': a.version_code,
+                    'filename': apk,
+                    'versionCode': int(a.version_code),
                     'title': a.application}
         print('Added %s to cache' % details['docId'])
     return details
@@ -207,9 +206,8 @@ class Play(object):
 
     def insert_app_into_state(self, newApp):
         found = False
-        result = filter(lambda x: x['docId'] == newApp['docId'],
-                        self.currentSet)
-        result = list(result)
+        result = list(filter(lambda x: x['docId'] == newApp['docId'],
+                             self.currentSet))
         if len(result) > 0:
             found = True
             if self.debug:
@@ -241,15 +239,18 @@ class Play(object):
         return {'status': 'SUCCESS',
                 'message': apps}
 
+    def details(self, app):
+        try:
+            details = self.service.details(app)
+        except RequestError:
+            details = None
+        return details
+
     def get_bulk_details(self, apksList):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
         try:
-            apps = self.service.bulkDetails(apksList)
-        except RequestError as e:
-            print(e)
-            return {'status': 'ERROR',
-                    'message': SESSION_EXPIRED_ERR}
+            apps = [self.details(a) for a in apksList]
         except LoginError as e:
             print(e)
             self.loggedIn = False
@@ -262,37 +263,36 @@ class Play(object):
         failed = []
         unavail = []
 
-        details = self.get_bulk_details(appNames)
-
-        for appname, appdetails in zip(appNames, details):
-            if appdetails['docId'] == '':
-                print('Package does not exits')
-                unavail.append(appname)
+        for app in appNames:
+            details = self.details(app)
+            if details is None:
+                print('Package %s does not exits' % app)
+                unavail.append(app)
                 continue
-            print('Downloading %s' % appname)
+            print('Downloading %s' % app)
             try:
-                if appdetails['offer'][0]['formattedAmount'] == 'Free':
-                    data = self.service.download(appname, appdetails['versionCode'])
+                if details['offer'][0]['formattedAmount'] == 'Free':
+                    data = self.service.download(app, details['versionCode'])
                 else:
-                    data = self.service.delivery(appname, appdetails['versionCode'])
-                print('Done!')
+                    data = self.service.delivery(app, details['versionCode'])
             except IndexError as exc:
                 print(exc)
-                print('Package %s does not exists' % appname)
-                unavail.append(appname)
+                print('Package %s does not exists' % app)
+                unavail.append(app)
             except Exception as exc:
                 print(exc)
-                print('Failed to download %s' % appname)
-                failed.append(appname)
+                print('Failed to download %s' % app)
+                failed.append(app)
             else:
-                filename = appname + '.apk'
+                filename = app + '.apk'
                 filepath = os.path.join(self.download_path, filename)
                 try:
                     open(filepath, 'wb').write(data['data'])
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
-                    failed.append(appname)
-                success.append(appdetails)
+                    failed.append(app)
+                details['filename'] = filename
+                success.append(details)
         for x in success:
             self.insert_app_into_state(x)
         return {'status': 'SUCCESS',
@@ -303,38 +303,35 @@ class Play(object):
     def check_local_apks(self):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
-        localDetails = self.currentSet
-        onlineDetails = self.get_bulk_details([app['docId'] for app in localDetails])
-        if len(localDetails) == 0 or len(onlineDetails) == 0:
-            print('There is no package locally')
+        if len(self.currentSet) == 0:
+            print('There is no package')
             return {'status': 'SUCCESS',
                     'message': []}
         else:
             toUpdate = []
-            for local, online in zip(localDetails, onlineDetails):
-                if online is None:
-                    print('%s not available in Play Store' % local['docId'])
+            for app in self.currentSet:
+                details = self.details(app['docId'])
+                if details is None:
+                    print('%s not available in Play Store' % app['docId'])
                     continue
                 if self.debug:
-                    print('Checking %s' % local['docId'])
-                    print('%d == %d ?' % (local['versionCode'], online['versionCode']))
-                if local['versionCode'] != online['versionCode']:
-                    toUpdate.append(online['docId'])
+                    print('Checking %s' % app['docId'])
+                    print('%d == %d ?' % (app['versionCode'], details['versionCode']))
+                if app['versionCode'] != details['versionCode']:
+                    toUpdate.append(details['docId'])
         return {'status': 'SUCCESS',
                 'message': toUpdate}
 
-    def remove_local_app(self, appName):
+    def remove_local_app(self, docId):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
-        apkName = appName + '.apk'
-        apkPath = os.path.join(self.download_path, apkName)
+        # get app from cache
+        app = list(filter(lambda x: x['docId'] == docId, self.currentSet))
+        if len(app) < 1:
+            return {'status': 'ERROR'}
+        apkPath = os.path.join(self.download_path, app[0]['filename'])
         if os.path.isfile(apkPath):
             os.remove(apkPath)
-            for pos, app in enumerate(self.currentSet):
-                if app['docId'] == appName:
-                    del self.currentSet[pos]
-                filename = app.get('filename')
-                if filename is not None and filename == appName:
-                    del self.currentSet[pos]
+            self.currentSet.remove(app[0])
             return {'status': 'SUCCESS'}
         return {'status': 'ERROR'}

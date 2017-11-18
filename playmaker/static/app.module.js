@@ -129,13 +129,7 @@ app.component('appList', {
 
 
     ctrl.delete = function(app) {
-      toRemove = "";
-      if (app.filename !== undefined) {
-        toRemove = app.filename;
-      } else {
-        toRemove = app.docId;
-      }
-      api.remove(toRemove, function(data) {
+      api.remove(app.docId, function(data) {
         if (data.status === 'SUCCESS') {
           var i = ctrl.apps.findIndex(function(elem) {
             return elem.docId === app.docId;
