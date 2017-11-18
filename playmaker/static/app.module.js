@@ -190,6 +190,12 @@ app.component('appList', {
           a.formattedSize = a.installationSize / (1024*1024);
           a.formattedSize = a.formattedSize.toFixed(2);
         }
+        if (a.author === undefined) {
+          a.author = "unknown";
+        }
+        if (a.files === undefined) {
+          a.files = ["unknown"];
+        }
         a.updating = false;
         return a;
       });

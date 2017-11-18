@@ -37,7 +37,8 @@
             <span><strong>Developer:</strong> {{app.author}}</span><br>
             <span><strong>Version:</strong> {{app.versionCode}}</span><br>
             <span><strong>Files:</strong> {{app.files.length}}</span><br>
-            <span><strong>Size:</strong> {{app.formattedSize}} MB</span><br>
+            <span ng-if="app.formattedSize !== undefined"><strong>Size:</strong> {{app.formattedSize}} MB</span>
+            <span ng-if="app.formattedSize === undefined"><strong>Size:</strong> unknown</span><br>
             <span><strong>PackageId:</strong> {{app.docId}}</span><br>
           </div>
         </div><!-- panel-body -->
