@@ -284,7 +284,7 @@ app.component('searchView', {
         if (data.status === 'SUCCESS') {
           if (data.message.success.length === 0) {
             app.downloading = false;
-            global.addAlert(app.docId + ' can\'t be downloaded');
+            global.addAlert('warning', app.docId + ' can\'t be downloaded');
             return;
           }
         }
@@ -306,7 +306,7 @@ app.component('loginView', {
       api.getApps(function(response) {
         if (response === 'err') {
           ctrl.loggingIn = false;
-          console.log('unable to contact server');
+          return;
         }
         if (response.status === 'UNAUTHORIZED') {
           return;
