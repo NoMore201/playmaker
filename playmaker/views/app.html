@@ -4,13 +4,13 @@
       <div class="sidebar-list-el">
         Update applications <a ng-click="$ctrl.check()" class=
         "btn btn-default sidebar-button">
-          <i class="fa fa-refresh" aria-hidden="true"></i>
+          <i class="fas fa-sync-alt" aria-hidden="true"></i>
         </a>
       </div>
       <div class="sidebar-list-el">
         Update fdroid repo <a ng-click="$ctrl.fdroid()" class=
         "btn btn-default">
-          <i class="fa fa-android" aria-hidden="true"></i>
+          <i class="fab fa-android" aria-hidden="true"></i>
         </a>
       </div>
       <div class="sidebar-list-el">
@@ -31,7 +31,7 @@
             <strong><span class=
             "apk-item-title">{{app.title}}</span></strong>
             <i ng-repeat="val in app.starList" ng-class=
-              "val.full ? 'fa fa-star' : 'fa fa-star-o'"
+              "val.full ? 'fas fa-star' : 'far fa-star'"
               aria-hidden="true"></i>
             <strong>{{app.formattedStars}}</strong><br>
             <span><strong>Developer:</strong> {{app.author}}</span><br>

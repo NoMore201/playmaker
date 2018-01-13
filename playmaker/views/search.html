@@ -1,7 +1,7 @@
 <div class="view-container">
   <div id="search-area" class="input-group input-group-lg">
     <span class="input-group-addon" id="search-input-label">
-      <i class="fa fa-search" aria-hidden="true"></i>
+      <i class="fas fa-search"></i>
     </span>
     <input ng-model="searchString" on-enter="$ctrl.search(searchString)"
     type="text" class="form-control" id="search-input" placeholder="Search"
@@ -29,12 +29,14 @@
       <tbody id="table-body">
         <tr ng-repeat="app in $ctrl.results">
           <td id="dl-button-td">
-            <a ng-class=
+            <a ng-click="$ctrl.download(app)" ng-class=
             "{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
-              <i ng-click="$ctrl.download(app)" ng-hide="app.downloading"
-                class="fa fa-download fa-2x" aria-hidden="true"></i>
-              <i ng-hide="!app.downloading" class=
-                "fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
+              <div ng-hide="app.downloading" class="fa-2x">
+                <i class="fas fa-download"></i>
+              </div>
+              <div ng-hide="!app.downloading" class="fa-2x">
+                <i class="fas fa-cog fa-spin"></i>
+              </div>
             </a>
           </td>
           <td>{{app.title}}</td>
@@ -72,18 +74,20 @@
       <tbody id="table-body">
         <tr ng-repeat="app in $ctrl.results">
           <td id="dl-button-td">
-            <a ng-class=
+            <a ng-click="$ctrl.download(app)" ng-class=
             "{'dl-button-disabled': app.disabled, 'dl-button': !app.disabled}">
-              <i ng-click="$ctrl.download(app)" ng-hide="app.downloading"
-                class="fa fa-download fa-2x" aria-hidden="true"></i>
-              <i ng-hide="!app.downloading"
-                class="fa fa-cog fa-spin fa-2x fa-fw" aria-hidden="true"></i>
+              <div ng-hide="app.downloading" class="fa-2x">
+                <i class="fas fa-download"></i>
+              </div>
+              <div ng-hide="!app.downloading" class="fa-2x">
+                <i class="fas fa-cog fa-spin"></i>
+              </div>
             </a>
           </td>
           <td>{{app.title}}</td>
           <td>
             <a ng-click="$ctrl.modalOpen(app)" class="dl-button">
-              <i class="fa fa-info-circle fa-2x" data-toggle="popover"
+              <i class="fas fa-info-circle fa-2x" data-toggle="popover"
                 data-html="true" title="" data-placement="left"
                 data-content="" aria-hidden="true"></i>
             </a>
