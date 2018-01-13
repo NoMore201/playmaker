@@ -136,7 +136,7 @@ def createServer(service):
             (r'/fdroid/(.*)', web.StaticFileHandler, {'path': service.download_path}),
             (r'/static/(.*)', web.StaticFileHandler, {'path': static_dir}),
             (r'/views/(.*)', web.StaticFileHandler, {'path': app_dir + '/views'}),
-        ], debug=service.debug)
+        ], debug=False)
     else:
         app = web.Application([
             (r'/', HomeHandler),
