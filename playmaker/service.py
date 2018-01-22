@@ -120,6 +120,8 @@ class Play(object):
             print('Fdroid repo initialized successfully')
 
     def get_last_fdroid_update(self):
+        if not self.loggedIn:
+            return {'status': 'UNAUTHORIZED'}
         return {'status': 'SUCCESS',
                 'message': str(self._last_fdroid_update)}
 
@@ -147,6 +149,7 @@ class Play(object):
     def get_apps(self):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
+
         if self.firstRun:
             return {'status': 'PENDING',
                     'total': self.totalNumOfApps,
@@ -155,8 +158,8 @@ class Play(object):
                 'message': sorted(self.currentSet, key=lambda k: k['title'])}
 
     def login(self, email=None, password=None):
-        def unpad(s):
-            return s[:-ord(s[len(s)-1:])]
+        if self.loggedIn:
+            return {'status': 'SUCCESS', 'message': 'OK'}
 
         try:
             if email is not None and password is not None:
@@ -175,16 +178,21 @@ class Play(object):
             return {'status': 'SUCCESS', 'message': 'OK'}
         except LoginError as e:
             print('Wrong credentials: {0}'.format(e))
+            self.loggedIn = False
             return {'status': 'ERROR',
                     'message': 'Wrong credentials'}
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
-            print(e)
+            print('Request error: {0}'.format(e))
+            self.loggedIn = False
             return {'status': 'ERROR',
                     'message': 'Request error, probably invalid token'}
 
     def update_state(self):
+        if not self.loggedIn:
+            return {'status': 'UNAUTHORIZED'}
+
         print('Updating cache')
         with concurrent.futures.ProcessPoolExecutor() as executor:
             # get application ids from apk files
@@ -222,6 +230,7 @@ class Play(object):
     def search(self, appName, numItems=15):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
+
         try:
             apps = self.service.search(appName, numItems, None)
         except RequestError as e:
