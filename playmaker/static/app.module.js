@@ -87,7 +87,7 @@ app.component('appList', {
 
     var updateApp = function(app) {
       app.updating = true;
-      api.download(app.docId, function(data) {
+      api.download(app, function(data) {
         if (data === 'err' || data.status === 'ERROR') {
           global.addAlert('danger', 'Unable to update ' + app.docId);
           app.updating = false;
@@ -118,7 +118,7 @@ app.component('appList', {
 
           data.message.forEach(function(newApp) {
             var oldAppIndex = ctrl.apps.findIndex(function(elem) {
-              return elem.docId === newApp;
+              return elem.docId === newApp.docI.docIdd;
             });
             if (oldAppIndex === -1) return;
             updateApp(ctrl.apps[oldAppIndex]);
@@ -275,7 +275,7 @@ app.component('searchView', {
         return;
       }
       app.downloading = true;
-      api.download(app.docId, function(data) {
+      api.download(app, function(data) {
         if (data === 'err') {
           app.downloading = false;
           global.addAlert('danger', 'Error downloading app');

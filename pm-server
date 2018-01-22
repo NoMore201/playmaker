@@ -3,9 +3,22 @@
 import argparse
 from tornado import httpserver
 from tornado import ioloop as io
+import functools
+import tornado_crontab
+import os
 
 from playmaker.server import createServer
 from playmaker.service import Play
+
+
+def auto_update(service):
+    if service.loggedIn:
+        print('Executing auto update cron task')
+        apps = service.check_local_apks().get('message')
+        if len(apps) > 0:
+            service.download_selection(apps)
+            service.fdroid_update()
+
 
 # tornado setup
 if __name__ == '__main__':
@@ -30,4 +43,12 @@ if __name__ == '__main__':
             "certfile": "./certs/playmaker.crt",
             "keyfile": "./certs/playmaker.key"}))
     server.listen(5000, address='0.0.0.0')
+
+    # cron task settings
+    cron_string = os.environ.get('CRONTAB_STRING')
+    if cron_string is None:
+        # default is every night at 2AM
+        cron_string = "0 2 * * *"
+    _func = functools.partial(auto_update, *[service])
+    tornado_crontab.CronTabCallback(_func, cron_string).start()
     io.IOLoop.instance().start()

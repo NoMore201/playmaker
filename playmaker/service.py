@@ -32,6 +32,7 @@ def get_details_from_apk(apk, downloadPath, service):
         try:
             details = service.details(a.package)
             details['filename'] = apk
+            details['versionCode'] = int(a.version_code)
         except RequestError as e:
             print('Cannot fetch information for %s' % a.package)
             print('Extracting basic information from package...')
@@ -265,41 +266,44 @@ class Play(object):
             self.loggedIn = False
         return apps
 
-    def download_selection(self, appNames):
+    def download_selection(self, apps):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
         success = []
         failed = []
         unavail = []
 
-        for app in appNames:
-            details = self.details(app)
+        for app in apps:
+            docid = app.get('docId')
+            details = self.details(docid)
+            filename = app.get('filename')
+            if filename is None:
+                filename = details.get('docId') + '.apk'
             if details is None:
-                print('Package %s does not exits' % app)
-                unavail.append(app)
+                print('Package %s does not exits' % docid)
+                unavail.append(docid)
                 continue
-            print('Downloading %s' % app)
+            print('Downloading %s' % docid)
             try:
                 if details['offer'][0]['formattedAmount'] == 'Free':
-                    data = self.service.download(app, details['versionCode'])
+                    data = self.service.download(docid, details['versionCode'])
                 else:
-                    data = self.service.delivery(app, details['versionCode'])
+                    data = self.service.delivery(docid, details['versionCode'])
             except IndexError as exc:
                 print(exc)
-                print('Package %s does not exists' % app)
-                unavail.append(app)
+                print('Package %s does not exists' % docid)
+                unavail.append(docid)
             except Exception as exc:
                 print(exc)
-                print('Failed to download %s' % app)
-                failed.append(app)
+                print('Failed to download %s' % docid)
+                failed.append(docid)
             else:
-                filename = app + '.apk'
                 filepath = os.path.join(self.download_path, filename)
                 try:
                     open(filepath, 'wb').write(data['data'])
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
-                    failed.append(app)
+                    failed.append(docid)
                 details['filename'] = filename
                 success.append(details)
         for x in success:
@@ -319,15 +323,16 @@ class Play(object):
         else:
             toUpdate = []
             for app in self.currentSet:
-                details = self.details(app['docId'])
+                details = self.details(app.get('docId'))
                 if details is None:
                     print('%s not available in Play Store' % app['docId'])
                     continue
+                details['filename'] = app.get('filename')
                 if self.debug:
                     print('Checking %s' % app['docId'])
                     print('%d == %d ?' % (app['versionCode'], details['versionCode']))
                 if app['versionCode'] != details['versionCode']:
-                    toUpdate.append(details['docId'])
+                    toUpdate.append(details)
         return {'status': 'SUCCESS',
                 'message': toUpdate}
 
