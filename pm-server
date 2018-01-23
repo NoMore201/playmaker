@@ -31,17 +31,16 @@ if __name__ == '__main__':
     ap.add_argument('-d', '--debug', dest='debug',
                     action='store_true', default=False,
                     help='Enable debug output')
-    ap.add_argument('-n', '--no-https', dest='no_https',
-                    action='store_true', default=False,
-                    help='Disable HTTPS server')
     args = ap.parse_args()
     service = Play(debug=args.debug, fdroid=args.fdroid)
     app = createServer(service)
-    server = (
-        httpserver.HTTPServer(app) if args.no_https
-        else httpserver.HTTPServer(app, ssl_options={
-            "certfile": "./certs/playmaker.crt",
-            "keyfile": "./certs/playmaker.key"}))
+    certfile = os.environ.get('HTTPS_CERTFILE')
+    keyfile = os.environ.get('HTTPS_KEYFILE')
+    server = (httpserver.HTTPServer(app)
+              if certfile is None and keyfile is None else
+              httpserver.HTTPServer(app,
+                                    ssl_options={"certfile": certfile,
+                                                 "keyfile": keyfile}))
     server.listen(5000, address='0.0.0.0')
 
     # cron task settings
