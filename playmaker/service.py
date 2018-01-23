@@ -158,34 +158,35 @@ class Play(object):
         return {'status': 'SUCCESS',
                 'message': sorted(self.currentSet, key=lambda k: k['title'])}
 
-    def login(self, email=None, password=None):
+    def set_encoded_credentials(self, email, password):
+        self._email = base64.b64decode(email).decode('utf-8')
+        self._passwd = base64.b64decode(password).decode('utf-8')
+
+    def set_credentials(self, email, password):
+        self._email = email
+        self._passwd = password
+
+    def login(self):
         if self.loggedIn:
             return {'status': 'SUCCESS', 'message': 'OK'}
 
         try:
-            if email is not None and password is not None:
-                self._email = base64.b64decode(email).decode('utf-8')
-                self._passwd = base64.b64decode(password).decode('utf-8')
-                self.service.login(self._email,
-                                   self._passwd,
-                                   None, None)
-            else:
-                # otherwise we need only to refresh auth token
-                encrypted = self.service.encrypt_password(self._email,
-                                                          self._passwd).decode('utf-8')
-                self.service.getAuthSubToken(self._email,
-                                             encrypted)
+            if self._email is None or self._passwd is None:
+                raise LoginError("either username or password is null")
+            self.service.login(self._email,
+                               self._passwd,
+                               None, None)
             self.loggedIn = True
             return {'status': 'SUCCESS', 'message': 'OK'}
         except LoginError as e:
-            print('Wrong credentials: {0}'.format(e))
+            print('LoginError: {0}'.format(e))
             self.loggedIn = False
             return {'status': 'ERROR',
                     'message': 'Wrong credentials'}
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
-            print('Request error: {0}'.format(e))
+            print('RequestError: {0}'.format(e))
             self.loggedIn = False
             return {'status': 'ERROR',
                     'message': 'Request error, probably invalid token'}
