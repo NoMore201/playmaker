@@ -46,4 +46,4 @@ VOLUME /data/fdroid
 WORKDIR /data/fdroid
 
 EXPOSE 5000
-ENTRYPOINT python3 -u /usr/local/bin/pm-server --fdroid --debug -n
+ENTRYPOINT python3 -u /usr/local/bin/pm-server --fdroid --debug
