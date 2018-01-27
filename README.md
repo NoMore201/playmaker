@@ -31,33 +31,35 @@ repository.
 
 ### Requirements
 
-Playmaker requires HTTPS to avoid mitm attacks, since it needs to send base64 encoded google credentials to the server. You can use you own certs, placing them in a `certs` subfolder in the current working directory (or in the mounted volume if you are using docker image)
-
-```
-# cd /srv/playmaker
-# mkdir certs
-# cp [cert_dir]/my.crt ./certs/playmaker.crt
-# cp [cert_dir]/my.key ./certs/playmaker.key
-```
-
-If you are running playmaker behind an already configured HTTPS proxy like nginx, or if you want to locally start it without HTTPS, you need to disable built-in https support (docker image has disabled HTTPS support by default)
-
-```
-# pm-server --debug --fdroid --no-https
-```
-
+Playmaker requires HTTPS to avoid mitm attacks, since it needs to send base64 encoded google credentials to the server.
+You can use you own certs through environment variables (see below)
 On first launch, playmaker will ask your for your google credentials. To avoid authentication problems, like captcha requests,
 it's recommended to setup app specific password, and securing your account with 2-factor auth.
 
-### Docker image
+### Running
 
-Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image. You can use a pre-built image on docker hub:
+Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image.
+You can use a pre-built image on [docker hub](https://hub.docker.com/r/nomore201/playmaker/builds/) or build by yourself using provided `Dockerfile`.
+There are some environemnt variables you'll want to use:
 
+- `GOOGLE_EMAIL` (not recommended): if you want to supply credentials directly to docker, skipping the login page
+- `GOOGLE_PASSWORD` (not recommended): if you want to supply credentials directly to docker, skipping the login page
+- `HTTPS_CERTFILE`: path of the https certificate file
+- `HTTPS_KEYFILE`: path of the https key file
+- `LANG_LOCALE`: set a specific locale. Defaults to the system one if not set
+- `LANG_TIMEZONE`: set a specific timezone. Defaults to `Europe/Berlin` if not set
+
+The docker run command will look like this:
 ```
-docker run -d --name playmaker -p 5000:5000 -v /srv/fdroid:/data/fdroid nomore201/playmaker
+docker run -d --name playmaker \
+    -p 5000:5000 \
+    -v /srv/fdroid:/data/fdroid \
+    -e HTTPS_CERTFILE="/srv/https.crt" \
+    -e HTTPS_KEYFILE="/srv/https.key" \
+    -e LANG_LOCALE="it_IT" \
+    -e LANG_TIMEZONE="Europe/Rome" \
+    nomore201/playmaker
 ```
-
-or use the available `Dockerfile` if you want to build it by yourself. Notice that the docker image is built by default with HTTPS support disabled, so if you need it change `Dockerfile` accordingly and place your certificate in the mounted volume like described above
 
 ### Virtualenv
 
