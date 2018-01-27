@@ -6,6 +6,7 @@ import base64
 import os
 import sys
 import concurrent.futures
+import locale as locale_service
 from datetime import datetime as dt
 from shutil import move
 
@@ -68,7 +69,14 @@ class Play(object):
             self.fdroid_path = os.getcwd()
             self.fdroid_init()
 
-        self.service = GooglePlayAPI(self.debug)
+        # language settings
+        locale = os.environ.get('LANG_LOCALE')
+        if locale is None:
+            locale = locale_service.getdefaultlocale()[0]
+        timezone = os.environ.get('LANG_TIMEZONE')
+        if timezone is None:
+            timezone = 'Europe/Berlin'
+        self.service = GooglePlayAPI(locale, timezone, self.debug)
 
     def fdroid_init(self):
         found = False
@@ -287,9 +295,10 @@ class Play(object):
             print('Downloading %s' % docid)
             try:
                 if details['offer'][0]['formattedAmount'] == 'Free':
-                    data = self.service.download(docid, details['versionCode'])
+                    data_gen = self.service.download(docid, details['versionCode'])
                 else:
-                    data = self.service.delivery(docid, details['versionCode'])
+                    data_gen = self.service.delivery(docid, details['versionCode'])
+                data_gen = data_gen.get('file').get('data')
             except IndexError as exc:
                 print(exc)
                 print('Package %s does not exists' % docid)
@@ -301,7 +310,9 @@ class Play(object):
             else:
                 filepath = os.path.join(self.download_path, filename)
                 try:
-                    open(filepath, 'wb').write(data['data'])
+                    with open(filepath, 'wb') as apk_file:
+                        for chunk in data_gen:
+                            apk_file.write(chunk)
                 except IOError as exc:
                     print('Error while writing %s: %s' % (filename, exc))
                     failed.append(docid)

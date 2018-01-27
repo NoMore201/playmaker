@@ -118,7 +118,7 @@ app.component('appList', {
 
           data.message.forEach(function(newApp) {
             var oldAppIndex = ctrl.apps.findIndex(function(elem) {
-              return elem.docId === newApp.docI.docIdd;
+              return elem.docId === newApp.docId
             });
             if (oldAppIndex === -1) return;
             updateApp(ctrl.apps[oldAppIndex]);
