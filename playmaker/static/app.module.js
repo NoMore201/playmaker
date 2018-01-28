@@ -16,9 +16,6 @@ app.config(['$locationProvider', '$routeProvider',
       when('/login', {
         template: '<login-view></login-view>'
       }).
-      when('/enforce', {
-        template: '<enforce-view></enforce-view>'
-      }).
       otherwise('/');
   }
 
@@ -30,10 +27,7 @@ app.config(['$locationProvider', '$routeProvider',
         global.auth.login();
       }
 
-      if ($location.protocol() !== 'https' &&
-            !global.forceHttp) {
-          $location.path('/enforce');
-      } else if (response === 'err' || !global.auth.isLoggedIn()) {
+      if (response === 'err' || !global.auth.isLoggedIn()) {
           $location.path('/login');
       } else {
         // redirect home
@@ -41,15 +35,10 @@ app.config(['$locationProvider', '$routeProvider',
       }
 
       $rootScope.$on('$routeChangeStart', function (event, next, current) {
-          if ($location.protocol() !== 'https' &&
-            !global.forceHttp) {
-          $location.path('/enforce');
-        } else if (!global.auth.isLoggedIn() &&
-                   $location.path() !== '/login') {
+        if (!global.auth.isLoggedIn() && $location.path() !== '/login') {
           event.preventDefault();
           $location.path('/login');
-        } else if (global.auth.isLoggedIn() &&
-                   $location.path() === '/login') {
+        } else if (global.auth.isLoggedIn() && $location.path() === '/login') {
           // redirect home
           event.preventDefault();
           $location.path('/');
@@ -58,21 +47,6 @@ app.config(['$locationProvider', '$routeProvider',
     });
   }
 ]);
-
-app.component('enforceView', {
-  templateUrl: '/views/error.html',
-  controller: function EnforceController($location, global) {
-    var ctrl = this;
-
-    ctrl.acceptEula = function(checkbox) {
-      if (checkbox === undefined || !checkbox.value) {
-        return;
-      }
-      global.forceHttp = true;
-      $location.path('/login');
-    };
-  }
-});
 
 app.component('appList', {
   templateUrl: '/views/app.html',

@@ -18,8 +18,6 @@ angular.module('playmaker').service('global', ['$http', function($http) {
   this.desktop = false;
   this.mobile = false;
 
-  this.forceHttp = false;
-
   this.auth = new AuthManager();
 
   var screenWidth = window.innerWidth;

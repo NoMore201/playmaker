@@ -29,18 +29,22 @@ repository.
 
 ## Usage
 
-### Requirements
+### Login process
 
-Playmaker requires HTTPS to avoid mitm attacks, since it needs to send base64 encoded google credentials to the server.
-You can use you own certs through environment variables (see below)
-On first launch, playmaker will ask your for your google credentials. To avoid authentication problems, like captcha requests,
-it's recommended to setup app specific password, and securing your account with 2-factor auth.
+There are two ways to login to Play Store:
 
-### Running
+- Providing credentials directly to docker container with environment variables, skipping login page.
+- Through a login page.
+
+If you choose the login page approach, it is highly recommended to configure playmaker with HTTPS, since playmaker needs to send to the server credentials in plaintext. You can setup it in conjunction with a proxy like nginx, or provide certificate directly to playmaker.
+
+To avoid authentication problems, like captcha requests, it's recommended to setup app specific password, and securing your account with 2-factor auth.
+
+### Configuration
 
 Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image.
 You can use a pre-built image on [docker hub](https://hub.docker.com/r/nomore201/playmaker/builds/) or build by yourself using provided `Dockerfile`.
-There are some environemnt variables you'll want to use:
+There are some environment variables you'll want to use:
 
 - `GOOGLE_EMAIL` (not recommended): if you want to supply credentials directly to docker, skipping the login page
 - `GOOGLE_PASSWORD` (not recommended): if you want to supply credentials directly to docker, skipping the login page
@@ -48,6 +52,10 @@ There are some environemnt variables you'll want to use:
 - `HTTPS_KEYFILE`: path of the https key file
 - `LANG_LOCALE`: set a specific locale. Defaults to the system one if not set
 - `LANG_TIMEZONE`: set a specific timezone. Defaults to `Europe/Berlin` if not set
+
+To enable HTTPS through playmaker, without an external tool, just define `HTTPS_CERTFILE` and `HTTPS_KEYFILE` with paths to those file. If these variables are not set, tornado will default to http.
+
+If you want to browse apps for a specific country, you need to specify the variables `LANG_LOCALE` and `LANG_TIMEZONE`. Before creating an issue "cannot find app X", make sure the app is available it that country.
 
 The docker run command will look like this:
 ```
