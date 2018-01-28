@@ -83,7 +83,11 @@ app.component('appList', {
     ctrl.lastFdroidUpdate = 'None';
     ctrl.desktop = global.desktop;
     ctrl.mobile = global.mobile;
+    var port = $location.port();
     ctrl.baseUrl = $location.protocol() + '://' + $location.host();
+    if (port !== 80 && port !== 443) {
+      ctrl.baseUrl += ":" + port.toString();
+    }
 
     var updateApp = function(app) {
       app.updating = true;
