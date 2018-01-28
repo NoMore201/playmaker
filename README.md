@@ -19,8 +19,9 @@ and configure repository with app you download. After you setup the server, repo
 Server uses [googleplay-api](https://github.com/NoMore201/googleplay-api) library, which is the python equivalent of the Java [play-store-api](https://github.com/yeriomin/play-store-api) library used by YalpStore.
 
 Features:
-* Download apks from google play store to your collection. Update them or delete if they are not needed anymore.
-* Manage the fdroid repository. You can update it manually, as you add/remove apks to your collection.
+* Download apks from google play store to your collection
+* Generate a fdroid repository serving apks downloaded, directly from `<pm_url>/fdroid`
+* Configure automatic updates of app+repo through a Crontab string
 * Non-blocking UI, you can browse the collection or search for an app while the server is updating the fdroid
 repository.
 * Responsive UI, usable also from a mobile device
@@ -52,6 +53,7 @@ There are some environment variables you'll want to use:
 - `HTTPS_KEYFILE`: path of the https key file
 - `LANG_LOCALE`: set a specific locale. Defaults to the system one if not set
 - `LANG_TIMEZONE`: set a specific timezone. Defaults to `Europe/Berlin` if not set
+- `CRONTAB_STRING`: crontab string to configure automatic updates. Defaults to every night at 2AM (`0 2 * * *`)
 
 To enable HTTPS through playmaker, without an external tool, just define `HTTPS_CERTFILE` and `HTTPS_KEYFILE` with paths to those file. If these variables are not set, tornado will default to http.
 
