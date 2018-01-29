@@ -6,6 +6,7 @@ from tornado import ioloop as io
 import functools
 import tornado_crontab
 import os
+import configparser
 
 from playmaker.server import createServer
 from playmaker.service import Play
@@ -41,13 +42,18 @@ if __name__ == '__main__':
     server = (httpserver.HTTPServer(app)
               if certfile is None and keyfile is None else
               httpserver.HTTPServer(app,
-                                    ssl_options={"certfile": certfile,
-                                                 "keyfile": keyfile}))
+                                    ssl_options={'certfile': certfile,
+                                                 'keyfile': keyfile}))
     server.listen(5000, address='0.0.0.0')
 
     # credentials setup
-    email = os.environ.get('GOOGLE_EMAIL')
-    password = os.environ.get('GOOGLE_PASSWORD')
+    auth_file_parser = configparser.ConfigParser()
+    email = None
+    password = None
+    if len(auth_file_parser.read('credentials.conf')) != 0:
+        email = auth_file_parser['google']['email']
+        password = auth_file_parser['google']['password']
+
     if email is not None and password is not None:
         service.set_credentials(email, password)
         service.login()
@@ -57,7 +63,7 @@ if __name__ == '__main__':
     cron_string = os.environ.get('CRONTAB_STRING')
     if cron_string is None:
         # default is every night at 2AM
-        cron_string = "0 2 * * *"
+        cron_string = '0 2 * * *'
     _func = functools.partial(auto_update, *[service])
     tornado_crontab.CronTabCallback(_func, cron_string).start()
     io.IOLoop.instance().start()

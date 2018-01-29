@@ -34,7 +34,7 @@ repository.
 
 There are two ways to login to Play Store:
 
-- Providing credentials directly to docker container with environment variables, skipping login page.
+- Providing credentials in a configuration file
 - Through a login page.
 
 If you choose the login page approach, it is highly recommended to configure playmaker with HTTPS, since playmaker needs to send to the server credentials in plaintext. You can setup it in conjunction with a proxy like nginx, or provide certificate directly to playmaker.
@@ -47,8 +47,6 @@ Since this app requires a lot of heavy dependencies, like Android SDK and fdroid
 You can use a pre-built image on [docker hub](https://hub.docker.com/r/nomore201/playmaker/builds/) or build by yourself using provided `Dockerfile`.
 There are some environment variables you'll want to use:
 
-- `GOOGLE_EMAIL` (not recommended): if you want to supply credentials directly to docker, skipping the login page
-- `GOOGLE_PASSWORD` (not recommended): if you want to supply credentials directly to docker, skipping the login page
 - `HTTPS_CERTFILE`: path of the https certificate file
 - `HTTPS_KEYFILE`: path of the https key file
 - `LANG_LOCALE`: set a specific locale. Defaults to the system one if not set
@@ -58,6 +56,16 @@ There are some environment variables you'll want to use:
 To enable HTTPS through playmaker, without an external tool, just define `HTTPS_CERTFILE` and `HTTPS_KEYFILE` with paths to those file. If these variables are not set, tornado will default to http.
 
 If you want to browse apps for a specific country, you need to specify the variables `LANG_LOCALE` and `LANG_TIMEZONE`. Before creating an issue "cannot find app X", make sure the app is available it that country.
+
+In order to skip login page, it is possible to provide google credentials through a configuration file. Just put `credentials.conf` inside the playmaker directory, with this structure:
+
+```
+[google]
+email = myemail@gmail.com
+password = mypassword
+```
+
+To restrict access to that file, ensure it is readable only by user running playmaker.
 
 The docker run command will look like this:
 ```
