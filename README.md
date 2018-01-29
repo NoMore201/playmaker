@@ -28,20 +28,30 @@ repository.
 
 <a name="usage"/>
 
-## Usage
+## Configuration
 
-### Login process
+### Authentication
 
-There are two ways to login to Play Store:
+To avoid authentication problems, like captcha requests, it's recommended to setup app specific password, and securing your account with 2-factor auth. There are two ways to login to Play Store:
 
 - Providing credentials in a configuration file
 - Through a login page.
 
-If you choose the login page approach, it is highly recommended to configure playmaker with HTTPS, since playmaker needs to send to the server credentials in plaintext. You can setup it in conjunction with a proxy like nginx, or provide certificate directly to playmaker.
+The default behaviour is to ask credentials with a login page, when accessing playmaker on first launch. In order to skip login page, it is possible to provide google credentials through a configuration file. Just put `credentials.conf` inside the playmaker directory, with this structure:
 
-To avoid authentication problems, like captcha requests, it's recommended to setup app specific password, and securing your account with 2-factor auth.
+```
+[google]
+email = myemail@gmail.com
+password = mypassword
+```
 
-### Configuration
+To restrict access to that file, ensure it is readable only by user running playmaker.
+
+### HTTPS
+
+It's recommended to configure playmaker with HTTPS, especially with the login page authentication, since playmaker needs to send to the server credentials in plaintext. You can setup it in conjunction with a proxy like nginx, or provide certificate directly to playmaker.
+
+## Running
 
 Since this app requires a lot of heavy dependencies, like Android SDK and fdroidserver, it is recommended to use the docker image.
 You can use a pre-built image on [docker hub](https://hub.docker.com/r/nomore201/playmaker/builds/) or build by yourself using provided `Dockerfile`.
@@ -57,16 +67,6 @@ To enable HTTPS through playmaker, without an external tool, just define `HTTPS_
 
 If you want to browse apps for a specific country, you need to specify the variables `LANG_LOCALE` and `LANG_TIMEZONE`. Before creating an issue "cannot find app X", make sure the app is available it that country.
 
-In order to skip login page, it is possible to provide google credentials through a configuration file. Just put `credentials.conf` inside the playmaker directory, with this structure:
-
-```
-[google]
-email = myemail@gmail.com
-password = mypassword
-```
-
-To restrict access to that file, ensure it is readable only by user running playmaker.
-
 The docker run command will look like this:
 ```
 docker run -d --name playmaker \
@@ -78,8 +78,6 @@ docker run -d --name playmaker \
     -e LANG_TIMEZONE="Europe/Rome" \
     nomore201/playmaker
 ```
-
-### Virtualenv
 
 If you want to run it in a virtualenv rather than using docker, remember that you need to install fdroidserver,
 android SDK and define the ANDROID_HOME env variable (see the Dockerfile as a reference).
