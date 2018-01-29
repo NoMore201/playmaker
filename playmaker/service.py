@@ -8,7 +8,6 @@ import sys
 import concurrent.futures
 import locale as locale_service
 from datetime import datetime as dt
-from shutil import move
 
 NOT_LOGGED_IN_ERR = 'Not logged in'
 WRONG_CREDENTIALS_ERR = 'Wrong credentials'
@@ -88,8 +87,8 @@ class Play(object):
         if not found:
             print('Please install fdroid')
             sys.exit(1)
-        elif os.path.isfile('./config.py'):
-            print('Repo already initalized, skipping')
+        elif os.path.isfile('config.py'):
+            print('Repo already initalized, skipping init')
         else:
             p = Popen([self.fdroid_exe, 'init', '-v'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
@@ -99,32 +98,29 @@ class Play(object):
                 sys.exit(1)
         # backup config.py
         if self.debug:
-            print('Backing up config.py')
-        move('./config.py', './config-backup.py')
-        with open('./config-backup.py') as f1:
-            content = f1.readlines()
-        # copy all content of backup in the main config.py
-        # if the file was not modified with custom values, do it
-        with open('./config.py', 'w') as f:
+            print('Checking config.py file')
+        with open('config.py', 'r') as config_file:
+            content = config_file.readlines()
+        with open('config.py', 'w') as config_file:
+            # copy all the original content of config.py
+            # if the file was not modified with custom values, do it
             modified = False
             for line in content:
                 if '# playmaker' in line:
                     modified = True
-                f.write(line)
+                config_file.write(line)
             if not modified:
                 if self.debug:
                     print('Appending playmaker data to config.py')
-                f.write('\n# playmaker\nrepo_name = "playmaker"\n'
-                        'repo_description = "repository managed with '
-                        'playmaker https://github.com/NoMore201/playmaker"\n')
-        os.chmod('./config.py', 0o600)
+                config_file.write('\n# playmaker\nrepo_name = "playmaker"\n'
+                                  'repo_description = "repository managed with '
+                                  'playmaker https://github.com/NoMore201/playmaker"\n')
 
         # ensure all folder and files are setup
         p = Popen([self.fdroid_exe, 'update', '--create-key', '-v'], stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if p.returncode != 0:
-            sys.stderr.write("error initializing fdroid repository " +
-                             stderr.decode('utf-8'))
+            print('Skipping fdroid update')
         else:
             print('Fdroid repo initialized successfully')
 
