@@ -2,14 +2,6 @@
 
 ![screenshot](https://github.com/NoMore201/playmaker/raw/master/example.png)
 
-## Table of Content
-
-* [Description & Features](#desc)
-* [Usage](#usage)
-* [Alternatives](#diff)
-
-<a name="desc"/>
-
 ## Description & Features
 
 Playmaker is a fdroid repository manager, which lets you download/update apps from the play store using your google account
@@ -25,8 +17,6 @@ Features:
 * Non-blocking UI, you can browse the collection or search for an app while the server is updating the fdroid
 repository.
 * Responsive UI, usable also from a mobile device
-
-<a name="usage"/>
 
 ## Configuration
 
@@ -82,8 +72,6 @@ docker run -d --name playmaker \
 If you want to run it in a virtualenv rather than using docker, remember that you need to install fdroidserver,
 android SDK and define the ANDROID_HOME env variable (see the Dockerfile as a reference).
 Instruction on how to install fdroidserver [here](https://f-droid.org/docs/Installing_the_Server_and_Repo_Tools/)
-
-<a name="diff"/>
 
 ## Alternatives
 
