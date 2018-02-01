@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='playmaker',
-      version='0.6',
+      version='0.6.1',
       description='Apk manager with web interface based on googleplay-api',
       url='https://github.com/NoMore201/playmaker',
       author='NoMore201',
@@ -22,7 +22,7 @@ setup(name='playmaker',
             'pyaxmlparser',
             'pycryptodome',
             'tornado',
-            'gpapi>=0.4.1',
+            'gpapi>=0.4.2',
             'tornado-crontab'
       ],
       scripts=['pm-server']
