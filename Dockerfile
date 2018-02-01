@@ -11,7 +11,7 @@ RUN apt-get update && \
     libjpeg-dev \
     libxml2-dev \
     libxslt1-dev \
-    openjdk-8-jdk \
+    openjdk-8-jdk-headless \
     virtualenv \
     wget \
     unzip \
@@ -28,8 +28,6 @@ ENV ANDROID_HOME=/opt/android-sdk-linux
 ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platforms;android-26" \
     && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "build-tools;26.0.1" \
-    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platform-tools" \
-    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "tools" \
     && rm -rf tools
 
 RUN mkdir -p /data/fdroid/repo && \
