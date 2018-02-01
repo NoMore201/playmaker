@@ -290,7 +290,10 @@ class Play(object):
                 continue
             print('Downloading %s' % docid)
             try:
-                data_gen = self.service.delivery(docid, details['versionCode'])
+                if details['offer'][0]['formattedAmount'] == 'Free':
+                    data_gen = self.service.download(docid, details['versionCode'])
+                else:
+                    data_gen = self.service.delivery(docid, details['versionCode'])
                 data_gen = data_gen.get('file').get('data')
             except IndexError as exc:
                 print(exc)
