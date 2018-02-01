@@ -290,7 +290,7 @@ class Play(object):
                 continue
             print('Downloading %s' % docid)
             try:
-                if details['offer'][0]['formattedAmount'] == 'Free':
+                if details.get('offer')[0].get('micros') == 0:
                     data_gen = self.service.download(docid, details['versionCode'])
                 else:
                     data_gen = self.service.delivery(docid, details['versionCode'])
