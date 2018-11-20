@@ -48,14 +48,15 @@ if __name__ == '__main__':
 
     # credentials setup
     auth_file_parser = configparser.ConfigParser()
-    email = None
-    password = None
-    if len(auth_file_parser.read('credentials.conf')) != 0:
-        email = auth_file_parser['google']['email']
-        password = auth_file_parser['google']['password']
+    auth_file_parser.read('credentials.conf')
+    if 'google' in auth_file_parser:
+        google_section = auth_file_parser['google']
+        if 'email' in google_section and 'password' in google_section:
+            service.set_credentials(google_section['email'], google_section['password'])
+        elif 'gsfId' in google_section and 'token' in google_section:
+            service.set_token_credentials(google_section['gsfId'], google_section['token'])
 
-    if email is not None and password is not None:
-        service.set_credentials(email, password)
+    if service.has_credentials():
         service.login()
         service.update_state()
 
