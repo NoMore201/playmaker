@@ -1,4 +1,4 @@
-from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError
+from gpapi.googleplay import GooglePlayAPI, LoginError, RequestError, SecurityCheckError
 from pyaxmlparser import APK
 from subprocess import Popen, PIPE
 
@@ -183,7 +183,7 @@ class Play(object):
 
     def login(self):
         if self.loggedIn:
-            return {'status': 'SUCCESS', 'message': 'OK'}
+            return {'status': 'SUCCESS', 'securityCheck': False, 'message': 'OK'}
 
         try:
             if not self.has_credentials():
@@ -193,18 +193,26 @@ class Play(object):
                                self._gsfId,
                                self._token)
             self.loggedIn = True
-            return {'status': 'SUCCESS', 'message': 'OK'}
+            return {'status': 'SUCCESS', 'securityCheck': False, 'message': 'OK'}
         except LoginError as e:
             print('LoginError: {0}'.format(e))
             self.loggedIn = False
             return {'status': 'ERROR',
+                    'securityCheck': False,
                     'message': 'Wrong credentials'}
+        except SecurityCheckError as e:
+            print('SecurityCheckError: {0}'.format(e))
+            self.loggedIn = False
+            return {'status': 'ERROR',
+                    'securityCheck': True,
+                    'message': 'Need security check'}
         except RequestError as e:
             # probably tokens are invalid, so it is better to
             # invalidate them
             print('RequestError: {0}'.format(e))
             self.loggedIn = False
             return {'status': 'ERROR',
+                    'securityCheck': False,
                     'message': 'Request error, probably invalid token'}
 
     def update_state(self):

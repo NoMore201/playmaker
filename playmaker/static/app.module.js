@@ -280,6 +280,7 @@ app.component('loginView', {
     ctrl.current = 0;
     ctrl.max = -1;
     ctrl.formattedPercent = 0;
+    ctrl.securityCheck = false;
     var polling = function() {
       api.getApps(function(response) {
         if (response === 'err') {
@@ -337,6 +338,7 @@ app.component('loginView', {
         if (data.status === 'ERROR') {
           global.addAlert('danger', data.message);
           ctrl.loggingIn = false;
+          ctrl.securityCheck = data.securityCheck;
           return;
         }
       });

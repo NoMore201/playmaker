@@ -24,6 +24,10 @@
         tooltip-is-open="$ctrl.badPassword" ng-disabled="$ctrl.loggingIn">
       </div><button type="submit" class="btn btn-default" ng-click=
       "$ctrl.login(user)" ng-disabled="$ctrl.loggingIn">Submit</button>
+      <a class="btn btn-warning"
+        href="https://accounts.google.com/b/0/DisplayUnlockCaptcha"
+        target="_blank"
+        ng-disabled="!$ctrl.securityCheck">Security check</a>
     </div>
   </form>
   <div ng-hide="!$ctrl.loggingIn" class="row loading-login">
