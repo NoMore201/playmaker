@@ -54,6 +54,8 @@ class Play(object):
         self.loggedIn = False
         self._email = None
         self._passwd = None
+        self._gsfId = None
+        self._token = None
         self._last_fdroid_update = None
 
         # configuring download folder
@@ -170,16 +172,26 @@ class Play(object):
         self._email = email
         self._passwd = password
 
+    def set_token_credentials(self, gsfId, token):
+        self._gsfId = int(gsfId, 16)
+        self._token = token
+
+    def has_credentials(self):
+        passwd_credentials = self._email is not None and self._passwd is not None
+        token_credentials = self._gsfId is not None and self._token is not None
+        return passwd_credentials or token_credentials
+
     def login(self):
         if self.loggedIn:
             return {'status': 'SUCCESS', 'message': 'OK'}
 
         try:
-            if self._email is None or self._passwd is None:
-                raise LoginError("either username or password is null")
+            if not self.has_credentials():
+                raise LoginError("missing credentials")
             self.service.login(self._email,
                                self._passwd,
-                               None, None)
+                               self._gsfId,
+                               self._token)
             self.loggedIn = True
             return {'status': 'SUCCESS', 'message': 'OK'}
         except LoginError as e:
