@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='playmaker',
-      version='0.6.3',
+      version='0.6.4',
       description='Apk manager with web interface based on googleplay-api',
       url='https://github.com/NoMore201/playmaker',
       author='NoMore201',
