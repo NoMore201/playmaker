@@ -77,7 +77,12 @@ class Play(object):
         timezone = os.environ.get('LANG_TIMEZONE')
         if timezone is None:
             timezone = 'Europe/Berlin'
-        self.service = GooglePlayAPI(locale, timezone)
+        device = os.environ.get('DEVICE_CODE')
+        if device is None:
+            self.service = GooglePlayAPI(locale, timezone)
+        else:
+            self.service = GooglePlayAPI(locale, timezone,
+                    device_codename=device)
 
     def fdroid_init(self):
         found = False

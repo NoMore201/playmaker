@@ -52,10 +52,14 @@ There are some environment variables you'll want to use:
 - `LANG_LOCALE`: set a specific locale. Defaults to the system one if not set
 - `LANG_TIMEZONE`: set a specific timezone. Defaults to `Europe/Berlin` if not set
 - `CRONTAB_STRING`: crontab string to configure automatic updates. Defaults to every night at 2AM (`0 2 * * *`)
+- `DEVICE_CODE`: specify a device to be used by playmaker, defaults to `bacon` (OnePlus One) if not specified. For
+a list of supported devices see [this file](https://raw.githubusercontent.com/NoMore201/googleplay-api/master/gpapi/device.properties)
 
-To enable HTTPS through playmaker, without an external tool, just define `HTTPS_CERTFILE` and `HTTPS_KEYFILE` with paths to those file. If these variables are not set, tornado will default to http.
+To enable HTTPS through playmaker, without an external tool, just define `HTTPS_CERTFILE`
+and `HTTPS_KEYFILE` with paths to those file. If these variables are not set, tornado will default to http.
 
-If you want to browse apps for a specific country, you need to specify the variables `LANG_LOCALE` and `LANG_TIMEZONE`. Before creating an issue "cannot find app X", make sure the app is available it that country.
+If you want to browse apps for a specific country, you need to specify the variables `LANG_LOCALE` and `LANG_TIMEZONE`.
+Before creating an issue "cannot find app X", make sure the app is available it that country.
 
 The docker run command will look like this:
 ```
@@ -66,20 +70,24 @@ docker run -d --name playmaker \
     -e HTTPS_KEYFILE="/srv/https.key" \
     -e LANG_LOCALE="it_IT" \
     -e LANG_TIMEZONE="Europe/Rome" \
+    -e DEVICE_CODE="hammerhead" \
     nomore201/playmaker
 ```
 
 If you want to run it in a virtualenv rather than using docker, remember that you need to install fdroidserver,
-android SDK and define the ANDROID_HOME env variable (see the Dockerfile as a reference).
+android SDK and define the ANDROID\_HOME env variable (see the Dockerfile as a reference).
 Instruction on how to install fdroidserver [here](https://f-droid.org/docs/Installing_the_Server_and_Repo_Tools/)
 
 ## Alternatives
 
 ### YalpStore
 
-[YalpStore](https://github.com/yeriomin/YalpStore) is an open source alternative to the play store. It works very well and it requires you to install only the app, but it requires one of the following thing to be able to install/update apks:
+[YalpStore](https://github.com/yeriomin/YalpStore) is an open source alternative to the play store.
+It works very well and it requires you to install only the app, but it requires one of the
+following thing to be able to install/update apks:
 
 - enable **Unknown Sources**
 - have **root** privileges
 
-While if you use playmaker and the fdroid [privileged extension](https://gitlab.com/fdroid/privileged-extension), fdroid will be able to install/update app without root privileges or enabling unknown sources.
+If you use playmaker and the fdroid [privileged extension](https://gitlab.com/fdroid/privileged-extension),
+fdroid will be able to install/update app without root privileges or enabling unknown sources.

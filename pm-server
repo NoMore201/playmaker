@@ -40,7 +40,7 @@ if __name__ == '__main__':
     certfile = os.environ.get('HTTPS_CERTFILE')
     keyfile = os.environ.get('HTTPS_KEYFILE')
     server = (httpserver.HTTPServer(app)
-              if certfile is None and keyfile is None else
+              if certfile is None or keyfile is None else
               httpserver.HTTPServer(app,
                                     ssl_options={'certfile': certfile,
                                                  'keyfile': keyfile}))
