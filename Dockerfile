@@ -16,7 +16,9 @@ RUN apt-get update && \
     wget \
     unzip \
     fdroidserver \
-    zlib1g-dev
+    zlib1g-dev \
+    less \
+    nano
 
 RUN wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip \
     && echo "92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9 sdk-tools-linux-4333796.zip" | sha256sum -c \
@@ -38,7 +40,8 @@ ADD playmaker /opt/playmaker/playmaker
 
 WORKDIR /opt/playmaker
 RUN pip3 install . && \
-    cd /opt && rm -rf playmaker
+    cd /opt && rm -rf playmaker && \
+    sed -i 's/\"sdk_version\"/#\"sdk_version\"/g' /usr/local/lib/python3.7/site-packages/gpapi/config.py
 
 RUN groupadd -g 999 pmuser && \
     useradd -m -u 999 -g pmuser pmuser
