@@ -263,7 +263,7 @@ class Play(object):
             return {'status': 'UNAUTHORIZED'}
 
         try:
-            apps = self.service.search(appName, numItems)
+            apps = self.service.search(appName)
         except RequestError as e:
             print(e)
             self.loggedIn = False
