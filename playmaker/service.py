@@ -316,9 +316,9 @@ class Play(object):
             print('Downloading %s' % docid)
             try:
                 if details.get('offer')[0].get('micros') == 0:
-                    data_gen = self.service.download(docid, details['versionCode'])
+                    data_gen = self.service.download(docid, details.appDetails.file['versionCode'])
                 else:
-                    data_gen = self.service.delivery(docid, details['versionCode'])
+                    data_gen = self.service.delivery(docid, details.appDetails.file['versionCode'])
                 data_gen = data_gen.get('file').get('data')
             except IndexError as exc:
                 print(exc)
@@ -363,8 +363,8 @@ class Play(object):
                 details['filename'] = app.get('filename')
                 if self.debug:
                     print('Checking %s' % app['docid'])
-                    print('%d == %d ?' % (app['versionCode'], details['versionCode']))
-                if app['versionCode'] != details['versionCode']:
+                    print('%d == %d ?' % (app['versionCode'], details.appDetails.file['versionCode']))
+                if app['versionCode'] != details.appDetails.file['versionCode']:
                     toUpdate.append(details)
         return {'status': 'SUCCESS',
                 'message': toUpdate}
