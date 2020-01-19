@@ -34,9 +34,9 @@
               "val.full ? 'fas fa-star' : 'far fa-star'"
               aria-hidden="true"></i>
             <strong>{{app.formattedStars}}</strong><br>
-            <span><strong>Developer:</strong> {{app.author}}</span><br>
-            <span><strong>Version:</strong> {{app.versionCode}}</span><br>
-            <span><strong>Files:</strong> {{app.files.length}}</span><br>
+            <span><strong>Developer:</strong> {{app.creator}}</span><br>
+            <span><strong>Version:</strong> {{app.details.appDetails.versionCode}}</span><br>
+            <span><strong>Files:</strong> {{app.details.appDetails.file.length}}</span><br>
             <span ng-if="app.formattedSize !== undefined"><strong>Size:</strong> {{app.formattedSize}} MB</span>
             <span ng-if="app.formattedSize === undefined"><strong>Size:</strong> unknown</span><br>
             <span><strong>PackageId:</strong> {{app.docid}}</span><br>
