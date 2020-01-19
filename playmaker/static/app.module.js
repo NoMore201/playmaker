@@ -67,12 +67,12 @@ app.component('appList', {
       app.updating = true;
       api.download(app, function(data) {
         if (data === 'err' || data.status === 'ERROR') {
-          global.addAlert('danger', 'Unable to update ' + app.docId);
+          global.addAlert('danger', 'Unable to update ' + app.docid);
           app.updating = false;
           return;
         }
         if (data.message.success.length === 0) {
-          global.addAlert('danger', 'Unable to update ' + app.docId);
+          global.addAlert('danger', 'Unable to update ' + app.docid);
           app.updating = false;
           return;
         }
@@ -96,7 +96,7 @@ app.component('appList', {
 
           data.message.forEach(function(newApp) {
             var oldAppIndex = ctrl.apps.findIndex(function(elem) {
-              return elem.docId === newApp.docId
+              return elem.docid === newApp.docid
             });
             if (oldAppIndex === -1) return;
             updateApp(ctrl.apps[oldAppIndex]);
@@ -107,14 +107,14 @@ app.component('appList', {
 
 
     ctrl.delete = function(app) {
-      api.remove(app.docId, function(data) {
+      api.remove(app.docid, function(data) {
         if (data.status === 'SUCCESS') {
           var i = ctrl.apps.findIndex(function(elem) {
-            return elem.docId === app.docId;
+            return elem.docid === app.docid;
           });
           ctrl.apps.splice(i, 1);
         } else {
-          global.addAlert('danger', 'Unable to delete ' + app.docId);
+          global.addAlert('danger', 'Unable to delete ' + app.docid);
         }
       });
     };
@@ -262,7 +262,7 @@ app.component('searchView', {
         if (data.status === 'SUCCESS') {
           if (data.message.success.length === 0) {
             app.downloading = false;
-            global.addAlert('warning', app.docId + ' can\'t be downloaded');
+            global.addAlert('warning', app.docid + ' can\'t be downloaded');
             return;
           }
         }
