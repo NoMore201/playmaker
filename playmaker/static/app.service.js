@@ -79,11 +79,11 @@ angular.module('playmaker').service('api', ['$http', '$location', 'global', func
 
   this.download = function(app, callback) {
     var requestData = {
-      download: [app[0]]
+      download: [app]
     };
     $http({
       method: 'POST',
-      url: '/api/',
+      url: '/api/download',
       data: JSON.stringify(requestData)
     }).then(function success(response) {
         callback(response.data);
