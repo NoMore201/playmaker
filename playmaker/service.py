@@ -315,6 +315,7 @@ class Play(object):
                 print('Package %s does not exits' % docid)
                 unavail.append(docid)
                 continue
+            print('Downloading %s' % docid)
             try:
                 if details.get('offer')[0].get('micros') == 0:
                     data_gen = self.service.download(docid, appDetails['versionCode'])
@@ -358,6 +359,7 @@ class Play(object):
             toUpdate = []
             for app in self.currentSet:
                 details = self.details(app.get('docid'))
+                #print(details)
                 detailss = details.get('details')
                 appDetails = detailss.get('appDetails')
                 if details is None:
