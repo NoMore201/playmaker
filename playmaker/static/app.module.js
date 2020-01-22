@@ -159,13 +159,13 @@ app.component('appList', {
             }
           }
         }
-        if (a.images !== undefined) {
-          a.previewImage = a.images.filter(function(img) {
+        if (a.image !== undefined) {
+          a.previewImage = a.image.filter(function(img) {
             return img.imageType === 4;
           });
         }
-        if (a.installationSize !== undefined) {
-          a.formattedSize = a.installationSize / (1024*1024);
+        if (a.details.appDetails.installationSize !== undefined) {
+          a.formattedSize = a.details.appDetails.installationSize / (1024*1024);
           a.formattedSize = a.formattedSize.toFixed(2);
         }
         if (a.author === undefined) {
