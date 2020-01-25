@@ -9,8 +9,7 @@
   </div>
   <div ng-hide="!$ctrl.searching" id="search-progress" class="progress">
     <div class="progress-bar progress-bar-striped active" role="progressbar"
-    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style=
-    "width:100%">
+    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
       <span class="sr-only">Loading results</span>
     </div>
   </div><!-- progress -->
@@ -24,6 +23,7 @@
           <th>Id</th>
           <th>Version</th>
           <th>Size</th>
+          <th>Stars</th>
         </tr>
       </thead>
       <tbody id="table-body">
@@ -43,7 +43,8 @@
           <td>{{app.creator}}</td>
           <td>{{app.docid}}</td>
           <td>{{app.details.appDetails.versionCode}}</td>
-          <td>{{app.details.appDetails.file[0].size}}</td>
+          <td>{{ ((app.details.appDetails.file[0].size)/(1024*1024)).toFixed(2) }} MB</td>
+          <td>{{app.aggregateRating.starRating.toFixed(2)}} Stars</td>
         </tr>
       </tbody>
     </table>
@@ -56,8 +57,9 @@
       <div class="modal-body" id="modal-body">
         <strong>Id:</strong> {{app.docid}}<br>
         <strong>Developer:</strong> {{app.creator}}<br>
-        <strong>Size:</strong> {{app.details.appDetails.file[0].size}}<br>
-        <strong>Stars:</strong> {{app.aggregateRating.starRating}}
+        <strong>Version:</strong> {{app.details.appDetails.versionCode}}<br>
+        <strong>Size:</strong> {{ ((app.details.appDetails.file[0].size)/(1024*1024)).toFixed(2) }} MB<br>
+        <strong>Stars:</strong> {{app.aggregateRating.starRating.toFixed(2)}}
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" type="button" ng-click="$close()">Close</button>
