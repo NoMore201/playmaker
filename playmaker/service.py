@@ -306,8 +306,6 @@ class Play(object):
         for app in apps:
             docid = app.get('docid')
             details = self.details(docid)
-            detailss = details.get('details')
-            appDetails = detailss.get('appDetails')
             filename = app.get('filename')
             if filename is None:
                 filename = details.get('docid') + '.apk'
@@ -318,9 +316,9 @@ class Play(object):
             print('Downloading %s' % docid)
             try:
                 if details.get('offer')[0].get('micros') == 0:
-                    data_gen = self.service.download(docid, appDetails['versionCode'])
+                    data_gen = self.service.download(docid, details.get('details').get('appDetails')['versionCode'])
                 else:
-                    data_gen = self.service.delivery(docid, appDetails['versionCode'])
+                    data_gen = self.service.delivery(docid, details.get('details').get('appDetails')['versionCode'])
                 data_gen = data_gen.get('file').get('data')
             except IndexError as exc:
                 print(exc)
@@ -360,16 +358,14 @@ class Play(object):
             for app in self.currentSet:
                 details = self.details(app.get('docid'))
                 #print(details)
-                detailss = details.get('details')
-                appDetails = detailss.get('appDetails')
                 if details is None:
                     print('%s not available in Play Store' % app['docid'])
                     continue
                 details['filename'] = app.get('filename')
                 if self.debug:
                     print('Checking %s' % app['docid'])
-                    print('%d == %d ?' % (app['versionCode'], details['versionCode']))
-                if app['versionCode'] != details['versionCode']:
+                    print('%d == %d ?' % (app.get('details').get('appDetails')['versionCode'], details.get('details').get('appDetails')['versionCode']))
+                if app.get('details').get('appDetails')['versionCode'] !=  details.get('details').get('appDetails')['versionCode']:
                     toUpdate.append(details)
         return {'status': 'SUCCESS',
                 'message': toUpdate}
