@@ -28,9 +28,9 @@ RUN wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip \
 RUN mkdir /opt/android-sdk-linux
 ENV ANDROID_HOME=/opt/android-sdk-linux
 ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "platforms;android-26" \
-    && tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "build-tools;26.0.1" \
-    && rm -rf tools
+RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose --install "platforms;android-28" "build-tools;28.0.3"
+#RUN echo 'y' | tools/bin/sdkmanager --sdk_root=/opt/android-sdk-linux --verbose "build-tools;29.0.2"
+RUN echo 'y' | rm -rf tools
 
 RUN mkdir -p /data/fdroid/repo && \
     mkdir -p /opt/playmaker
@@ -39,6 +39,7 @@ COPY README.md setup.py pm-server /opt/playmaker/
 ADD playmaker /opt/playmaker/playmaker
 
 WORKDIR /opt/playmaker
+RUN pip3 install --upgrade pip
 RUN pip3 install . && \
     cd /opt && rm -rf playmaker && \
     sed -i 's/\"sdk_version\"/#\"sdk_version\"/g' /usr/local/lib/python3.7/site-packages/gpapi/config.py
