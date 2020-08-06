@@ -43,8 +43,6 @@ RUN mkdir -p /data/fdroid/repo && \
 
 COPY README.md setup.py pm-server /opt/playmaker/
 COPY playmaker /opt/playmaker/playmaker
-RUN rm -rf /usr/bin/apksigner
-COPY apksigner /usr/bin/apksigner
 
 WORKDIR /opt/playmaker
 RUN pip3 install . && \
