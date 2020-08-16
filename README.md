@@ -68,10 +68,10 @@ docker run -d --name playmaker \
     -v /srv/fdroid:/data/fdroid \
     -e HTTPS_CERTFILE="/srv/https.crt" \
     -e HTTPS_KEYFILE="/srv/https.key" \
-    -e LANG_LOCALE="it_IT" \
-    -e LANG_TIMEZONE="Europe/Rome" \
+    -e LANG_LOCALE="de_DE" \
+    -e LANG_TIMEZONE="Europe/Berlin" \
     -e DEVICE_CODE="hammerhead" \
-    nomore201/playmaker
+    fellek/playmaker:fellek
 ```
 
 If you want to run it in a virtualenv rather than using docker, remember that you need to install fdroidserver,

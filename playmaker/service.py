@@ -36,11 +36,11 @@ def get_details_from_apk(apk, downloadPath, service):
         except RequestError as e:
             print('Cannot fetch information for %s' % a.package)
             print('Extracting basic information from package...')
-            return {'docId': a.package,
+            return {'docid': a.package,
                     'filename': apk,
                     'versionCode': int(a.version_code),
                     'title': a.application}
-        print('Added %s to cache' % details['docId'])
+        print('Added %s to cache' % details['docid'])
     return details
 
 
@@ -245,17 +245,17 @@ class Play(object):
 
     def insert_app_into_state(self, newApp):
         found = False
-        result = list(filter(lambda x: x['docId'] == newApp['docId'],
+        result = list(filter(lambda x: x['docid'] == newApp['docid'],
                              self.currentSet))
         if len(result) > 0:
             found = True
             if self.debug:
-                print('%s is already cached, updating..' % newApp['docId'])
+                print('%s is already cached, updating..' % newApp['docid'])
                 i = self.currentSet.index(result[0])
                 self.currentSet[i] = newApp
         if not found:
             if self.debug:
-                print('Adding %s into cache..' % newApp['docId'])
+                print('Adding %s into cache..' % newApp['docid'])
             self.currentSet.append(newApp)
 
     def search(self, appName, numItems=15):
@@ -263,7 +263,7 @@ class Play(object):
             return {'status': 'UNAUTHORIZED'}
 
         try:
-            apps = self.service.search(appName, numItems, None)
+            apps = self.service.search(appName)
         except RequestError as e:
             print(e)
             self.loggedIn = False
@@ -304,11 +304,11 @@ class Play(object):
         unavail = []
 
         for app in apps:
-            docid = app.get('docId')
+            docid = app.get('docid')
             details = self.details(docid)
             filename = app.get('filename')
             if filename is None:
-                filename = details.get('docId') + '.apk'
+                filename = details.get('docid') + '.apk'
             if details is None:
                 print('Package %s does not exits' % docid)
                 unavail.append(docid)
@@ -316,9 +316,9 @@ class Play(object):
             print('Downloading %s' % docid)
             try:
                 if details.get('offer')[0].get('micros') == 0:
-                    data_gen = self.service.download(docid, details['versionCode'])
+                    data_gen = self.service.download(docid, details.get('details').get('appDetails')['versionCode'])
                 else:
-                    data_gen = self.service.delivery(docid, details['versionCode'])
+                    data_gen = self.service.delivery(docid, details.get('details').get('appDetails')['versionCode'])
                 data_gen = data_gen.get('file').get('data')
             except IndexError as exc:
                 print(exc)
@@ -356,24 +356,25 @@ class Play(object):
         else:
             toUpdate = []
             for app in self.currentSet:
-                details = self.details(app.get('docId'))
+                details = self.details(app.get('docid'))
+                #print(details)
                 if details is None:
-                    print('%s not available in Play Store' % app['docId'])
+                    print('%s not available in Play Store' % app['docid'])
                     continue
                 details['filename'] = app.get('filename')
                 if self.debug:
-                    print('Checking %s' % app['docId'])
-                    print('%d == %d ?' % (app['versionCode'], details['versionCode']))
-                if app['versionCode'] != details['versionCode']:
+                    print('Checking %s' % app['docid'])
+                    print('%d == %d ?' % (app.get('details').get('appDetails')['versionCode'], details.get('details').get('appDetails')['versionCode']))
+                if app.get('details').get('appDetails')['versionCode'] !=  details.get('details').get('appDetails')['versionCode']:
                     toUpdate.append(details)
         return {'status': 'SUCCESS',
                 'message': toUpdate}
 
-    def remove_local_app(self, docId):
+    def remove_local_app(self, docid):
         if not self.loggedIn:
             return {'status': 'UNAUTHORIZED'}
         # get app from cache
-        app = list(filter(lambda x: x['docId'] == docId, self.currentSet))
+        app = list(filter(lambda x: x['docid'] == docid, self.currentSet))
         if len(app) < 1:
             return {'status': 'ERROR'}
         apkPath = os.path.join(self.download_path, app[0]['filename'])
